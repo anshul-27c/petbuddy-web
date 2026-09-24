@@ -45,6 +45,13 @@ Checks:
 npm run lint
 ```
 
+Deploying to Railway: `railway.json` builds with `npm run build` and starts
+`next start` on the port Railway assigns. Set one variable on the service,
+`NEXT_PUBLIC_API_URL=https://${{petbuddy-backend.RAILWAY_PUBLIC_DOMAIN}}`
+(the API service's name inside `${{…}}`), and add this service's domain to
+the API's `CORS_ORIGIN`. The value is baked in at build time, so redeploy
+after changing it.
+
 ## Page map
 
 Public:
