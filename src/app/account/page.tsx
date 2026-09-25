@@ -3,14 +3,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { LogOut, Trash2, UserRound } from "lucide-react";
 import { useId, useState, type FormEvent } from "react";
-import { AccountNav } from "@/components/account/account-nav";
+import { AccountShell } from "@/components/account/account-nav";
 import { useAuth } from "@/components/auth/auth-provider";
 import { RequireAuth } from "@/components/auth/require-auth";
 import { useSignOutAndLeave } from "@/components/layout/account-menu";
-import { Container, PageHeader } from "@/components/layout/container";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardTitle } from "@/components/ui/card";
 import { Dialog } from "@/components/ui/dialog";
 import { ChoiceCard, TextField } from "@/components/ui/field";
 import { ErrorNotice } from "@/components/ui/notice";
@@ -66,7 +65,7 @@ function ProfileForm({ user }: { user: UserProfile }) {
   const mapped = isApiError(save.error) && hasErrors({ ...save.error.fieldErrors });
 
   return (
-    <form onSubmit={submit} noValidate className="space-y-5">
+    <form onSubmit={submit} noValidate className="space-y-6">
       <TextField
         label="Name"
         value={name}
@@ -87,8 +86,8 @@ function ProfileForm({ user }: { user: UserProfile }) {
       />
       <fieldset>
         <legend className="text-sm font-semibold">Language</legend>
-        <p className="text-small text-ink-muted">Used for app screens and messages. This website is in English.</p>
-        <div className="mt-2 grid gap-2 sm:grid-cols-2">
+        <p className="mt-1 text-small text-ink-muted">Used for app screens and messages. This website is in English.</p>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <ChoiceCard
             name={languageName}
             value="en"
@@ -105,12 +104,14 @@ function ProfileForm({ user }: { user: UserProfile }) {
             description="Hindi"
           />
         </div>
-        {errors.languageCode ? <p className="mt-1.5 text-small font-medium text-alert">{errors.languageCode}</p> : null}
+        {errors.languageCode ? <p className="mt-2 text-small font-medium text-alert">{errors.languageCode}</p> : null}
       </fieldset>
       {save.error && !mapped ? <ErrorNotice error={save.error} /> : null}
-      <Button type="submit" loading={save.isPending}>
-        Save profile
-      </Button>
+      <div className="flex justify-end border-t border-hairline pt-5">
+        <Button type="submit" loading={save.isPending}>
+          Save profile
+        </Button>
+      </div>
     </form>
   );
 }
@@ -129,15 +130,16 @@ function DeleteAccount() {
   });
 
   return (
-    <Card>
-      <h2 className="text-title font-semibold">Delete account</h2>
-      <p className="mt-1 text-sm text-ink-muted">
-        Removes your personal details and signs you out everywhere. You cannot delete it while a booking is
-        requested, confirmed or under way.
-      </p>
+    <Card className="flex flex-wrap items-center justify-between gap-4 border-alert/20">
+      <div className="min-w-0 max-w-xl">
+        <CardTitle>Delete account</CardTitle>
+        <p className="mt-1 text-sm text-ink-muted">
+          Removes your personal details and signs you out everywhere. You cannot delete it while a booking is
+          requested, confirmed or under way.
+        </p>
+      </div>
       <Button
-        variant="outline"
-        className="mt-4 text-alert"
+        variant="danger-outline"
         onClick={() => {
           remove.reset();
           setOpen(true);
@@ -177,16 +179,14 @@ function Account() {
   const signOutAndLeave = useSignOutAndLeave();
   const user = me.data?.user;
   return (
-    <Container width="medium">
-      <PageHeader title="Your account" />
-      <AccountNav />
-      <div className="mt-6 space-y-6">
+    <AccountShell title="Your account">
+      <div className="grid grid-cols-1 gap-3 sm:gap-4">
         {me.isError && !user ? (
           <ErrorState error={me.error} onRetry={() => void me.refetch()} retrying={me.isFetching} />
         ) : user ? (
           <>
             <Card>
-              <div className="mb-6 flex items-center gap-4">
+              <div className="mb-6 flex items-center gap-4 border-b border-hairline pb-6">
                 <Avatar
                   name={user.name?.trim() || "You"}
                   size="lg"
@@ -194,15 +194,15 @@ function Account() {
                 />
                 <div className="min-w-0">
                   <p className="truncate text-title font-semibold">{user.name?.trim() || "Add your name"}</p>
-                  <p className="text-sm text-ink-muted">{formatPhone(user.phone)}</p>
+                  <p className="mt-1 text-sm text-ink-muted">{formatPhone(user.phone)}</p>
                 </div>
               </div>
               <ProfileForm user={user} />
             </Card>
-            <Card className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <h2 className="text-title font-semibold">Sign out</h2>
-                <p className="text-sm text-ink-muted">You can sign back in with a code sent to your phone.</p>
+            <Card className="flex flex-wrap items-center justify-between gap-4">
+              <div className="min-w-0">
+                <CardTitle>Sign out</CardTitle>
+                <p className="mt-1 text-sm text-ink-muted">You can sign back in with a code sent to your phone.</p>
               </div>
               <Button variant="outline" onClick={() => void signOutAndLeave()} icon={<LogOut className="size-4" aria-hidden />}>
                 Sign out
@@ -214,7 +214,7 @@ function Account() {
           <CardSkeleton lines={4} />
         )}
       </div>
-    </Container>
+    </AccountShell>
   );
 }
 

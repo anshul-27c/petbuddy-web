@@ -4,9 +4,9 @@ import { useQuery } from "@tanstack/react-query";
 import { ChevronRight, Package } from "lucide-react";
 import Link from "next/link";
 import { RequireAuth } from "@/components/auth/require-auth";
-import { AccountNav } from "@/components/account/account-nav";
-import { Container, PageHeader } from "@/components/layout/container";
+import { AccountShell } from "@/components/account/account-nav";
 import { ButtonLink } from "@/components/ui/button";
+import { IconTile } from "@/components/ui/icon-tile";
 import { Money } from "@/components/ui/money";
 import { ListSkeleton } from "@/components/ui/skeleton";
 import { EmptyState, QueryView } from "@/components/ui/states";
@@ -15,6 +15,7 @@ import { api } from "@/lib/api";
 import { formatDate } from "@/lib/format";
 import { qk } from "@/lib/query-keys";
 import { PageTitle } from "@/components/layout/page-title";
+import { Reveal, revealItem } from "@/components/ui/motion";
 
 function Orders() {
   const orders = useQuery({ queryKey: qk.orders, queryFn: api.store.orders });
@@ -33,34 +34,39 @@ function Orders() {
       }
     >
       {(list) => (
-        <ul className="space-y-3">
-          {list.map((order) => {
+        <Reveal as="ul" className="grid grid-cols-1 gap-3 sm:gap-4">
+          {list.map((order, index) => {
             const items = order.items.reduce((sum, item) => sum + item.quantity, 0);
             return (
-              <li key={order.id}>
+              <li key={order.id} {...revealItem(index)}>
                 <Link
                   href={`/orders/${order.id}`}
-                  className="flex items-center gap-4 rounded-card border border-hairline bg-surface p-4 transition-colors hover:border-ink-faint sm:p-5"
+                  className="lift group flex items-center gap-4 rounded-card border border-hairline bg-surface p-4 shadow-card hover:border-ink-faint sm:p-5"
                 >
-                  <span className="flex size-11 shrink-0 items-center justify-center rounded-field bg-sky text-leash">
-                    <Package className="size-5" aria-hidden />
+                  <span className="hidden sm:block">
+                    <IconTile size="lg">
+                      <Package />
+                    </IconTile>
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="font-semibold">Order {order.code}</p>
+                      <p className="text-title font-semibold">Order {order.code}</p>
                       <OrderStatusPill status={order.status} />
                     </div>
-                    <p className="mt-0.5 text-sm text-ink-muted">
+                    <p className="mt-1 text-sm text-ink-muted">
                       {formatDate(order.placedAt)} · {items} {items === 1 ? "item" : "items"}
                     </p>
                   </div>
                   <Money paise={order.totalPaise} className="font-semibold" />
-                  <ChevronRight className="size-5 shrink-0 text-ink-muted" aria-hidden />
+                  <ChevronRight
+                    className="size-5 shrink-0 text-ink-faint transition-transform duration-150 group-hover:translate-x-1"
+                    aria-hidden
+                  />
                 </Link>
               </li>
             );
           })}
-        </ul>
+        </Reveal>
       )}
     </QueryView>
   );
@@ -71,13 +77,9 @@ export default function OrdersPage() {
     <>
       <PageTitle title={"Store orders"} />
       <RequireAuth>
-        <Container width="medium">
-          <PageHeader title="Store orders" />
-          <AccountNav />
-          <div className="mt-6">
-            <Orders />
-          </div>
-        </Container>
+        <AccountShell title="Store orders">
+          <Orders />
+        </AccountShell>
       </RequireAuth>
     </>
   );

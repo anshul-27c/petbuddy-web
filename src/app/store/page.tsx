@@ -19,6 +19,9 @@ import { CATEGORY_LABELS, CATEGORY_ORDER } from "@/lib/labels";
 import { qk } from "@/lib/query-keys";
 import type { ProductCategory } from "@/lib/types";
 import { PageTitle } from "@/components/layout/page-title";
+import { CategoryIcon } from "@/components/ui/icons";
+import { Reveal, revealItem } from "@/components/ui/motion";
+import { cn } from "@/lib/utils";
 
 function Store() {
   const params = useSearchParams();
@@ -56,43 +59,52 @@ function Store() {
         subtitle="Food, treats, toys and grooming supplies, delivered to your door."
         action={
           status === "signedIn" ? (
-            <Button variant="tonal" onClick={openCart} icon={<ShoppingBag className="size-4" aria-hidden />}>
-              Basket{count > 0 ? ` (${count})` : ""}
-            </Button>
+            // Phones already have the header basket and the bottom bar.
+            <div className="hidden sm:block">
+              <Button variant="tonal" onClick={openCart} icon={<ShoppingBag className="size-4" aria-hidden />}>
+                Basket{count > 0 ? ` (${count})` : ""}
+              </Button>
+            </div>
           ) : null
         }
       />
 
-      <div className="max-w-xl">
-        <SearchBox
-          key={resetKey}
-          initial={q}
-          onSearch={(value) => setParams({ q: value })}
-          label="Search the store"
-          placeholder="Search food, toys, brands"
-        />
-      </div>
-
-      <div
-        className="scrollbar-none relative -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 pb-1 sm:-mx-6 sm:px-6 md:mx-0 md:flex-wrap md:px-0"
-        role="group"
-        aria-label="Categories"
-      >
-        <Chip selected={category === null} onClick={() => setParams({ category: null })}>
-          All
-        </Chip>
-        {CATEGORY_ORDER.map((key) => (
-          <Chip key={key} selected={category === key} onClick={() => setParams({ category: key })}>
-            {CATEGORY_LABELS[key]}
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between lg:gap-6">
+        <div className="lg:order-2 lg:w-80 lg:shrink-0">
+          <SearchBox
+            key={resetKey}
+            initial={q}
+            onSearch={(value) => setParams({ q: value })}
+            label="Search the store"
+            placeholder="Search food, toys, brands"
+          />
+        </div>
+        <div
+          className="rail gap-2 pb-1 lg:order-1 lg:mx-0 lg:flex-wrap lg:overflow-visible lg:px-0 lg:pb-0"
+          role="group"
+          aria-label="Categories"
+        >
+          <Chip selected={category === null} onClick={() => setParams({ category: null })}>
+            All
           </Chip>
-        ))}
+          {CATEGORY_ORDER.map((key) => (
+            <Chip
+              key={key}
+              selected={category === key}
+              onClick={() => setParams({ category: key })}
+              icon={<CategoryIcon category={key} className="size-4" />}
+            >
+              {CATEGORY_LABELS[key]}
+            </Chip>
+          ))}
+        </div>
       </div>
 
-      <div className="mt-6">
+      <div className="mt-6 sm:mt-8">
         <QueryView
           query={products}
           loading={
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4" role="status" aria-label="Loading products">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4" role="status" aria-label="Loading products">
               {Array.from({ length: 8 }, (_, i) => (
                 <ProductCardSkeleton key={i} />
               ))}
@@ -120,26 +132,36 @@ function Store() {
           }
         >
           {(list) => (
-            <ul
-              className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4"
+            <Reveal
+              as="ul"
+              className={cn(
+                "grid grid-cols-2 gap-3 transition-opacity sm:gap-4 md:grid-cols-3 lg:grid-cols-4",
+                products.isFetching && "opacity-70",
+              )}
               aria-busy={products.isFetching}
             >
-              {list.map((product) => (
-                <li key={product.id}>
+              {list.map((product, index) => (
+                <li key={product.id} className="flex" {...revealItem(index)}>
                   <ProductCard product={product} quantity={byProduct.get(product.id) ?? 0} />
                 </li>
               ))}
-            </ul>
+            </Reveal>
           )}
         </QueryView>
       </div>
 
       {status === "signedIn" && count > 0 ? (
-        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-hairline bg-surface/95 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur md:hidden">
-          <Button block size="lg" onClick={openCart} icon={<ShoppingBag className="size-5" aria-hidden />}>
-            View basket ({count} {count === 1 ? "item" : "items"})
-          </Button>
-        </div>
+        <>
+          {/* Reserves the bar's 80 px so the last row is never under it. */}
+          <div aria-hidden className="pb-bar md:hidden" />
+          <div className="fixed inset-x-0 bottom-0 z-30 animate-sheet-in bg-surface/90 shadow-[0_-1px_0_var(--color-hairline)] pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden">
+            <div className="container-page flex h-20 items-center">
+              <Button block size="lg" sheen onClick={openCart} icon={<ShoppingBag className="size-5" aria-hidden />}>
+                View basket ({count} {count === 1 ? "item" : "items"})
+              </Button>
+            </div>
+          </div>
+        </>
       ) : null}
     </Container>
   );

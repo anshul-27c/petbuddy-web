@@ -1,5 +1,6 @@
 import { CalendarCheck, CircleCheck, Clock3, Footprints, MapPinned, XCircle } from "lucide-react";
 import type { ReactNode } from "react";
+import { IconTile } from "@/components/ui/icon-tile";
 import { Money } from "@/components/ui/money";
 import { formatDayTime, formatTime } from "@/lib/format";
 import { CANCELLED_BY_LABELS, firstName } from "@/lib/labels";
@@ -18,20 +19,19 @@ function Shell({
   children: ReactNode;
 }) {
   return (
-    <div className="flex gap-4 rounded-card border border-hairline bg-surface p-4 sm:p-5">
-      <span
-        className={cn(
-          "flex size-11 shrink-0 items-center justify-center rounded-full [&_svg]:size-5",
-          tone === "amber" && "bg-amber-soft text-amber",
-          tone === "leash" && "bg-sky text-leash-dark",
-          tone === "trail" && "bg-trail-soft text-trail",
-          tone === "alert" && "bg-alert-soft text-alert",
-        )}
-        aria-hidden
-      >
+    <div
+      className={cn(
+        "flex gap-4 rounded-card border bg-surface p-4 shadow-card sm:p-5",
+        tone === "amber" && "border-amber/25",
+        tone === "leash" && "border-leash/25",
+        tone === "trail" && "border-trail/25",
+        tone === "alert" && "border-alert/25",
+      )}
+    >
+      <IconTile size="lg" tone={tone}>
         {icon}
-      </span>
-      <div className="min-w-0">
+      </IconTile>
+      <div className="min-w-0 pt-1">
         <h2 className="text-title font-semibold">{title}</h2>
         <div className="mt-1 space-y-1 text-sm text-ink-muted">{children}</div>
       </div>

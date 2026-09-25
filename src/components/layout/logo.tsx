@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 /** The two white paws on the brand tile, with the wordmark set in Fraunces. */
 export function Logo({ className, tone = "ink" }: { className?: string; tone?: "ink" | "light" }) {
   return (
-    <Link href="/" className={cn("inline-flex items-center gap-2.5 rounded-field", className)} aria-label="PetBuddy home">
+    <Link href="/" className={cn("inline-flex items-center gap-3 rounded-field", className)} aria-label="PetBuddy home">
       <LogoMark />
       <span className={cn("font-display text-[1.375rem] font-semibold tracking-tight", tone === "light" ? "text-surface" : "text-ink")}>
         PetBuddy

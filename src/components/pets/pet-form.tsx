@@ -142,7 +142,7 @@ export function PetForm({
   const unmappedError = save.error && !hasErrors(serverErrors(save.error)) ? save.error : null;
 
   return (
-    <form onSubmit={submit} noValidate className="space-y-5">
+    <form onSubmit={submit} noValidate className="space-y-6">
       <TextField
         label="Name"
         value={draft.name}
@@ -155,7 +155,7 @@ export function PetForm({
 
       <fieldset>
         <legend className="text-sm font-semibold">Species</legend>
-        <div className="mt-2 flex flex-wrap gap-2">
+        <div className="mt-3 flex flex-wrap gap-2">
           {SPECIES_ORDER.map((species) => (
             <Chip
               key={species}
@@ -167,7 +167,7 @@ export function PetForm({
             </Chip>
           ))}
         </div>
-        {errors.species ? <p className="mt-1.5 text-small font-medium text-alert">{errors.species}</p> : null}
+        {errors.species ? <p className="mt-2 text-small font-medium text-alert">{errors.species}</p> : null}
       </fieldset>
 
       <TextField
@@ -182,7 +182,7 @@ export function PetForm({
 
       <fieldset>
         <legend className="text-sm font-semibold">Age</legend>
-        <div className="mt-1.5 grid grid-cols-2 gap-3">
+        <div className="mt-2 grid grid-cols-2 gap-3">
           <TextField
             label="Years"
             inputMode="numeric"
@@ -200,7 +200,7 @@ export function PetForm({
             invalid={Boolean(errors.age)}
           />
         </div>
-        {errors.age ? <p className="mt-1.5 text-small font-medium text-alert">{errors.age}</p> : null}
+        {errors.age ? <p className="mt-2 text-small font-medium text-alert">{errors.age}</p> : null}
       </fieldset>
 
       <TextField
@@ -214,8 +214,8 @@ export function PetForm({
 
       <fieldset>
         <legend className="text-sm font-semibold">Temperament</legend>
-        <p className="text-small text-ink-muted">Pick any that fit. Carers read this before they accept.</p>
-        <div className="mt-2 flex flex-wrap gap-2">
+        <p className="mt-1 text-small text-ink-muted">Pick any that fit. Carers read this before they accept.</p>
+        <div className="mt-3 flex flex-wrap gap-2">
           {TEMPERAMENT_ORDER.map((trait) => {
             const on = draft.temperament.includes(trait);
             return (
@@ -236,7 +236,7 @@ export function PetForm({
         </div>
       </fieldset>
 
-      <div className="rounded-field border border-hairline p-3.5">
+      <div className="rounded-field border border-hairline bg-mist p-4">
         <Toggle
           label="Vaccinations up to date"
           checked={draft.vaccinated}

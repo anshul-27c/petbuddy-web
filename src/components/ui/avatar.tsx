@@ -9,6 +9,8 @@ const SIZES = {
   md: "size-11 text-sm",
   lg: "size-14 text-body",
   xl: "size-18 text-title",
+  // The profile hero: 72 px on phones, 96 px from 640 px up.
+  hero: "size-18 text-title sm:size-24 sm:text-headline",
 } as const;
 
 /** Initials on the brand tint. An icon can stand in for pets. */
@@ -30,7 +32,7 @@ export function Avatar({
       <span
         aria-hidden
         className={cn(
-          "inline-flex items-center justify-center rounded-full bg-sky font-bold text-leash-dark",
+          "inline-flex items-center justify-center rounded-full bg-linear-to-br from-sky to-leash-tint font-bold text-leash-dark ring-1 ring-leash/10",
           SIZES[size],
         )}
       >

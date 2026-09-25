@@ -63,3 +63,8 @@ export function SpeciesIcon({ species, className }: { species: PetSpecies; class
   const Icon = SPECIES_ICONS[species] ?? PawPrint;
   return <Icon className={className} aria-hidden />;
 }
+
+export function CategoryIcon({ category, className }: { category: ProductCategory; className?: string }) {
+  const Icon = CATEGORY_ICONS[category] ?? PawPrint;
+  return <Icon className={className} aria-hidden />;
+}

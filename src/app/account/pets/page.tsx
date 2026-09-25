@@ -3,9 +3,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { PawPrint, Plus } from "lucide-react";
 import { useState } from "react";
-import { AccountNav } from "@/components/account/account-nav";
+import { AccountShell, AddTile } from "@/components/account/account-nav";
 import { RequireAuth } from "@/components/auth/require-auth";
-import { Container, PageHeader } from "@/components/layout/container";
 import { PetCard } from "@/components/pets/pet-card";
 import { PetForm } from "@/components/pets/pet-form";
 import { Button } from "@/components/ui/button";
@@ -19,6 +18,7 @@ import { usePets } from "@/lib/queries";
 import { qk } from "@/lib/query-keys";
 import type { Pet } from "@/lib/types";
 import { PageTitle } from "@/components/layout/page-title";
+import { Reveal, revealItem } from "@/components/ui/motion";
 
 function Pets() {
   const pets = usePets();
@@ -37,21 +37,19 @@ function Pets() {
   });
 
   return (
-    <Container width="medium">
-      <PageHeader
-        title="Your pets"
-        action={
-          <Button onClick={() => setEditing("new")} icon={<Plus className="size-4" aria-hidden />}>
-            Add a pet
-          </Button>
-        }
-      />
-      <AccountNav />
-      <div className="mt-6">
+    <AccountShell
+      title="Your pets"
+      action={
+        <Button onClick={() => setEditing("new")} icon={<Plus className="size-4" aria-hidden />}>
+          Add a pet
+        </Button>
+      }
+    >
+      <div>
         <QueryView
           query={pets}
           loading={
-            <div className="grid gap-4 sm:grid-cols-2" role="status" aria-label="Loading pets">
+            <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2" role="status" aria-label="Loading pets">
               <CardSkeleton />
               <CardSkeleton />
             </div>
@@ -67,9 +65,9 @@ function Pets() {
           }
         >
           {(list) => (
-            <ul className="grid gap-4 sm:grid-cols-2">
-              {list.map((pet) => (
-                <li key={pet.id}>
+            <Reveal as="ul" className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
+              {list.map((pet, index) => (
+                <li key={pet.id} className="flex" {...revealItem(index)}>
                   <PetCard
                     pet={pet}
                     onEdit={() => setEditing(pet)}
@@ -80,7 +78,13 @@ function Pets() {
                   />
                 </li>
               ))}
-            </ul>
+              {list.length % 2 === 1 ? (
+                // Completes the last row of the two-column grid.
+                <li className="hidden md:flex" {...revealItem(list.length)}>
+                  <AddTile label="Add a pet" onClick={() => setEditing("new")} icon={<PawPrint />} />
+                </li>
+              ) : null}
+            </Reveal>
           )}
         </QueryView>
       </div>
@@ -114,7 +118,7 @@ function Pets() {
         pending={remove.isPending}
         error={remove.error}
       />
-    </Container>
+    </AccountShell>
   );
 }
 

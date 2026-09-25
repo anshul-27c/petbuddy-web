@@ -27,16 +27,16 @@ export function ConfirmedBanner({
     <section
       role="status"
       aria-labelledby="booked-title"
-      className="relative rounded-card border-2 border-trail bg-surface p-5 sm:p-6"
+      className="relative animate-rise-in overflow-hidden rounded-panel border border-trail/30 bg-linear-to-br from-surface via-surface to-trail-soft p-5 shadow-card sm:p-6"
     >
       <IconButton label="Dismiss" onClick={onDismiss} className="absolute top-2 right-2">
         <X className="size-5" aria-hidden />
       </IconButton>
-      <div className="flex items-start gap-4 pr-8">
-        <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-trail-soft text-trail">
+      <div className="flex items-start gap-4 pr-10">
+        <span className="flex size-12 shrink-0 animate-pop-in items-center justify-center rounded-full bg-trail text-surface shadow-float">
           <CircleCheck className="size-6" aria-hidden />
         </span>
-        <div>
+        <div className="min-w-0">
           <h2 id="booked-title" className="font-display text-headline font-semibold">
             Booked
           </h2>
@@ -46,10 +46,10 @@ export function ConfirmedBanner({
           </p>
         </div>
       </div>
-      <h3 className="mt-5 text-sm font-semibold">What happens next</h3>
-      <ol className="mt-2 grid gap-3 sm:grid-cols-3">
+      <h3 className="mt-6 text-sm font-semibold">What happens next</h3>
+      <ol className="mt-3 grid gap-3 sm:grid-cols-3">
         {NEXT_STEPS(first).map((text, index) => (
-          <li key={text} className="flex gap-3 rounded-field bg-canvas p-3 text-sm">
+          <li key={text} className="flex gap-3 rounded-field border border-hairline bg-surface p-4 text-sm shadow-card">
             <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-sky text-label font-bold text-leash-dark">
               {index + 1}
             </span>

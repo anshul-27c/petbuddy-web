@@ -18,7 +18,7 @@ export function Money({
   const text = formatMoney(paise);
   if (strike) {
     return (
-      <s className={cn("tabular-nums text-ink-faint", className)}>
+      <s className={cn("tabular-nums text-ink-muted", className)}>
         <span className="sr-only">Was </span>
         {text}
       </s>

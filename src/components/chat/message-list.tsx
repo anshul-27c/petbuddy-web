@@ -49,8 +49,10 @@ export function MessageList({ messages, className }: { messages: ChatMessage[]; 
           return (
             <Fragment key={message.id}>
               {newDay ? (
-                <li className="py-2 text-center text-label font-semibold text-ink-muted" aria-hidden>
-                  {formatDay(message.at)}
+                <li className="flex justify-center py-2" aria-hidden>
+                  <span className="rounded-full bg-surface px-3 py-1 text-label font-semibold text-ink-muted shadow-card">
+                    {formatDay(message.at)}
+                  </span>
                 </li>
               ) : null}
               {message.isSystem ? (
@@ -62,10 +64,10 @@ export function MessageList({ messages, className }: { messages: ChatMessage[]; 
                 <li className={cn("flex", message.fromMe ? "justify-end" : "justify-start")}>
                   <div
                     className={cn(
-                      "max-w-[85%] rounded-card px-4 py-2.5 sm:max-w-[70%]",
+                      "max-w-[85%] animate-rise-in rounded-card px-4 py-3 sm:max-w-[70%]",
                       message.fromMe
-                        ? "rounded-br-md bg-leash text-surface"
-                        : "rounded-bl-md border border-hairline bg-surface text-ink",
+                        ? "rounded-br-md bg-linear-to-br from-leash to-leash-dark text-surface shadow-cta"
+                        : "rounded-bl-md border border-hairline bg-surface text-ink shadow-card",
                     )}
                   >
                     <span className="sr-only">{message.fromMe ? "You: " : "Them: "}</span>

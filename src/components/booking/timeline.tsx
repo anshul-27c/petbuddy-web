@@ -6,7 +6,7 @@ import type { TimelineEvent } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 function Dot({ kind }: { kind: TimelineEvent["kind"] }) {
-  const base = "relative z-10 flex size-8 shrink-0 items-center justify-center rounded-full";
+  const base = "relative z-10 flex size-8 shrink-0 items-center justify-center rounded-full ring-4 ring-surface";
   if (kind === "cancelled") {
     return (
       <span className={cn(base, "bg-alert-soft text-alert")}>
@@ -47,25 +47,28 @@ export function Timeline({ events }: { events: TimelineEvent[] }) {
   return (
     <ol className="relative">
       {events.map((event, index) => (
-        <li key={`${event.kind}-${event.at}-${index}`} className="relative flex gap-3 pb-5 last:pb-0">
+        <li key={`${event.kind}-${event.at}-${index}`} className="relative flex gap-4 pb-6 last:pb-0">
           {index < events.length - 1 ? (
-            <span aria-hidden className="absolute top-8 bottom-0 left-4 w-0.5 -translate-x-1/2 bg-hairline" />
+            <span
+              aria-hidden
+              className="absolute top-8 bottom-0 left-4 w-0.5 -translate-x-1/2 bg-linear-to-b from-leash-tint to-hairline"
+            />
           ) : null}
           <Dot kind={event.kind} />
           <div className="min-w-0 flex-1 pt-1">
             <p className="text-sm font-semibold">{TIMELINE_LABELS[event.kind] ?? "Update"}</p>
-            <p className="text-small text-ink-muted">
+            <p className="mt-1 text-small text-ink-muted">
               <time dateTime={event.at}>{formatDayTime(event.at)}</time>
             </p>
             {event.note ? (
-              <p className="mt-2 rounded-field bg-canvas px-3 py-2 text-sm whitespace-pre-line">{event.note}</p>
+              <p className="mt-2 rounded-field bg-mist px-3 py-2 text-sm whitespace-pre-line">{event.note}</p>
             ) : null}
             {event.photoUrl ? (
               <a
                 href={event.photoUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-2 block w-full max-w-xs overflow-hidden rounded-field border border-hairline"
+                className="mt-3 block w-full max-w-xs overflow-hidden rounded-field border border-hairline shadow-card transition-shadow duration-200 hover:shadow-lift"
               >
                 <Image
                   src={event.photoUrl}

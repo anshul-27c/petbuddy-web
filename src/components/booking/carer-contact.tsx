@@ -24,11 +24,13 @@ export function CarerContact({ booking }: { booking: Booking }) {
 
   return (
     <Card>
-      <Link href={`/carers/${booking.earner.id}`} className="flex items-center gap-3 rounded-field">
+      <Link href={`/carers/${booking.earner.id}`} className="group flex items-center gap-3 rounded-field">
         <Avatar name={booking.earner.name} size="lg" verified={booking.earner.idVerified} />
         <div className="min-w-0">
-          <p className="truncate font-semibold hover:underline">{booking.earner.name}</p>
-          <RatingInline rating={booking.earner.rating} count={booking.earner.reviewCount} />
+          <p className="truncate text-title font-semibold group-hover:underline">{booking.earner.name}</p>
+          <div className="mt-1">
+            <RatingInline rating={booking.earner.rating} count={booking.earner.reviewCount} />
+          </div>
         </div>
       </Link>
       <div className="mt-4 grid gap-2">
@@ -55,7 +57,7 @@ export function CarerContact({ booking }: { booking: Booking }) {
           {masked ? `Call ${masked}` : "Call"}
         </Button>
       </div>
-      <p id="call-note" className="mt-2 text-small text-ink-muted">
+      <p id="call-note" className="mt-3 text-small text-ink-muted">
         Calls use a masked number, so neither of you sees the other&apos;s. Calling works in the PetBuddy app, not on
         the website yet.
       </p>

@@ -53,7 +53,7 @@ export function Composer({
           onKeyDown={onKeyDown}
           rows={1}
           placeholder="Type a message"
-          className="field-sizing-content max-h-40 min-h-12 flex-1 resize-none rounded-field border border-hairline bg-surface px-3.5 py-3 text-body placeholder:text-ink-faint focus:border-leash focus:outline-2 focus:outline-offset-0 focus:outline-leash/30"
+          className="field-sizing-content focus-glow max-h-40 min-h-12 flex-1 resize-none rounded-field border border-hairline bg-surface px-4 py-3 text-body placeholder:text-ink-muted"
           aria-invalid={tooLong || undefined}
           aria-describedby={tooLong ? `${id}-long` : undefined}
         />
@@ -61,13 +61,13 @@ export function Composer({
           type="submit"
           disabled={!trimmed || tooLong || sending}
           aria-label="Send message"
-          className="inline-flex size-12 shrink-0 items-center justify-center rounded-field bg-leash text-surface transition-colors hover:bg-leash-dark disabled:opacity-50"
+          className="inline-flex size-12 shrink-0 items-center justify-center rounded-field bg-leash text-surface shadow-cta transition duration-150 hover:bg-leash-dark active:scale-95 disabled:opacity-50 disabled:shadow-none"
         >
           <SendHorizontal className="size-5" aria-hidden />
         </button>
       </div>
       {tooLong ? (
-        <p id={`${id}-long`} className="mt-1.5 text-small font-medium text-alert">
+        <p id={`${id}-long`} className="mt-2 text-small font-medium text-alert">
           Messages can be up to {MAX} characters. This one is {trimmed.length}.
         </p>
       ) : null}

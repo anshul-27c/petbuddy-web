@@ -1,8 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Languages, MapPin, UserX } from "lucide-react";
-import Link from "next/link";
+import { Languages, MapPin, Route, ShieldCheck, UserX } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { loginHref, useAuth } from "@/components/auth/auth-provider";
@@ -14,10 +13,11 @@ import { AllReviewsDialog, NoReviews, ReviewItem, ReviewSummaryBlock } from "@/c
 import { ServicePrices } from "@/components/carers/service-prices";
 import { TrustBlock } from "@/components/carers/trust-block";
 import { VerificationBadges } from "@/components/carers/verification-badges";
-import { Container } from "@/components/layout/container";
+import { Container, PageBack } from "@/components/layout/container";
 import { Avatar } from "@/components/ui/avatar";
 import { Button, ButtonLink } from "@/components/ui/button";
-import { Card, SectionTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
+import { SectionHeader } from "@/components/ui/section-header";
 import { Money } from "@/components/ui/money";
 import { Notice } from "@/components/ui/notice";
 import { CardSkeleton, Skeleton } from "@/components/ui/skeleton";
@@ -30,6 +30,7 @@ import { usePolicy } from "@/lib/queries";
 import { qk } from "@/lib/query-keys";
 import type { EarnerDetail } from "@/lib/types";
 import { PageTitle } from "@/components/layout/page-title";
+import { cn } from "@/lib/utils";
 
 function BookPanel({ earner }: { earner: EarnerDetail }) {
   const href = useBookHref(earner.id);
@@ -43,7 +44,7 @@ function BookPanel({ earner }: { earner: EarnerDetail }) {
       </div>
       <NextAvailable at={earner.nextAvailableAt} />
       {earner.isOnline ? (
-        <ButtonLink href={href} size="lg" block>
+        <ButtonLink href={href} size="lg" block sheen>
           Book {first}
         </ButtonLink>
       ) : (
@@ -51,29 +52,81 @@ function BookPanel({ earner }: { earner: EarnerDetail }) {
           Save them to your favourites and check back later, or find another carer.
         </Notice>
       )}
-      <p className="text-small text-ink-muted">
-        You see the full price before paying. Free cancellation up to {freeCancelHours}{" "}
-        {freeCancelHours === 1 ? "hour" : "hours"} before the visit.
+      <p className="flex gap-2 border-t border-hairline pt-4 text-small text-ink-muted">
+        <span className="flex h-[1lh] shrink-0 items-center" aria-hidden>
+          <ShieldCheck className="size-4 text-trail" />
+        </span>
+        <span>
+          You see the full price before paying. Free cancellation up to {freeCancelHours}{" "}
+          {freeCancelHours === 1 ? "hour" : "hours"} before the visit.
+        </span>
       </p>
     </Card>
   );
 }
 
+/** Fixed to the bottom on phones and tablets; the page reserves its 80 px (see `pb-bar`). */
 function MobileBookBar({ earner }: { earner: EarnerDetail }) {
   const href = useBookHref(earner.id);
   if (!earner.isOnline) return null;
   return (
-    <div className="fixed inset-x-0 bottom-0 z-30 border-t border-hairline bg-surface/95 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur lg:hidden">
-      <div className="mx-auto flex max-w-2xl items-center justify-between gap-3">
+    <div className="fixed inset-x-0 bottom-0 z-30 bg-surface/90 shadow-[0_-1px_0_var(--color-hairline)] pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden">
+      <div className="container-page flex h-20 items-center justify-between gap-3">
         <div className="min-w-0">
           <Money paise={earner.pricePerHourPaise} display suffix="/hr" className="text-title" />
-          <NextAvailable at={earner.nextAvailableAt} className="block truncate text-small" />
+          <NextAvailable at={earner.nextAvailableAt} size="xs" className="mt-1" />
         </div>
-        <ButtonLink href={href} size="lg" className="shrink-0">
+        <ButtonLink href={href} size="lg" sheen className="shrink-0">
           Book {firstName(earner.name)}
         </ButtonLink>
       </div>
     </div>
+  );
+}
+
+/** The top of the profile: a soft aurora cover, the avatar overlapping it, then name, rating and badges. */
+function ProfileHero({ earner }: { earner: EarnerDetail }) {
+  const { status } = useAuth();
+  return (
+    <section aria-labelledby="carer-name" className="overflow-hidden rounded-panel border border-hairline bg-surface shadow-card">
+      <div aria-hidden className="relative h-24 sm:h-32">
+        <div className="bg-aurora absolute inset-0" />
+        <div className="bg-dot-grid absolute inset-0" />
+      </div>
+      <div className="px-4 pb-5 sm:px-6 sm:pb-6">
+        <div className="-mt-10 flex items-end justify-between gap-3 sm:-mt-12">
+          <Avatar
+            name={earner.name}
+            size="hero"
+            verified={earner.idVerified}
+            className="rounded-full ring-4 ring-surface"
+          />
+          {status === "signedIn" ? (
+            <FavouriteButton
+              earnerId={earner.id}
+              name={earner.name}
+              isFavourite={earner.isFavourite}
+              className="-mr-2 border border-hairline bg-surface shadow-card"
+            />
+          ) : null}
+        </div>
+        <h1 id="carer-name" className="mt-4 font-display text-headline font-semibold sm:text-display">
+          {earner.name}
+        </h1>
+        <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink-muted">
+          <RatingInline rating={earner.rating} count={earner.reviewCount} />
+          <span className="inline-flex items-center gap-1">
+            <MapPin className="size-3.5" aria-hidden />
+            {earner.area}, {formatDistance(earner.distanceKm)}
+          </span>
+        </div>
+        {earner.idVerified || earner.policeVerified ? (
+          <div className="mt-4 flex flex-wrap gap-2">
+            <VerificationBadges idVerified={earner.idVerified} policeVerified={earner.policeVerified} />
+          </div>
+        ) : null}
+      </div>
+    </section>
   );
 }
 
@@ -85,63 +138,48 @@ function Profile({ earner }: { earner: EarnerDetail }) {
 
   return (
     <>
-      <div className="grid gap-8 pb-28 lg:grid-cols-[1fr_22rem] lg:pb-0">
-        <div className="min-w-0 space-y-8">
-          <div className="flex items-start gap-4">
-            <Avatar name={earner.name} size="xl" verified={earner.idVerified} />
-            <div className="min-w-0 flex-1">
-              <div className="flex items-start justify-between gap-2">
-                <h1 className="font-display text-headline font-semibold sm:text-display">{earner.name}</h1>
-                {status === "signedIn" ? (
-                  <FavouriteButton earnerId={earner.id} name={earner.name} isFavourite={earner.isFavourite} />
-                ) : null}
-              </div>
-              <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-ink-muted">
-                <RatingInline rating={earner.rating} count={earner.reviewCount} />
-                <span aria-hidden>·</span>
-                <span className="inline-flex items-center gap-1">
-                  <MapPin className="size-3.5" aria-hidden />
-                  {earner.area}, {formatDistance(earner.distanceKm)}
-                </span>
-              </div>
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                <VerificationBadges idVerified={earner.idVerified} policeVerified={earner.policeVerified} />
-              </div>
-            </div>
+      <div className={cn("grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-10", earner.isOnline && "pb-bar lg:pb-0")}>
+        <div className="stack-sections min-w-0">
+          <div className="space-y-4">
+            <ProfileHero earner={earner} />
+            {!earner.isOnline ? (
+              <Notice tone="warning" title={`${first} is not taking bookings right now`} className="lg:hidden">
+                Save them to your favourites and check back later, or find another carer.
+              </Notice>
+            ) : null}
           </div>
 
-          {!earner.isOnline ? (
-            <Notice tone="warning" title={`${first} is not taking bookings right now`} className="lg:hidden">
-              Save them to your favourites and check back later, or find another carer.
-            </Notice>
-          ) : null}
-
           <section aria-labelledby="trust">
-            <SectionTitle id="trust" title={`Why people book ${first}`} />
+            <SectionHeader id="trust" title={`Why people book ${first}`} />
             <TrustBlock earner={earner} />
           </section>
 
           <section aria-labelledby="about">
-            <SectionTitle id="about" title="About" />
+            <SectionHeader id="about" title="About" />
             <Card>
               <p className="whitespace-pre-line">{earner.about || `${first} has not written an introduction yet.`}</p>
-              {earner.languages.length ? (
-                <p className="mt-4 flex items-center gap-2 text-sm text-ink-muted">
-                  <Languages className="size-4" aria-hidden />
-                  Speaks {earner.languages.join(", ")}
+              <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 border-t border-hairline pt-4 text-sm text-ink-muted">
+                {earner.languages.length ? (
+                  <p className="flex items-center gap-2">
+                    <Languages className="size-4" aria-hidden />
+                    Speaks {earner.languages.join(", ")}
+                  </p>
+                ) : null}
+                <p className="flex items-center gap-2">
+                  <Route className="size-4" aria-hidden />
+                  Travels up to {earner.serviceRadiusKm} km for visits.
                 </p>
-              ) : null}
-              <p className="mt-2 text-sm text-ink-muted">Travels up to {earner.serviceRadiusKm} km for visits.</p>
+              </div>
             </Card>
           </section>
 
           <section aria-labelledby="services">
-            <SectionTitle id="services" title="Services and prices" subtitle="Price of one booking at the usual length." />
+            <SectionHeader id="services" title="Services and prices" subtitle="Price of one booking at the usual length." />
             <ServicePrices earner={earner} />
           </section>
 
           <section aria-labelledby="availability">
-            <SectionTitle
+            <SectionHeader
               id="availability"
               title="Availability"
               subtitle={earner.isOnline ? "Pick a time to start booking it." : "The next two weeks."}
@@ -161,13 +199,13 @@ function Profile({ earner }: { earner: EarnerDetail }) {
           </section>
 
           <section aria-labelledby="reviews">
-            <SectionTitle id="reviews" title="Reviews" />
+            <SectionHeader id="reviews" title="Reviews" />
             {earner.reviewSummary.total === 0 ? (
               <NoReviews />
             ) : (
               <Card>
                 <ReviewSummaryBlock summary={earner.reviewSummary} />
-                <div className="mt-4 divide-y divide-hairline border-t border-hairline">
+                <div className="mt-5 divide-y divide-hairline border-t border-hairline">
                   {earner.recentReviews.map((review) => (
                     <ReviewItem key={review.id} review={review} carerFirstName={first} />
                   ))}
@@ -202,19 +240,19 @@ function Profile({ earner }: { earner: EarnerDetail }) {
 
 function ProfileSkeleton() {
   return (
-    <div className="grid gap-8 lg:grid-cols-[1fr_22rem]" role="status" aria-label="Loading carer">
-      <div className="space-y-6">
-        <div className="flex items-center gap-4">
-          <Skeleton className="size-18 rounded-full" />
-          <div className="flex-1 space-y-2">
-            <Skeleton className="h-7 w-1/2" />
-            <Skeleton className="h-4 w-1/3" />
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-10" role="status" aria-label="Loading carer">
+      <div className="space-y-10">
+        <div className="overflow-hidden rounded-panel border border-hairline bg-surface">
+          <Skeleton className="h-24 rounded-none sm:h-32" />
+          <div className="px-4 pb-5 sm:px-6 sm:pb-6">
+            <Skeleton className="-mt-10 size-18 rounded-full ring-4 ring-surface sm:-mt-12 sm:size-24" />
+            <Skeleton className="mt-4 h-8 w-1/2" />
+            <Skeleton className="mt-2 h-4 w-1/3" />
           </div>
         </div>
-        <CardSkeleton />
         <CardSkeleton lines={4} />
       </div>
-      <Skeleton className="hidden h-56 rounded-card lg:block" />
+      <Skeleton className="hidden h-64 rounded-card lg:block" />
     </div>
   );
 }
@@ -226,14 +264,8 @@ export default function CarerProfilePage() {
   return (
     <>
       <PageTitle title={query.data?.name ?? "Carer"} />
-      <Container className="pt-4 sm:pt-6">
-        <Link
-          href="/carers"
-          className="mb-4 inline-flex min-h-11 items-center gap-2 rounded-field text-sm font-semibold text-leash-dark hover:underline"
-        >
-          <ArrowLeft className="size-4" aria-hidden />
-          All carers
-        </Link>
+      <Container>
+        <PageBack href="/carers">All carers</PageBack>
         {query.data ? (
           <Profile earner={query.data} />
         ) : query.isError ? (

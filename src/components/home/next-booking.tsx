@@ -3,6 +3,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { BookingCard } from "@/components/booking/booking-card";
 import { useAuth } from "@/components/auth/auth-provider";
+import { Reveal } from "@/components/ui/motion";
+import { SectionHeader } from "@/components/ui/section-header";
 import { api } from "@/lib/api";
 import { qk } from "@/lib/query-keys";
 
@@ -16,11 +18,11 @@ export function NextBooking() {
   });
   if (!query.data) return null;
   return (
-    <section aria-labelledby="next-booking" className="mt-8">
-      <h2 id="next-booking" className="mb-3 text-title font-semibold">
-        Your next booking
-      </h2>
-      <BookingCard booking={query.data} pinned />
+    <section aria-labelledby="next-booking">
+      <SectionHeader id="next-booking" eyebrow="Upcoming" title="Your next booking" />
+      <Reveal self>
+        <BookingCard booking={query.data} pinned />
+      </Reveal>
     </section>
   );
 }

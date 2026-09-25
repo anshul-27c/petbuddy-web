@@ -1,11 +1,12 @@
 "use client";
 
-import { ChevronDown } from "lucide-react";
+import { Check, ChevronDown } from "lucide-react";
 import { useId, type ComponentProps, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
+/** Inputs share one look: 48 px tall, 16 px inset, and a soft leash halo on focus. */
 const CONTROL =
-  "w-full rounded-field border bg-surface px-3.5 text-body text-ink placeholder:text-ink-faint transition-colors focus:border-leash focus:outline-2 focus:outline-offset-0 focus:outline-leash/30 disabled:bg-canvas disabled:text-ink-faint";
+  "w-full rounded-field border bg-surface px-4 text-body text-ink shadow-card placeholder:text-ink-muted transition duration-150 ease-out hover:border-ink-faint focus-glow disabled:bg-canvas disabled:text-ink-faint";
 
 function describedBy(id: string, error: string | undefined, hint: ReactNode) {
   if (error) return `${id}-error`;
@@ -26,7 +27,7 @@ interface ShellProps {
 
 function FieldShell({ id, label, hint, error, optional, className, children, hideLabel }: ShellProps) {
   return (
-    <div className={cn("flex flex-col gap-1.5", className)}>
+    <div className={cn("flex flex-col gap-2", className)}>
       <label htmlFor={id} className={cn("text-sm font-semibold text-ink", hideLabel && "sr-only")}>
         {label}
         {optional ? <span className="font-normal text-ink-muted"> (optional)</span> : null}
@@ -80,7 +81,7 @@ export function TextField({
         CONTROL,
         "h-12",
         error || invalid ? "border-alert" : "border-hairline",
-        leading ? "pl-16" : "",
+        leading ? "pl-18" : "",
         className,
       )}
       {...rest}
@@ -98,7 +99,7 @@ export function TextField({
     >
       {leading ? (
         <div className="relative">
-          <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center border-r border-hairline px-3.5 text-body font-semibold text-ink-muted">
+          <span className="pointer-events-none absolute inset-y-0 left-0 z-10 flex w-14 items-center justify-center border-r border-hairline text-body font-semibold text-ink-muted">
             {leading}
           </span>
           {input}
@@ -169,7 +170,7 @@ export function SelectField({
           {children}
         </select>
         <ChevronDown
-          className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-ink-muted"
+          className="pointer-events-none absolute top-1/2 right-4 size-4 -translate-y-1/2 text-ink-muted"
           aria-hidden
         />
       </div>
@@ -177,7 +178,7 @@ export function SelectField({
   );
 }
 
-/** An on/off switch built on a checkbox. */
+/** An on/off switch built on a checkbox: a pill track and a thumb that springs across. */
 export function Toggle({
   label,
   description,
@@ -196,7 +197,7 @@ export function Toggle({
     <div className="flex min-h-11 items-center justify-between gap-4">
       <label htmlFor={id} className="min-w-0 cursor-pointer">
         <span className="block text-body font-medium text-ink">{label}</span>
-        {description ? <span className="block text-small text-ink-muted">{description}</span> : null}
+        {description ? <span className="mt-1 block text-small text-ink-muted">{description}</span> : null}
       </label>
       <span className="relative inline-flex shrink-0">
         <input
@@ -206,15 +207,15 @@ export function Toggle({
           checked={checked}
           disabled={disabled}
           onChange={(event) => onChange(event.target.checked)}
-          className="peer absolute inset-0 z-10 size-full cursor-pointer opacity-0"
+          className="peer absolute inset-0 z-10 size-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
         />
         <span
           aria-hidden
-          className="h-7 w-12 rounded-full bg-hairline transition-colors peer-checked:bg-leash peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-leash peer-disabled:opacity-50"
+          className="h-7 w-12 rounded-full bg-hairline shadow-[inset_0_1px_2px_rgb(14_32_56/0.12)] transition-colors duration-200 peer-checked:bg-leash peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-leash peer-disabled:opacity-50"
         />
         <span
           aria-hidden
-          className="absolute top-1 left-1 size-5 rounded-full bg-surface shadow-float transition-transform peer-checked:translate-x-5"
+          className="absolute top-1 left-1 size-5 rounded-full bg-surface shadow-float transition-transform duration-300 ease-spring peer-checked:translate-x-5"
         />
       </span>
     </div>
@@ -246,8 +247,11 @@ export function ChoiceCard({
   return (
     <label
       className={cn(
-        "flex min-h-14 cursor-pointer items-center gap-3 rounded-field border p-3.5 transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-leash",
-        checked ? "border-leash bg-sky" : "border-hairline bg-surface hover:border-ink-faint",
+        "flex min-h-16 cursor-pointer items-center gap-3 rounded-field border p-4 transition duration-150 ease-out",
+        "has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-leash",
+        checked
+          ? "border-leash bg-sky shadow-[inset_0_0_0_1px_var(--color-leash)]"
+          : "border-hairline bg-surface shadow-card hover:border-ink-faint",
         disabled && "cursor-not-allowed opacity-60",
       )}
     >
@@ -263,8 +267,8 @@ export function ChoiceCard({
       {icon ? (
         <span
           className={cn(
-            "flex size-10 shrink-0 items-center justify-center rounded-full [&_svg]:size-5",
-            checked ? "bg-surface text-leash" : "bg-canvas text-leash",
+            "flex size-10 shrink-0 items-center justify-center rounded-field text-leash transition-colors [&_svg]:size-5",
+            checked ? "bg-surface" : "bg-sky",
           )}
           aria-hidden
         >
@@ -273,17 +277,17 @@ export function ChoiceCard({
       ) : null}
       <span className="min-w-0 flex-1">
         <span className="block text-body font-semibold text-ink">{title}</span>
-        {description ? <span className="block text-small text-ink-muted">{description}</span> : null}
+        {description ? <span className="mt-1 block text-small text-ink-muted">{description}</span> : null}
       </span>
       {trailing ? <span className="shrink-0">{trailing}</span> : null}
       <span
         aria-hidden
         className={cn(
-          "flex size-5 shrink-0 items-center justify-center rounded-full border-2",
-          checked ? "border-leash" : "border-ink-faint",
+          "flex size-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors duration-150",
+          checked ? "border-leash bg-leash" : "border-ink-faint bg-surface",
         )}
       >
-        {checked ? <span className="size-2.5 rounded-full bg-leash" /> : null}
+        {checked ? <Check className="size-3 animate-pop-in text-surface" strokeWidth={4} /> : null}
       </span>
     </label>
   );

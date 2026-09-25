@@ -4,6 +4,7 @@ import { CalendarClock, MapPin, PawPrint, Sparkles } from "lucide-react";
 import type { ReactNode } from "react";
 import { Avatar } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
+import { IconTile } from "@/components/ui/icon-tile";
 import { Money } from "@/components/ui/money";
 import { RatingInline } from "@/components/ui/stars";
 import { formatSlot } from "@/lib/format";
@@ -11,13 +12,13 @@ import type { Address, Earner, Pet } from "@/lib/types";
 
 function Line({ icon, label, value }: { icon: ReactNode; label: string; value: ReactNode }) {
   return (
-    <div className="flex gap-3">
-      <span className="mt-0.5 text-ink-muted [&_svg]:size-4" aria-hidden>
+    <div className="flex items-start gap-3">
+      <IconTile size="sm" tone={value ? "leash" : "muted"}>
         {icon}
-      </span>
+      </IconTile>
       <div className="min-w-0">
         <dt className="text-small text-ink-muted">{label}</dt>
-        <dd className="text-sm font-medium">{value ?? <span className="text-ink-faint">Not chosen yet</span>}</dd>
+        <dd className="mt-1 text-sm font-medium">{value ?? <span className="text-ink-muted">Not chosen yet</span>}</dd>
       </div>
     </div>
   );
@@ -47,11 +48,11 @@ export function BookingSummary({
       <div className="flex items-center gap-3">
         <Avatar name={earner.name} verified={earner.idVerified} />
         <div className="min-w-0">
-          <p className="truncate font-semibold">{earner.name}</p>
-          <RatingInline rating={earner.rating} count={earner.reviewCount} />
+          <p className="truncate text-title font-semibold">{earner.name}</p>
+          <RatingInline rating={earner.rating} count={earner.reviewCount} className="mt-1" />
         </div>
       </div>
-      <dl className="mt-4 space-y-3 border-t border-hairline pt-4">
+      <dl className="mt-4 space-y-4 border-t border-hairline pt-4">
         <Line icon={<Sparkles />} label="Service" value={serviceLabel} />
         <Line icon={<PawPrint />} label="Pet" value={pet?.name ?? null} />
         <Line icon={<CalendarClock />} label="When" value={start && end ? formatSlot(start, end) : null} />

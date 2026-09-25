@@ -34,7 +34,7 @@ export function SearchBox({
       <label htmlFor={id} className="sr-only">
         {label}
       </label>
-      <Search className="pointer-events-none absolute top-1/2 left-3.5 size-5 -translate-y-1/2 text-ink-muted" aria-hidden />
+      <Search className="pointer-events-none absolute top-1/2 left-4 z-10 size-5 -translate-y-1/2 text-ink-muted" aria-hidden />
       <input
         id={id}
         type="search"
@@ -42,7 +42,7 @@ export function SearchBox({
         onChange={(event) => setValue(event.target.value)}
         placeholder={placeholder}
         autoComplete="off"
-        className="h-12 w-full rounded-field border border-hairline bg-surface pr-11 pl-11 text-body placeholder:text-ink-faint focus:border-leash focus:outline-2 focus:outline-offset-0 focus:outline-leash/30 [&::-webkit-search-cancel-button]:hidden"
+        className="focus-glow h-12 w-full rounded-field border border-hairline bg-surface pr-12 pl-12 text-body shadow-card transition duration-150 ease-out placeholder:text-ink-muted hover:border-ink-faint [&::-webkit-search-cancel-button]:hidden"
       />
       {value ? (
         <button
@@ -51,7 +51,7 @@ export function SearchBox({
             setValue("");
             onSearch("");
           }}
-          className="absolute top-1/2 right-1 inline-flex size-10 -translate-y-1/2 items-center justify-center rounded-full text-ink-muted hover:bg-canvas"
+          className="absolute top-1/2 right-1 z-10 inline-flex size-10 -translate-y-1/2 items-center justify-center rounded-full text-ink-muted transition duration-150 hover:bg-canvas active:scale-95"
           aria-label="Clear search"
         >
           <X className="size-4" aria-hidden />

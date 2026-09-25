@@ -100,7 +100,7 @@ function PickerBody({
   return (
     <div>
       <div
-        className="scrollbar-none relative -mx-4 flex snap-x gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0"
+        className="scrollbar-none fade-x-end relative flex snap-x snap-mandatory gap-2 overflow-x-auto pb-1"
         role="group"
         aria-label="Pick a day"
       >
@@ -116,21 +116,21 @@ function PickerBody({
               aria-label={`${parts.long}, ${free === 0 ? "fully booked" : `${free} ${free === 1 ? "slot" : "slots"} free`}`}
               onClick={() => setChosenDay(index)}
               className={cn(
-                "flex w-16 shrink-0 snap-start flex-col items-center rounded-field border py-2.5 transition-colors",
+                "flex w-16 shrink-0 snap-start flex-col items-center rounded-field border py-3 transition duration-150 ease-out active:scale-95",
                 active
-                  ? "border-leash bg-leash text-surface"
+                  ? "border-leash bg-leash text-surface shadow-cta"
                   : free > 0
-                    ? "border-hairline bg-surface text-ink hover:border-ink-faint"
+                    ? "border-hairline bg-surface text-ink shadow-card hover:border-leash"
                     : "border-hairline bg-canvas text-ink-faint",
               )}
             >
               <span className={cn("text-label font-semibold", active ? "text-surface" : free ? "text-ink-muted" : "")}>
                 {parts.weekday}
               </span>
-              <span className="mt-0.5 text-title font-bold tabular-nums">{parts.day}</span>
+              <span className="mt-1 text-title font-bold tabular-nums">{parts.day}</span>
               <span
                 className={cn(
-                  "mt-0.5 text-label font-semibold",
+                  "mt-1 text-label font-semibold",
                   active ? "text-surface" : free ? "text-trail" : "text-ink-faint",
                 )}
               >
@@ -143,7 +143,7 @@ function PickerBody({
 
       <h3 className="mt-5 text-sm font-semibold text-ink">{availabilityDayParts(day.date).long}</h3>
       {openCount(day) === 0 ? (
-        <p className="mt-2 rounded-field bg-canvas px-4 py-3 text-sm text-ink-muted">
+        <p className="mt-3 rounded-field bg-canvas px-4 py-3 text-sm text-ink-muted">
           No free slots that day. Try another day.
         </p>
       ) : (
@@ -165,11 +165,11 @@ function PickerBody({
                         aria-pressed={active}
                         onClick={() => onSelect(slot)}
                         className={cn(
-                          "min-h-11 rounded-field border px-2 text-sm font-semibold tabular-nums transition-colors",
+                          "min-h-11 rounded-field border px-2 text-sm font-semibold tabular-nums transition duration-150 ease-out",
                           active
-                            ? "border-leash bg-leash text-surface"
+                            ? "border-leash bg-leash text-surface shadow-cta"
                             : slot.available
-                              ? "border-hairline bg-surface text-ink hover:border-leash"
+                              ? "border-hairline bg-surface text-ink shadow-card hover:border-leash hover:text-leash-dark active:scale-95"
                               : "cursor-not-allowed border-hairline bg-canvas font-medium text-ink-faint line-through",
                         )}
                       >

@@ -147,11 +147,13 @@ export function AddressForm({
   const unmappedError = save.error && !hasErrors(serverErrors(save.error)) ? save.error : null;
 
   return (
-    <form onSubmit={submit} noValidate className="space-y-4">
-      <div className="rounded-field border border-hairline bg-canvas p-3.5">
+    <form onSubmit={submit} noValidate className="space-y-5">
+      <div className="rounded-field border border-hairline bg-mist p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="flex min-w-0 items-start gap-2 text-sm">
-            <MapPin className="mt-0.5 size-4 shrink-0 text-leash" aria-hidden />
+            <span className="flex h-5 shrink-0 items-center" aria-hidden>
+              <MapPin className="size-4 text-leash" />
+            </span>
             <span aria-live="polite">
               {location.kind === "current"
                 ? "Using your current location for the map pin."
@@ -205,7 +207,7 @@ export function AddressForm({
         error={errors.line2}
         autoComplete="address-line2"
       />
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <TextField
           label="Area"
           value={values.area}
@@ -221,7 +223,7 @@ export function AddressForm({
           autoComplete="address-level2"
         />
       </div>
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <TextField
           label="Pincode"
           inputMode="numeric"

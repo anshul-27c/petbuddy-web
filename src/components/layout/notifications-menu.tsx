@@ -51,12 +51,12 @@ export function NotificationsMenu() {
         <button
           type="button"
           {...props}
-          className="relative inline-flex size-11 items-center justify-center rounded-full text-ink hover:bg-canvas"
+          className="relative inline-flex size-11 items-center justify-center rounded-full text-ink transition duration-150 hover:bg-canvas active:scale-95"
           aria-label={unread > 0 ? `Notifications, ${unread} unread` : "Notifications"}
         >
           <Bell className="size-5" aria-hidden />
           {unread > 0 ? (
-            <span className="absolute top-1.5 right-1.5 inline-flex min-w-4.5 items-center justify-center rounded-full bg-alert px-1 text-[0.625rem] leading-4.5 font-bold text-surface">
+            <span className="absolute top-1 right-1 inline-flex animate-pop-in ring-2 ring-surface min-w-4.5 items-center justify-center rounded-full bg-alert px-1 text-[0.625rem] leading-4.5 font-bold text-surface">
               {unread > 9 ? "9+" : unread}
             </span>
           ) : null}
@@ -85,7 +85,7 @@ export function NotificationsMenu() {
                   error={query.error}
                   onRetry={() => void query.refetch()}
                   retrying={query.isFetching}
-                  className="border-0"
+                  bare
                 />
               ) : (
                 <div className="space-y-3 p-2" role="status" aria-label="Loading">
@@ -115,7 +115,7 @@ export function NotificationsMenu() {
                       <button
                         type="button"
                         className={cn(
-                          "flex w-full gap-3 rounded-field p-3 text-left hover:bg-canvas",
+                          "flex w-full gap-3 rounded-field p-3 text-left transition-colors duration-150 hover:bg-canvas",
                           isUnread && "bg-sky/60",
                         )}
                         onClick={() => {
@@ -124,19 +124,19 @@ export function NotificationsMenu() {
                           if (href) router.push(href);
                         }}
                       >
-                        <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-sky text-leash">
+                        <span className="flex size-8 shrink-0 items-center justify-center rounded-[10px] bg-sky text-leash">
                           <KindIcon kind={notification.kind} />
                         </span>
                         <span className="min-w-0 flex-1">
                           <span className="flex items-start justify-between gap-2">
                             <span className="text-sm font-semibold">{notification.title}</span>
                             {isUnread ? (
-                              <span className="mt-1.5 size-2 shrink-0 rounded-full bg-leash">
+                              <span className="mt-2 size-2 shrink-0 rounded-full bg-leash">
                                 <span className="sr-only">Unread</span>
                               </span>
                             ) : null}
                           </span>
-                          <span className="mt-0.5 block text-sm text-ink-muted">{notification.body}</span>
+                          <span className="mt-1 block text-sm text-ink-muted">{notification.body}</span>
                           <span className="mt-1 block text-small text-ink-muted">
                             {formatAgo(notification.createdAt)}
                           </span>

@@ -15,6 +15,8 @@ import { api } from "@/lib/api";
 import { qk } from "@/lib/query-keys";
 import type { BookingScope } from "@/lib/types";
 import { PageTitle } from "@/components/layout/page-title";
+import { Reveal, revealItem } from "@/components/ui/motion";
+import { SectionHeader } from "@/components/ui/section-header";
 
 function BookingList({ scope }: { scope: BookingScope }) {
   const query = useQuery({ queryKey: qk.bookings(scope), queryFn: () => api.bookings.list(scope) });
@@ -22,7 +24,7 @@ function BookingList({ scope }: { scope: BookingScope }) {
     <QueryView
       query={query}
       loading={
-        <div className="space-y-3" role="status" aria-label="Loading bookings">
+        <div className="grid grid-cols-1 gap-3 sm:gap-4" role="status" aria-label="Loading bookings">
           {[0, 1, 2].map((i) => (
             <BookingCardSkeleton key={i} />
           ))}
@@ -48,36 +50,34 @@ function BookingList({ scope }: { scope: BookingScope }) {
     >
       {(bookings) =>
         scope === "upcoming" ? (
-          <div className="space-y-8">
+          <div className="stack-sections">
             <section aria-labelledby="soonest">
-              <h2 id="soonest" className="mb-3 text-title font-semibold">
-                Your next booking
-              </h2>
-              <BookingCard booking={bookings[0]} pinned />
+              <SectionHeader id="soonest" title="Your next booking" />
+              <Reveal self>
+                <BookingCard booking={bookings[0]} pinned />
+              </Reveal>
             </section>
             {bookings.length > 1 ? (
               <section aria-labelledby="later">
-                <h2 id="later" className="mb-3 text-title font-semibold">
-                  Later
-                </h2>
-                <ul className="space-y-3">
-                  {bookings.slice(1).map((booking) => (
-                    <li key={booking.id}>
+                <SectionHeader id="later" title="Later" />
+                <Reveal as="ul" className="grid grid-cols-1 gap-3 sm:gap-4">
+                  {bookings.slice(1).map((booking, index) => (
+                    <li key={booking.id} {...revealItem(index)}>
                       <BookingCard booking={booking} />
                     </li>
                   ))}
-                </ul>
+                </Reveal>
               </section>
             ) : null}
           </div>
         ) : (
-          <ul className="space-y-3">
-            {bookings.map((booking) => (
-              <li key={booking.id}>
+          <Reveal as="ul" className="grid grid-cols-1 gap-3 sm:gap-4">
+            {bookings.map((booking, index) => (
+              <li key={booking.id} {...revealItem(index)}>
                 <BookingCard booking={booking} />
               </li>
             ))}
-          </ul>
+          </Reveal>
         )
       }
     </QueryView>
@@ -88,10 +88,14 @@ function Bookings() {
   const params = useSearchParams();
   const scope: BookingScope = params.get("tab") === "past" ? "past" : "upcoming";
   return (
-    <Container width="medium">
+    <Container>
       <PageHeader
         title="Bookings"
-        action={<ButtonLink href="/carers" variant="tonal">Book a visit</ButtonLink>}
+        action={
+          <ButtonLink href="/carers" variant="tonal" icon={<CalendarPlus className="size-4" aria-hidden />}>
+            Book a visit
+          </ButtonLink>
+        }
       />
       <LinkTabs
         label="Booking lists"
@@ -101,7 +105,7 @@ function Bookings() {
           { key: "past", label: "Past", href: "/bookings?tab=past" },
         ]}
       />
-      <div className="mt-6">
+      <div className="mt-8">
         <BookingList key={scope} scope={scope} />
       </div>
     </Container>

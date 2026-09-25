@@ -6,6 +6,7 @@ import { AddressForm } from "@/components/addresses/address-form";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ChoiceCard, TextArea, TextField } from "@/components/ui/field";
+import { IconTile } from "@/components/ui/icon-tile";
 import { ListSkeleton } from "@/components/ui/skeleton";
 import { QueryView } from "@/components/ui/states";
 import { Pill } from "@/components/ui/status-pill";
@@ -34,23 +35,23 @@ export function WhereStep({
   const [adding, setAdding] = useState(false);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <fieldset>
-        <legend className="text-subhead font-bold">Where should {carerName} come?</legend>
-        <div className="mt-4">
+        <legend className="font-display text-subhead font-semibold sm:text-headline">Where should {carerName} come?</legend>
+        <div className="mt-4 sm:mt-5">
           <QueryView
             query={addresses}
             loading={<ListSkeleton count={2} />}
             isEmpty={(list) => list.length === 0}
             empty={
               <Card>
-                <div className="mb-4 flex items-center gap-3">
-                  <span className="flex size-10 items-center justify-center rounded-full bg-sky text-leash">
-                    <MapPin className="size-5" aria-hidden />
-                  </span>
+                <div className="mb-5 flex items-center gap-3">
+                  <IconTile>
+                    <MapPin />
+                  </IconTile>
                   <div>
-                    <p className="font-semibold">Add your address</p>
-                    <p className="text-sm text-ink-muted">Where your pet is, so your carer can find you.</p>
+                    <p className="text-title font-semibold">Add your address</p>
+                    <p className="mt-1 text-sm text-ink-muted">Where your pet is, so your carer can find you.</p>
                   </div>
                 </div>
                 <AddressForm isFirst onSaved={(address) => onAddress(address.id)} submitLabel="Save address" />
@@ -58,7 +59,7 @@ export function WhereStep({
             }
           >
             {(list) => (
-              <div className="grid gap-2">
+              <div className="grid grid-cols-1 gap-3">
                 {list.map((address) => (
                   <ChoiceCard
                     key={address.id}
@@ -81,8 +82,8 @@ export function WhereStep({
                   />
                 ))}
                 {adding ? (
-                  <Card className="mt-2">
-                    <h3 className="mb-4 text-title font-semibold">Add an address</h3>
+                  <Card>
+                    <h3 className="mb-5 text-title font-semibold">Add an address</h3>
                     <AddressForm
                       onSaved={(address) => {
                         onAddress(address.id);
@@ -94,7 +95,7 @@ export function WhereStep({
                 ) : (
                   <Button
                     variant="ghost"
-                    className="justify-self-start"
+                    className="-ml-4 justify-self-start"
                     onClick={() => setAdding(true)}
                     icon={<Plus className="size-4" aria-hidden />}
                   >
@@ -107,7 +108,7 @@ export function WhereStep({
         </div>
       </fieldset>
 
-      <div className="grid gap-4 sm:grid-cols-[14rem_1fr]">
+      <div className="grid grid-cols-1 gap-4 rounded-card border border-hairline bg-surface p-4 shadow-card sm:grid-cols-[14rem_1fr] sm:p-5">
         <TextField
           label="Gate or door code"
           optional

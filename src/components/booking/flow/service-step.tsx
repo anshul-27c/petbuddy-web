@@ -21,9 +21,9 @@ export function ServiceStep({
   const catalogue = useServiceCatalogue();
   return (
     <fieldset>
-      <legend className="text-subhead font-bold">What do you need?</legend>
-      <p className="mt-1 text-sm text-ink-muted">Prices are for one booking at the usual length.</p>
-      <div className="mt-4 grid gap-2">
+      <legend className="font-display text-subhead font-semibold sm:text-headline">What do you need?</legend>
+      <p className="mt-2 text-body text-ink-muted">Prices are for one booking at the usual length.</p>
+      <div className="mt-4 grid gap-3 sm:mt-5">
         {earner.services.map((key) => {
           const service = catalogue.get(key);
           const price = earner.prices[key];

@@ -44,34 +44,39 @@ const ORDER_TONES: Record<OrderStatus, PillTone> = {
   cancelled: "alert",
 };
 
+/** A status in a soft tinted capsule. `live` adds a pulsing ring to the dot. */
 export function Pill({
   tone,
   children,
   dot = true,
+  live = false,
   className,
 }: {
   tone: PillTone;
   children: ReactNode;
   dot?: boolean;
+  live?: boolean;
   className?: string;
 }) {
   return (
     <span
       className={cn(
-        "inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-label font-semibold whitespace-nowrap",
+        "inline-flex shrink-0 items-center gap-2 rounded-full px-3 py-1 text-label font-semibold whitespace-nowrap",
         TONES[tone],
         className,
       )}
     >
-      {dot ? <span className="size-1.5 rounded-full bg-current" aria-hidden /> : null}
+      {dot ? <span className={cn("size-1.5 rounded-full bg-current", live && "pulse-dot")} aria-hidden /> : null}
       {children}
     </span>
   );
 }
 
+const LIVE_STATUSES = new Set<BookingStatus>(["onTheWay", "inProgress"]);
+
 export function BookingStatusPill({ status, className }: { status: BookingStatus; className?: string }) {
   return (
-    <Pill tone={BOOKING_TONES[status]} className={className}>
+    <Pill tone={BOOKING_TONES[status]} live={LIVE_STATUSES.has(status)} className={className}>
       {BOOKING_STATUS_LABELS[status]}
     </Pill>
   );

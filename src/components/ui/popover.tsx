@@ -67,7 +67,7 @@ export function Popover({
         id={panelId}
         hidden={!open}
         className={cn(
-          "z-50 rounded-card border border-hairline bg-surface shadow-float",
+          "z-50 origin-top-right animate-rise-in rounded-card border border-hairline bg-surface shadow-float",
           panelClassName ?? "absolute top-full right-0 mt-2 w-72 p-2",
         )}
       >

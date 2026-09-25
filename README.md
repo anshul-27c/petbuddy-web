@@ -111,6 +111,16 @@ src/
     (`src/lib/payments/razorpay.ts`). This path has not been run against a
     live key yet.
   Closing either without paying is treated as "cancelled" and changes nothing.
-- **Design tokens** (colours, radii, type sizes, the floating shadow) are
+- **Design tokens** (colours, radii, type sizes, shadows, easing) are
   Tailwind v4 `@theme` tokens in `src/app/globals.css`; the default palette is
-  cleared so only these colours exist.
+  cleared so only these colours exist. The same file documents the 4-point
+  spacing scale and defines the layout utilities that apply it
+  (`container-page`, `stack-sections`, `stack-landing`, `rail`, `pb-bar`).
+- **Layout primitives**: `Container`, `PageHeader` and `PageBack`
+  (`components/layout/container.tsx`), `SectionHeader` (the one section title
+  style), `Card`/`CardTitle` and `IconTile`. `components/ui/grid.ts` picks
+  column spans and item counts so grids never end on a half-empty row.
+- **Motion** is decoration and switches off with `prefers-reduced-motion`:
+  `Reveal`/`CountUp` (`components/ui/motion.tsx`) and `ShaderBackdrop`, whose
+  WebGL code (`lib/aurora-gl.ts`) loads only on the pages that use it, pauses
+  off-screen and in hidden tabs, and falls back to a CSS gradient.

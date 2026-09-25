@@ -16,13 +16,13 @@ function Row({ label, paise, negative = false }: { label: string; paise: number;
 /** Every line of what is charged. Never collapsed to a single number. */
 export function PriceBreakdown({ price, serviceLabel }: { price: Price; serviceLabel?: string }) {
   return (
-    <dl className="space-y-2">
+    <dl className="space-y-3">
       <Row label={serviceLabel ? `Service: ${serviceLabel}` : "Service"} paise={price.servicePaise} />
       <Row label="Platform fee" paise={price.platformFeePaise} />
       <Row label="Taxes (GST on the platform fee)" paise={price.taxesPaise} />
       {price.tipPaise > 0 ? <Row label="Tip for your carer" paise={price.tipPaise} /> : null}
       {price.discountPaise > 0 ? <Row label="Discount" paise={price.discountPaise} negative /> : null}
-      <div className="flex items-baseline justify-between gap-4 border-t border-hairline pt-3">
+      <div className="flex items-baseline justify-between gap-4 border-t border-dashed border-hairline pt-4">
         <dt className="font-semibold">Total</dt>
         <dd>
           <Money paise={price.totalPaise} display className="text-subhead" />
@@ -41,7 +41,7 @@ export function PriceBreakdownSkeleton() {
           <Skeleton className="h-4 w-14" />
         </div>
       ))}
-      <div className="flex justify-between border-t border-hairline pt-3">
+      <div className="flex justify-between border-t border-dashed border-hairline pt-4">
         <Skeleton className="h-5 w-16" />
         <Skeleton className="h-6 w-20" />
       </div>

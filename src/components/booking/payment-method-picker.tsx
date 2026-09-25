@@ -22,7 +22,7 @@ export function PaymentMethodPicker({
   return (
     <fieldset disabled={disabled}>
       <legend className="text-sm font-semibold">Pay with</legend>
-      <div className={compact ? "mt-2 grid gap-2 sm:grid-cols-3" : "mt-2 grid gap-2"}>
+      <div className={compact ? "mt-3 grid gap-2 sm:grid-cols-3" : "mt-3 grid gap-2"}>
         {PAYMENT_METHODS.map((method) => {
           const Icon = METHOD_ICONS[method.value];
           return (

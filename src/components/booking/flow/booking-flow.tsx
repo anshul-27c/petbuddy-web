@@ -147,7 +147,7 @@ function Flow({
   };
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[1fr_20rem]">
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-10">
       <div className="min-w-0">
         <Stepper current={step} canOpen={canOpen} onOpen={goTo} />
 
@@ -160,7 +160,7 @@ function Flow({
           </Notice>
         ) : null}
 
-        <div className="mt-6">
+        <div key={step} className="mt-8 animate-rise-in">
           {step === SERVICE ? (
             <ServiceStep
               earner={earner}
@@ -188,7 +188,7 @@ function Flow({
             />
           ) : null}
           {step === WHERE ? (
-            <div className="space-y-6">
+            <div className="space-y-8">
               <WhereStep
                 carerName={first}
                 addressId={effectiveAddressId}
@@ -232,7 +232,7 @@ function Flow({
           ) : null}
         </div>
 
-        <div className="mt-8 flex items-center justify-between gap-3 border-t border-hairline pt-5">
+        <div className="mt-8 flex items-center justify-between gap-3 border-t border-hairline pt-6">
           {step > SERVICE && !(step === PET && onlyService) ? (
             <Button variant="outline" onClick={() => goTo(step - 1)} icon={<ArrowLeft className="size-4" aria-hidden />}>
               Back
@@ -243,9 +243,9 @@ function Flow({
             </ButtonLink>
           )}
           {step < WHERE ? (
-            <Button onClick={() => goTo(step + 1)} disabled={!complete[step]}>
+            <Button onClick={() => goTo(step + 1)} disabled={!complete[step]} className="group">
               Next
-              <ArrowRight className="size-4" aria-hidden />
+              <ArrowRight className="size-4 transition-transform duration-150 group-hover:translate-x-1" aria-hidden />
             </Button>
           ) : null}
         </div>
@@ -296,10 +296,11 @@ export function BookingFlow({
     return <ErrorState error={query.error} onRetry={() => void query.refetch()} retrying={query.isFetching} />;
   }
   return (
-    <div className="grid gap-8 lg:grid-cols-[1fr_20rem]" role="status" aria-label="Loading">
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-10" role="status" aria-label="Loading">
       <div>
-        <Skeleton className="h-14 w-full" />
-        <div className="mt-6 space-y-3">
+        <Skeleton className="h-20 w-full rounded-card" />
+        <Skeleton className="mt-8 h-8 w-1/2" />
+        <div className="mt-5 space-y-3">
           <CardSkeleton lines={1} />
           <CardSkeleton lines={1} />
         </div>

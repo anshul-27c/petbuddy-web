@@ -102,13 +102,13 @@ export function PaymentProvider({ children }: { children: ReactNode }) {
       >
         {pending ? (
           <div className="space-y-4">
-            <div className="rounded-card bg-canvas p-5 text-center">
+            <div className="rounded-card bg-mist p-5 text-center">
               <p className="text-sm text-ink-muted">{pending.request.description}</p>
               <p className="mt-1 font-display text-display font-semibold tabular-nums">
                 {formatMoney(pending.request.amountPaise)}
               </p>
             </div>
-            <div className="flex items-center gap-3 rounded-field border border-hairline p-3.5">
+            <div className="flex items-center gap-3 rounded-field border border-hairline p-4">
               {MethodIcon ? (
                 <span className="flex size-10 items-center justify-center rounded-full bg-sky text-leash">
                   <MethodIcon className="size-5" aria-hidden />

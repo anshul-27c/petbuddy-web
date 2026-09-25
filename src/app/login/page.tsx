@@ -20,6 +20,7 @@ import type { OtpSent } from "@/lib/types";
 import { safeNext } from "@/lib/utils";
 import { isValidPhone, normalisePhone } from "@/lib/validation";
 import { PageTitle } from "@/components/layout/page-title";
+import { ShaderBackdrop } from "@/components/ui/shader-backdrop";
 
 function PhoneStep({ onSent }: { onSent: (phone: string, sent: OtpSent) => void }) {
   const [phone, setPhone] = useState("");
@@ -44,10 +45,10 @@ function PhoneStep({ onSent }: { onSent: (phone: string, sent: OtpSent) => void 
   };
 
   return (
-    <form onSubmit={submit} noValidate className="space-y-5">
+    <form onSubmit={submit} noValidate className="space-y-6">
       <div>
         <h1 className="font-display text-headline font-semibold">What&apos;s your number?</h1>
-        <p className="mt-1 text-ink-muted">We&apos;ll send a six-digit code to confirm it&apos;s you.</p>
+        <p className="mt-2 text-ink-muted">We&apos;ll send a six-digit code to confirm it&apos;s you.</p>
       </div>
       <TextField
         label="Mobile number"
@@ -65,7 +66,7 @@ function PhoneStep({ onSent }: { onSent: (phone: string, sent: OtpSent) => void 
         error={error}
       />
       {send.error && !serverFieldError ? <ErrorNotice error={send.error} /> : null}
-      <Button type="submit" size="lg" block loading={send.isPending}>
+      <Button type="submit" size="lg" block sheen loading={send.isPending}>
         Send code
       </Button>
     </form>
@@ -116,7 +117,7 @@ function CodeStep({
   return (
     <form
       noValidate
-      className="space-y-5"
+      className="space-y-6"
       onSubmit={(event) => {
         event.preventDefault();
         if (code.length === 6 && !verify.isPending) verify.mutate(code);
@@ -126,18 +127,18 @@ function CodeStep({
         <button
           type="button"
           onClick={onChangeNumber}
-          className="-ml-1 mb-3 inline-flex min-h-11 items-center gap-1.5 rounded-field px-1 text-sm font-semibold text-leash-dark hover:underline"
+          className="group mb-2 inline-flex min-h-11 items-center gap-2 rounded-field text-sm font-semibold text-leash-dark"
         >
-          <ArrowLeft className="size-4" aria-hidden />
-          Change number
+          <ArrowLeft className="size-4 transition-transform duration-150 group-hover:-translate-x-1" aria-hidden />
+          <span className="group-hover:underline">Change number</span>
         </button>
         <h1 className="font-display text-headline font-semibold">Enter the code</h1>
-        <p className="mt-1 text-ink-muted">Sent to {formatPhone(phone)}.</p>
+        <p className="mt-2 text-ink-muted">Sent to {formatPhone(phone)}.</p>
       </div>
 
       {sent.devCode ? (
         <Notice tone="info" title="Test build">
-          <span className="inline-flex items-center gap-1.5">
+          <span className="inline-flex items-center gap-2">
             <FlaskConical className="size-4 text-leash-dark" aria-hidden />
             Your code is <strong className="tabular-nums tracking-widest">{sent.devCode}</strong>
           </span>
@@ -167,7 +168,14 @@ function CodeStep({
       {verify.error && !codeError ? <ErrorNotice error={verify.error} /> : null}
       {resend.error ? <ErrorNotice error={resend.error} /> : null}
 
-      <Button type="submit" size="lg" block loading={verify.isPending || verify.isSuccess} disabled={code.length < 6}>
+      <Button
+        type="submit"
+        size="lg"
+        block
+        sheen
+        loading={verify.isPending || verify.isSuccess}
+        disabled={code.length < 6}
+      >
         Verify
       </Button>
 
@@ -207,28 +215,31 @@ function SignIn() {
   if (status !== "signedOut") return <PageSkeleton />;
 
   return (
-    <Container width="narrow" className="py-10 sm:py-16">
-      <div className="mx-auto max-w-md rounded-card border border-hairline bg-surface p-6 sm:p-8">
-        <LogoMark size="lg" />
-        <div className="mt-6">
-          {step ? (
-            <CodeStep
-              key={step.phone}
-              phone={step.phone}
-              sent={step.sent}
-              onResent={(sent) => setStep({ phone: step.phone, sent })}
-              onChangeNumber={() => setStep(null)}
-              onVerified={() => router.replace(next)}
-            />
-          ) : (
-            <PhoneStep onSent={(phone, sent) => setStep({ phone, sent })} />
-          )}
+    <div className="relative isolate -mb-16 overflow-hidden pb-16 sm:-mb-24 sm:pb-24">
+      <ShaderBackdrop className="[mask-image:linear-gradient(to_bottom,#000_40%,transparent)]" />
+      <Container width="narrow" className="relative pt-10 sm:pt-16">
+        <div className="mx-auto max-w-md animate-rise-in rounded-panel border border-surface/80 bg-surface/90 p-6 shadow-float backdrop-blur-xl sm:p-8">
+          <LogoMark size="lg" />
+          <div className="mt-6">
+            {step ? (
+              <CodeStep
+                key={step.phone}
+                phone={step.phone}
+                sent={step.sent}
+                onResent={(sent) => setStep({ phone: step.phone, sent })}
+                onChangeNumber={() => setStep(null)}
+                onVerified={() => router.replace(next)}
+              />
+            ) : (
+              <PhoneStep onSent={(phone, sent) => setStep({ phone, sent })} />
+            )}
+          </div>
         </div>
-      </div>
-      <p className="mx-auto mt-6 max-w-md text-center text-small text-ink-muted">
-        One account works on the website and in the PetBuddy app.
-      </p>
-    </Container>
+        <p className="mx-auto mt-6 max-w-md text-center text-small text-ink-muted">
+          One account works on the website and in the PetBuddy app.
+        </p>
+      </Container>
+    </div>
   );
 }
 

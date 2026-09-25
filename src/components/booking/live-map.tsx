@@ -52,7 +52,7 @@ export function LiveMap({ booking }: { booking: Booking }) {
     : `Map: waiting for ${who}'s location. ${booking.address.label} is in the middle.`;
 
   return (
-    <figure className="overflow-hidden rounded-card border border-hairline bg-sky">
+    <figure className="overflow-hidden rounded-field border border-hairline bg-sky">
       <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="img" aria-label={label} className="block h-auto w-full">
         {lines.map((offset) => (
           <g key={offset} stroke="var(--color-hairline)" strokeWidth="1">
@@ -93,13 +93,13 @@ export function LiveMap({ booking }: { booking: Booking }) {
           </g>
         ) : null}
       </svg>
-      <figcaption className="flex flex-wrap items-center justify-between gap-2 border-t border-hairline bg-surface px-4 py-2.5 text-small text-ink-muted">
-        <span className="inline-flex items-center gap-3">
-          <span className="inline-flex items-center gap-1.5">
+      <figcaption className="flex flex-wrap items-center justify-between gap-2 border-t border-hairline bg-surface px-4 py-3 text-small text-ink-muted">
+        <span className="inline-flex items-center gap-4">
+          <span className="inline-flex items-center gap-2">
             <span className="size-2.5 rounded-full bg-leash" aria-hidden />
             {booking.address.label}
           </span>
-          <span className="inline-flex items-center gap-1.5">
+          <span className="inline-flex items-center gap-2">
             <span className="size-2.5 rounded-full bg-trail" aria-hidden />
             {who}
           </span>

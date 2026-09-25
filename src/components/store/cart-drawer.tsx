@@ -100,7 +100,7 @@ function CartLineRow({ line }: { line: CartLine }) {
   const setQuantity = useSetCartQuantity();
   const { product } = line;
   return (
-    <li className="flex gap-3 py-4">
+    <li className="flex gap-4 py-4">
       <ProductImage
         imageUrl={product.imageUrl}
         category={product.category}
@@ -110,13 +110,13 @@ function CartLineRow({ line }: { line: CartLine }) {
       />
       <div className="min-w-0 flex-1">
         <p className="text-small text-ink-muted">{product.brand}</p>
-        <p className="line-clamp-2 text-sm font-semibold">{product.name}</p>
-        <p className="mt-0.5 text-small text-ink-muted">
+        <p className="mt-1 line-clamp-2 text-sm font-semibold">{product.name}</p>
+        <p className="mt-1 text-small text-ink-muted">
           <Money paise={product.pricePaise} /> each
         </p>
         {!product.inStock ? <p className="mt-1 text-small font-semibold text-alert">Out of stock</p> : null}
         <QuantityStepper
-          className="mt-2"
+          className="mt-3"
           name={product.name}
           quantity={line.quantity}
           disabled={setQuantity.isPending}
@@ -137,9 +137,9 @@ function CartTotals({
   const data = summary.data;
   const updating = summary.isFetching;
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {data ? (
-        <dl className="space-y-1.5 text-sm" aria-busy={updating}>
+        <dl className="space-y-2 text-sm" aria-busy={updating}>
           <div className="flex justify-between">
             <dt className="text-ink-muted">Subtotal ({data.itemCount} {data.itemCount === 1 ? "item" : "items"})</dt>
             <dd>
@@ -150,7 +150,7 @@ function CartTotals({
             <dt className="text-ink-muted">Delivery</dt>
             <dd>{data.deliveryFeePaise === 0 ? "Free" : <Money paise={data.deliveryFeePaise} />}</dd>
           </div>
-          <div className="flex items-baseline justify-between pt-1">
+          <div className="flex items-baseline justify-between border-t border-dashed border-hairline pt-3">
             <dt className="font-semibold">Total</dt>
             <dd>
               <Money paise={data.totalPaise} display className="text-subhead" />
@@ -163,7 +163,7 @@ function CartTotals({
           <Skeleton className="h-6 w-1/2" />
         </div>
       )}
-      <ButtonLink href="/store/checkout" block size="lg" onClick={onCheckout}>
+      <ButtonLink href="/store/checkout" block size="lg" sheen onClick={onCheckout}>
         Checkout
       </ButtonLink>
     </div>

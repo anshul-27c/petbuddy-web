@@ -36,11 +36,11 @@ export function Notice({
   role?: "alert" | "status";
 }) {
   return (
-    <div role={role} className={cn("flex gap-3 rounded-field p-3.5 sm:p-4", TONES[tone], className)}>
-      <div className="shrink-0 pt-px">{ICONS[tone]}</div>
+    <div role={role} className={cn("flex gap-3 rounded-field p-4", TONES[tone], className)}>
+      <div className="flex h-5 shrink-0 items-center">{ICONS[tone]}</div>
       <div className="min-w-0 flex-1 text-sm">
         {title ? <p className="font-semibold">{title}</p> : null}
-        {children ? <div className={cn(title ? "mt-0.5" : "", "text-ink")}>{children}</div> : null}
+        {children ? <div className={cn(title ? "mt-1" : "", "text-ink")}>{children}</div> : null}
         {action ? <div className="mt-3">{action}</div> : null}
       </div>
     </div>

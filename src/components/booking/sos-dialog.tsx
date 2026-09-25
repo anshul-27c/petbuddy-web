@@ -39,7 +39,7 @@ export function SosDialog({ booking, open, onClose }: { booking: Booking; open: 
           </Button>
         }
       >
-        <div className="flex items-center gap-3 rounded-field bg-trail-soft p-3.5 text-trail">
+        <div className="flex items-center gap-3 rounded-field bg-trail-soft p-4 text-trail">
           <CircleCheck className="size-6 shrink-0" aria-hidden />
           <p className="text-sm font-semibold">Your alert reached the PetBuddy operations team.</p>
         </div>

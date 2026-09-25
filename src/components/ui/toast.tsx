@@ -18,6 +18,12 @@ interface ToastItem extends ToastInput {
 
 const ToastContext = createContext<(toast: ToastInput) => void>(() => {});
 
+const ICONS: Record<ToastTone, ReactNode> = {
+  success: <CircleCheck className="size-5" />,
+  info: <Info className="size-5" />,
+  error: <CircleAlert className="size-5" />,
+};
+
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const nextId = useRef(1);
@@ -38,32 +44,31 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         aria-live="polite"
         className="pointer-events-none fixed inset-x-0 bottom-4 z-50 flex flex-col items-center gap-2 px-4 pb-[env(safe-area-inset-bottom)]"
       >
-        {toasts.map((toast) => (
-          <div
-            key={toast.id}
-            className="pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-field bg-ink px-4 py-3 text-surface shadow-float"
-          >
-            <span
-              className={cn(
-                "mt-0.5 shrink-0",
-                toast.tone === "error" ? "text-alert-soft" : toast.tone === "info" ? "text-sky" : "text-trail-soft",
-              )}
-              aria-hidden
+        {toasts.map((toast) => {
+          const tone = toast.tone ?? "success";
+          return (
+            <div
+              key={toast.id}
+              className="pointer-events-auto flex w-full max-w-sm animate-rise-in items-start gap-3 rounded-card border border-surface/10 bg-ink/95 p-4 text-surface shadow-float backdrop-blur"
             >
-              {toast.tone === "error" ? (
-                <CircleAlert className="size-5" />
-              ) : toast.tone === "info" ? (
-                <Info className="size-5" />
-              ) : (
-                <CircleCheck className="size-5" />
-              )}
-            </span>
-            <div className="min-w-0 text-sm">
-              <p className="font-semibold">{toast.title}</p>
-              {toast.body ? <p className="mt-0.5 text-surface/80">{toast.body}</p> : null}
+              <span
+                className={cn(
+                  "flex size-8 shrink-0 items-center justify-center rounded-full",
+                  tone === "error" && "bg-alert/25 text-alert-soft",
+                  tone === "info" && "bg-leash/30 text-sky",
+                  tone === "success" && "bg-trail/35 text-trail-soft",
+                )}
+                aria-hidden
+              >
+                {ICONS[tone]}
+              </span>
+              <div className="min-w-0 pt-1 text-sm">
+                <p className="font-semibold">{toast.title}</p>
+                {toast.body ? <p className="mt-1 text-surface/80">{toast.body}</p> : null}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </ToastContext.Provider>
   );

@@ -38,7 +38,7 @@ export function PayPanel({
   return (
     <Card className="space-y-5">
       <div>
-        <h2 className="text-subhead font-bold">What you&apos;ll pay</h2>
+        <h2 className="text-title font-semibold">What you&apos;ll pay</h2>
         <div className="mt-4">
           {quote.data ? (
             <PriceBreakdown price={quote.data} serviceLabel={serviceLabel} />
@@ -47,7 +47,7 @@ export function PayPanel({
               error={quote.error}
               onRetry={() => void quote.refetch()}
               retrying={quote.isFetching}
-              className="py-6"
+              compact
             />
           ) : (
             <PriceBreakdownSkeleton />
@@ -55,8 +55,10 @@ export function PayPanel({
         </div>
       </div>
 
-      <p className="flex gap-2 rounded-field bg-trail-soft p-3 text-sm text-ink">
-        <ShieldCheck className="mt-0.5 size-4 shrink-0 text-trail" aria-hidden />
+      <p className="flex gap-2 rounded-field bg-trail-soft p-4 text-sm text-ink">
+        <span className="flex h-5 shrink-0 items-center" aria-hidden>
+          <ShieldCheck className="size-4 text-trail" />
+        </span>
         <span>
           Free cancellation up to {hours} before the visit. After that, {lateCancelFeePercent}% of the service price is
           kept as a fee.
@@ -71,6 +73,7 @@ export function PayPanel({
         variant="accent"
         size="lg"
         block
+        sheen
         onClick={onPay}
         loading={busy}
         disabled={!quote.data || !ready || quote.isFetching}

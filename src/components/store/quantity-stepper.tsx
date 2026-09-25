@@ -19,13 +19,13 @@ export function QuantityStepper({
 }) {
   return (
     <div
-      className={cn("inline-flex h-11 items-center rounded-full bg-sky text-leash-dark", className)}
+      className={cn("inline-flex h-11 items-center rounded-full bg-sky text-leash-dark ring-1 ring-leash/10 ring-inset", className)}
       role="group"
       aria-label={`Quantity of ${name}`}
     >
       <button
         type="button"
-        className="inline-flex size-11 items-center justify-center rounded-full hover:bg-leash/15 disabled:opacity-50"
+        className="inline-flex size-11 items-center justify-center rounded-full transition duration-150 hover:bg-leash-tint active:scale-90 disabled:opacity-50"
         onClick={() => onChange(quantity - 1)}
         disabled={disabled}
         aria-label={quantity <= 1 ? `Remove ${name}` : `Remove one ${name}`}
@@ -37,7 +37,7 @@ export function QuantityStepper({
       </span>
       <button
         type="button"
-        className="inline-flex size-11 items-center justify-center rounded-full hover:bg-leash/15 disabled:opacity-50"
+        className="inline-flex size-11 items-center justify-center rounded-full transition duration-150 hover:bg-leash-tint active:scale-90 disabled:opacity-50"
         onClick={() => onChange(quantity + 1)}
         disabled={disabled}
         aria-label={`Add one ${name}`}

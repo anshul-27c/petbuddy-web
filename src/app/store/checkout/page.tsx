@@ -1,18 +1,17 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, MapPin, Plus, ShoppingBag } from "lucide-react";
-import Link from "next/link";
+import { MapPin, Plus, ShoppingBag } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useId, useState } from "react";
 import { AddressForm } from "@/components/addresses/address-form";
 import { RequireAuth } from "@/components/auth/require-auth";
 import { PaymentMethodPicker } from "@/components/booking/payment-method-picker";
-import { Container, PageHeader } from "@/components/layout/container";
+import { BackLink, Container, PageHeader } from "@/components/layout/container";
 import { usePay } from "@/components/payments/payment-provider";
 import { ProductImage } from "@/components/store/product-image";
 import { Button, ButtonLink } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardTitle } from "@/components/ui/card";
 import { ChoiceCard } from "@/components/ui/field";
 import { Money } from "@/components/ui/money";
 import { ErrorNotice } from "@/components/ui/notice";
@@ -28,6 +27,7 @@ import { useAddresses, useCartSummary } from "@/lib/queries";
 import { qk } from "@/lib/query-keys";
 import type { CartSummary, PaymentMethod } from "@/lib/types";
 import { PageTitle } from "@/components/layout/page-title";
+import { SectionHeader, SectionLink } from "@/components/ui/section-header";
 
 function AddressPicker({ value, onChange }: { value: string | null; onChange: (id: string) => void }) {
   const name = useId();
@@ -35,21 +35,21 @@ function AddressPicker({ value, onChange }: { value: string | null; onChange: (i
   const [adding, setAdding] = useState(false);
   return (
     <fieldset>
-      <legend className="text-subhead font-bold">Deliver to</legend>
-      <div className="mt-4">
+      <legend className="font-display text-subhead font-semibold sm:text-headline">Deliver to</legend>
+      <div className="mt-4 sm:mt-5">
         <QueryView
           query={addresses}
           loading={<ListSkeleton count={1} />}
           isEmpty={(list) => list.length === 0}
           empty={
             <Card>
-              <p className="mb-4 font-semibold">Add a delivery address</p>
+              <p className="mb-5 text-title font-semibold">Add a delivery address</p>
               <AddressForm isFirst onSaved={(address) => onChange(address.id)} />
             </Card>
           }
         >
           {(list) => (
-            <div className="grid gap-2">
+            <div className="grid grid-cols-1 gap-3">
               {list.map((address) => (
                 <ChoiceCard
                   key={address.id}
@@ -72,8 +72,8 @@ function AddressPicker({ value, onChange }: { value: string | null; onChange: (i
                 />
               ))}
               {adding ? (
-                <Card className="mt-2">
-                  <h3 className="mb-4 text-title font-semibold">Add an address</h3>
+                <Card>
+                  <h3 className="mb-5 text-title font-semibold">Add an address</h3>
                   <AddressForm
                     onSaved={(address) => {
                       onChange(address.id);
@@ -83,7 +83,7 @@ function AddressPicker({ value, onChange }: { value: string | null; onChange: (i
                   />
                 </Card>
               ) : (
-                <Button variant="ghost" className="justify-self-start" onClick={() => setAdding(true)} icon={<Plus className="size-4" aria-hidden />}>
+                <Button variant="ghost" className="-ml-4 justify-self-start" onClick={() => setAdding(true)} icon={<Plus className="size-4" aria-hidden />}>
                   Add an address
                 </Button>
               )}
@@ -143,21 +143,14 @@ function Checkout({ summary }: { summary: CartSummary }) {
   };
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[1fr_22rem]">
-      <div className="min-w-0 space-y-8">
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-10">
+      <div className="stack-sections min-w-0">
         <AddressPicker value={effectiveAddressId} onChange={setAddressId} />
         <section aria-labelledby="items">
-          <div className="flex items-center justify-between">
-            <h2 id="items" className="text-subhead font-bold">
-              Items
-            </h2>
-            <Link href="/store" className="text-sm font-semibold text-leash-dark hover:underline">
-              Change basket
-            </Link>
-          </div>
-          <ul className="mt-4 divide-y divide-hairline rounded-card border border-hairline bg-surface px-4">
+          <SectionHeader id="items" title="Items" action={<SectionLink href="/store">Change basket</SectionLink>} />
+          <ul className="divide-y divide-hairline rounded-card border border-hairline bg-surface px-4 shadow-card sm:px-5">
             {summary.lines.map((line) => (
-              <li key={line.product.id} className="flex items-center gap-3 py-3">
+              <li key={line.product.id} className="flex items-center gap-4 py-4">
                 <ProductImage
                   imageUrl={line.product.imageUrl}
                   category={line.product.category}
@@ -167,10 +160,10 @@ function Checkout({ summary }: { summary: CartSummary }) {
                 />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-semibold">{line.product.name}</p>
-                  <p className="text-small text-ink-muted">
+                  <p className="mt-1 text-small text-ink-muted">
                     {line.quantity} × <Money paise={line.product.pricePaise} />
                   </p>
-                  {!line.product.inStock ? <p className="text-small font-semibold text-alert">Out of stock</p> : null}
+                  {!line.product.inStock ? <p className="mt-1 text-small font-semibold text-alert">Out of stock</p> : null}
                 </div>
               </li>
             ))}
@@ -180,8 +173,8 @@ function Checkout({ summary }: { summary: CartSummary }) {
 
       <aside>
         <Card className="space-y-5 lg:sticky lg:top-24">
-          <h2 className="text-subhead font-bold">Order summary</h2>
-          <dl className="space-y-2 text-sm" aria-busy={summaryQuery.isFetching}>
+          <CardTitle>Order summary</CardTitle>
+          <dl className="space-y-3 text-sm" aria-busy={summaryQuery.isFetching}>
             <div className="flex justify-between">
               <dt className="text-ink-muted">
                 Subtotal ({summary.itemCount} {summary.itemCount === 1 ? "item" : "items"})
@@ -194,7 +187,7 @@ function Checkout({ summary }: { summary: CartSummary }) {
               <dt className="text-ink-muted">Delivery</dt>
               <dd>{summary.deliveryFeePaise === 0 ? "Free" : <Money paise={summary.deliveryFeePaise} />}</dd>
             </div>
-            <div className="flex items-baseline justify-between border-t border-hairline pt-3">
+            <div className="flex items-baseline justify-between border-t border-dashed border-hairline pt-4">
               <dt className="font-semibold">Total</dt>
               <dd>
                 <Money paise={summary.totalPaise} display className="text-subhead" />
@@ -203,7 +196,7 @@ function Checkout({ summary }: { summary: CartSummary }) {
           </dl>
           <PaymentMethodPicker value={method} onChange={setMethod} disabled={busy} />
           {hasOutOfStock ? (
-            <p className="rounded-field bg-alert-soft p-3 text-sm text-alert">
+            <p className="rounded-field bg-alert-soft p-4 text-sm text-alert">
               Something in your basket is out of stock. Remove it to place your order.
             </p>
           ) : null}
@@ -212,6 +205,7 @@ function Checkout({ summary }: { summary: CartSummary }) {
             variant="accent"
             size="lg"
             block
+            sheen
             onClick={() => void placeOrder()}
             loading={busy}
             disabled={!effectiveAddressId || hasOutOfStock || summaryQuery.isFetching}
@@ -231,7 +225,7 @@ function CheckoutPageBody() {
     <QueryView
       query={summary}
       loading={
-        <div className="grid gap-8 lg:grid-cols-[1fr_22rem]" role="status" aria-label="Loading checkout">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-10" role="status" aria-label="Loading checkout">
           <ListSkeleton count={2} />
           <CardSkeleton lines={4} />
         </div>
@@ -257,15 +251,7 @@ export default function CheckoutPage() {
       <PageTitle title={"Checkout"} />
       <RequireAuth>
         <Container>
-          <PageHeader
-            title="Checkout"
-            back={
-              <Link href="/store" className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-leash-dark hover:underline">
-                <ArrowLeft className="size-4" aria-hidden />
-                Back to the store
-              </Link>
-            }
-          />
+          <PageHeader title="Checkout" back={<BackLink href="/store">Back to the store</BackLink>} />
           <CheckoutPageBody />
         </Container>
       </RequireAuth>

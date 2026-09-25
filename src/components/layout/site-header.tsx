@@ -34,14 +34,14 @@ function NavLink({ item, pathname, className }: { item: NavItem; pathname: strin
       href={item.href}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "relative inline-flex min-h-11 items-center gap-2 rounded-field px-3 text-sm font-semibold transition-colors",
+        "relative inline-flex min-h-11 items-center gap-2 rounded-full px-3 text-sm font-semibold whitespace-nowrap transition-colors duration-150 lg:px-4",
         active ? "bg-sky text-leash-dark" : "text-ink hover:bg-canvas",
         className,
       )}
     >
       {item.label}
       {item.dot ? (
-        <span className="size-2 rounded-full bg-leash">
+        <span className="pulse-dot size-2 rounded-full bg-leash text-leash">
           <span className="sr-only">, unread messages</span>
         </span>
       ) : null}
@@ -56,12 +56,12 @@ function CartButton() {
     <button
       type="button"
       onClick={openCart}
-      className="relative inline-flex size-11 items-center justify-center rounded-full text-ink hover:bg-canvas"
+      className="relative inline-flex size-11 items-center justify-center rounded-full text-ink transition duration-150 hover:bg-canvas active:scale-95"
       aria-label={count > 0 ? `Basket, ${count} ${count === 1 ? "item" : "items"}` : "Basket"}
     >
       <ShoppingBag className="size-5" aria-hidden />
       {count > 0 ? (
-        <span className="absolute top-1 right-0.5 inline-flex min-w-4.5 items-center justify-center rounded-full bg-leash px-1 text-[0.625rem] leading-4.5 font-bold text-surface tabular-nums">
+        <span className="absolute top-1 right-0.5 inline-flex min-w-4.5 animate-pop-in items-center justify-center rounded-full bg-leash px-1 text-[0.625rem] leading-4.5 font-bold text-surface tabular-nums ring-2 ring-surface">
           {count > 99 ? "99+" : count}
         </span>
       ) : null}
@@ -98,15 +98,15 @@ export function SiteHeader() {
       ];
 
   return (
-    <header className="sticky top-0 z-40 border-b border-hairline bg-surface/95 backdrop-blur supports-[backdrop-filter]:bg-surface/85">
+    <header className="sticky top-0 z-40 border-b border-hairline/80 bg-surface/90 backdrop-blur-xl backdrop-saturate-150 supports-[backdrop-filter]:bg-surface/75">
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-field focus:bg-surface focus:px-4 focus:py-2 focus:shadow-float"
       >
         Skip to content
       </a>
-      <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-2 px-4 sm:px-6">
-        <Logo className="mr-2 shrink-0" />
+      <div className="container-page flex h-16 items-center gap-2">
+        <Logo className="mr-4 shrink-0" />
 
         <nav aria-label="Main" className="hidden flex-1 items-center gap-1 md:flex">
           {nav.map((item) => (
@@ -114,7 +114,7 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <div className="ml-auto flex items-center gap-0.5">
+        <div className="-mr-3 ml-auto flex items-center gap-1 md:mr-0">
           {status === "loading" ? (
             <Skeleton className="h-10 w-24 rounded-full" />
           ) : signedIn ? (
@@ -127,14 +127,14 @@ export function SiteHeader() {
             </>
           ) : (
             pathname === "/login" ? null : (
-              <ButtonLink href={loginHref(pathname)} variant="tonal">
+              <ButtonLink href={loginHref(pathname)} variant="tonal" className="mr-3 md:mr-0">
                 Sign in
               </ButtonLink>
             )
           )}
           <button
             type="button"
-            className="inline-flex size-11 items-center justify-center rounded-full text-ink hover:bg-canvas md:hidden"
+            className="inline-flex size-11 items-center justify-center rounded-full text-ink transition duration-150 hover:bg-canvas active:scale-95 md:hidden"
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
             aria-label={menuOpen ? "Close menu" : "Open menu"}
@@ -145,21 +145,21 @@ export function SiteHeader() {
         </div>
       </div>
 
-      <div id="mobile-menu" hidden={!menuOpen} className="border-t border-hairline bg-surface md:hidden">
-        <nav aria-label="Main menu" className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-3">
+      <div id="mobile-menu" hidden={!menuOpen} className="animate-fade-in border-t border-hairline bg-surface md:hidden">
+        <nav aria-label="Main menu" className="container-page flex flex-col gap-1 py-3 [&>a]:-mx-3 [&>a]:w-auto">
           {nav.map((item) => (
             <NavLink key={item.href} item={item} pathname={pathname} className="w-full" />
           ))}
           {signedIn ? (
             <>
-              <div className="my-2 border-t border-hairline" />
+              <div className="my-2 border-t border-hairline" aria-hidden />
               {ACCOUNT_LINKS.map((link) => (
                 <NavLink key={link.href} item={link} pathname={pathname} className="w-full" />
               ))}
               <button
                 type="button"
                 onClick={() => void signOutAndLeave()}
-                className="inline-flex min-h-11 w-full items-center gap-2 rounded-field px-3 text-sm font-semibold text-alert hover:bg-alert-soft"
+                className="-mx-3 inline-flex min-h-11 items-center gap-2 rounded-full px-3 text-sm font-semibold text-alert hover:bg-alert-soft"
               >
                 <LogOut className="size-4" aria-hidden />
                 Sign out

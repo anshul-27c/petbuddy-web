@@ -37,7 +37,7 @@ export function AccountMenu() {
         <button
           type="button"
           {...props}
-          className="inline-flex min-h-11 items-center gap-1.5 rounded-full py-1 pr-2 pl-1 hover:bg-canvas"
+          className="inline-flex min-h-11 items-center gap-2 rounded-full py-1 pr-2 pl-1 transition-colors duration-150 hover:bg-canvas"
           aria-label="Account menu"
         >
           <Avatar
@@ -53,7 +53,7 @@ export function AccountMenu() {
         <div>
           <div className="border-b border-hairline px-3 pt-2 pb-3">
             <p className="truncate font-semibold">{name}</p>
-            {user?.phone ? <p className="text-sm text-ink-muted">{formatPhone(user.phone)}</p> : null}
+            {user?.phone ? <p className="mt-1 text-sm text-ink-muted">{formatPhone(user.phone)}</p> : null}
           </div>
           <ul className="py-1">
             {ACCOUNT_LINKS.map(({ href, label, icon: Icon }) => (
@@ -61,7 +61,7 @@ export function AccountMenu() {
                 <Link
                   href={href}
                   onClick={close}
-                  className="flex min-h-11 items-center gap-3 rounded-field px-3 text-sm font-medium hover:bg-canvas"
+                  className="flex min-h-11 items-center gap-3 rounded-field px-3 text-sm font-medium transition-colors duration-150 hover:bg-canvas"
                 >
                   <Icon className="size-4 text-ink-muted" aria-hidden />
                   {label}

@@ -15,11 +15,17 @@ export function OrderSteps({ status }: { status: OrderStatus }) {
         return (
           <li key={step} className="flex flex-col items-center text-center" aria-current={index === current ? "step" : undefined}>
             <div className="flex w-full items-center">
-              <span className={cn("h-1 flex-1 rounded-full", index === 0 ? "invisible" : done ? "bg-trail" : "bg-hairline")} />
+              <span
+                className={cn(
+                  "h-1 flex-1 rounded-full transition-colors duration-300",
+                  index === 0 ? "invisible" : done ? "bg-trail" : "bg-hairline",
+                )}
+              />
               <span
                 className={cn(
                   "mx-1 flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-bold",
-                  done ? "bg-trail text-surface" : "bg-canvas text-ink-muted",
+                  done ? "bg-trail text-surface shadow-card" : "border border-hairline bg-surface text-ink-muted",
+                  index === current && "ring-4 ring-trail-soft",
                 )}
               >
                 {done ? <Check className="size-4" strokeWidth={3} aria-hidden /> : index + 1}

@@ -7,6 +7,7 @@ import { errorCopy } from "@/lib/errors";
 import { cn } from "@/lib/utils";
 import { Button } from "./button";
 
+/** An empty list: an icon on a tinted squircle over a faint dot grid, a line of copy and an optional action. */
 export function EmptyState({
   icon,
   title,
@@ -23,16 +24,17 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "flex flex-col items-center rounded-card border border-dashed border-hairline bg-surface px-6 py-10 text-center",
+        "relative isolate flex flex-col items-center overflow-hidden rounded-card border border-dashed border-hairline bg-surface px-6 py-12 text-center",
         className,
       )}
     >
-      <div className="flex size-14 items-center justify-center rounded-full bg-sky text-leash [&_svg]:size-6">
+      <div aria-hidden className="bg-dot-grid absolute inset-0 -z-10 opacity-70" />
+      <div className="flex size-14 items-center justify-center rounded-card bg-sky text-leash shadow-card ring-8 ring-sky/50 [&_svg]:size-6">
         {icon}
       </div>
-      <h3 className="mt-4 text-title font-semibold">{title}</h3>
+      <h3 className="mt-6 text-title font-semibold">{title}</h3>
       <p className="mt-1 max-w-sm text-sm text-ink-muted">{body}</p>
-      {action ? <div className="mt-5">{action}</div> : null}
+      {action ? <div className="mt-6">{action}</div> : null}
     </div>
   );
 }
@@ -41,11 +43,17 @@ export function ErrorState({
   error,
   onRetry,
   retrying = false,
+  compact = false,
+  bare = false,
   className,
 }: {
   error: unknown;
   onRetry?: () => void;
   retrying?: boolean;
+  /** Less padding, for errors inside a card. */
+  compact?: boolean;
+  /** No border or shadow, for errors inside a menu. */
+  bare?: boolean;
   className?: string;
 }) {
   const { title, body } = errorCopy(error);
@@ -53,19 +61,21 @@ export function ErrorState({
     <div
       role="alert"
       className={cn(
-        "flex flex-col items-center rounded-card border border-hairline bg-surface px-6 py-10 text-center",
+        "flex flex-col items-center rounded-card bg-surface px-6 text-center",
+        compact ? "py-6" : "py-12",
+        !bare && "border border-hairline shadow-card",
         className,
       )}
     >
-      <div className="flex size-14 items-center justify-center rounded-full bg-alert-soft text-alert">
+      <div className="flex size-14 items-center justify-center rounded-card bg-alert-soft text-alert ring-8 ring-alert-soft/50">
         <CircleAlert className="size-6" aria-hidden />
       </div>
-      <h3 className="mt-4 text-title font-semibold">{title}</h3>
+      <h3 className="mt-6 text-title font-semibold">{title}</h3>
       <p className="mt-1 max-w-sm text-sm text-ink-muted">{body}</p>
       {onRetry ? (
         <Button
           variant="outline"
-          className="mt-5"
+          className="mt-6"
           onClick={onRetry}
           loading={retrying}
           icon={<RotateCcw className="size-4" aria-hidden />}

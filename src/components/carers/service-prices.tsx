@@ -2,11 +2,13 @@
 
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { IconTile } from "@/components/ui/icon-tile";
 import { ServiceIcon } from "@/components/ui/icons";
 import { Money } from "@/components/ui/money";
 import { formatDuration } from "@/lib/format";
 import { useServiceCatalogue } from "@/lib/queries";
 import type { Earner } from "@/lib/types";
+import { cn } from "@/lib/utils";
 import { useBookHref } from "./book-href";
 
 function ServiceRow({ earner, serviceKey }: { earner: Earner; serviceKey: Earner["services"][number] }) {
@@ -18,12 +20,12 @@ function ServiceRow({ earner, serviceKey }: { earner: Earner; serviceKey: Earner
 
   const body = (
     <>
-      <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-sky text-leash">
-        <ServiceIcon service={serviceKey} className="size-5" />
-      </span>
+      <IconTile>
+        <ServiceIcon service={serviceKey} />
+      </IconTile>
       <span className="min-w-0 flex-1">
         <span className="block font-semibold">{service.label}</span>
-        <span className="block text-small text-ink-muted">
+        <span className="mt-1 block text-small text-ink-muted">
           {service.blurb} · {formatDuration(service.defaultMinutes)}
         </span>
       </span>
@@ -34,18 +36,21 @@ function ServiceRow({ earner, serviceKey }: { earner: Earner; serviceKey: Earner
           <Money paise={earner.pricePerHourPaise} display suffix="/hr" className="text-title" />
         )}
       </span>
-      {bookable ? <ChevronRight className="size-4 shrink-0 text-ink-muted" aria-hidden /> : null}
+      {bookable ? (
+        <ChevronRight
+          className="size-4 shrink-0 text-ink-faint transition-transform duration-150 group-hover:translate-x-1 group-hover:text-leash"
+          aria-hidden
+        />
+      ) : null}
     </>
   );
 
+  const row = "flex items-center gap-3 rounded-field border border-hairline bg-surface p-4 shadow-card";
   if (!bookable) {
-    return <div className="flex items-center gap-3 rounded-field border border-hairline bg-surface p-3.5">{body}</div>;
+    return <div className={row}>{body}</div>;
   }
   return (
-    <Link
-      href={href}
-      className="flex items-center gap-3 rounded-field border border-hairline bg-surface p-3.5 transition-colors hover:border-leash"
-    >
+    <Link href={href} className={cn(row, "group transition duration-150 hover:border-leash hover:shadow-lift")}>
       <span className="sr-only">Book </span>
       {body}
     </Link>
@@ -55,7 +60,7 @@ function ServiceRow({ earner, serviceKey }: { earner: Earner; serviceKey: Earner
 /** Each offered service with the price of one booking at its default length. */
 export function ServicePrices({ earner }: { earner: Earner }) {
   return (
-    <ul className="space-y-2">
+    <ul className="grid grid-cols-1 gap-3">
       {earner.services.map((service) => (
         <li key={service}>
           <ServiceRow earner={earner} serviceKey={service} />

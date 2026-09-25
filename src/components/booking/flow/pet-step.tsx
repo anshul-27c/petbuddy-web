@@ -6,6 +6,7 @@ import { PetForm } from "@/components/pets/pet-form";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ChoiceCard } from "@/components/ui/field";
+import { IconTile } from "@/components/ui/icon-tile";
 import { SpeciesIcon } from "@/components/ui/icons";
 import { ListSkeleton } from "@/components/ui/skeleton";
 import { QueryView } from "@/components/ui/states";
@@ -19,22 +20,22 @@ export function PetStep({ value, onChange }: { value: string | null; onChange: (
 
   return (
     <fieldset>
-      <legend className="text-subhead font-bold">Which pet?</legend>
-      <p className="mt-1 text-sm text-ink-muted">Your carer sees their breed, temperament and vaccinations.</p>
-      <div className="mt-4">
+      <legend className="font-display text-subhead font-semibold sm:text-headline">Which pet?</legend>
+      <p className="mt-2 text-body text-ink-muted">Your carer sees their breed, temperament and vaccinations.</p>
+      <div className="mt-4 sm:mt-5">
         <QueryView
           query={pets}
           loading={<ListSkeleton count={2} />}
           isEmpty={(list) => list.length === 0}
           empty={
             <Card>
-              <div className="mb-4 flex items-center gap-3">
-                <span className="flex size-10 items-center justify-center rounded-full bg-sky text-leash">
-                  <PawPrint className="size-5" aria-hidden />
-                </span>
+              <div className="mb-5 flex items-center gap-3">
+                <IconTile>
+                  <PawPrint />
+                </IconTile>
                 <div>
-                  <p className="font-semibold">Add your pet</p>
-                  <p className="text-sm text-ink-muted">So your carer knows who they are meeting.</p>
+                  <p className="text-title font-semibold">Add your pet</p>
+                  <p className="mt-1 text-sm text-ink-muted">So your carer knows who they are meeting.</p>
                 </div>
               </div>
               <PetForm onSaved={(pet) => onChange(pet.id)} submitLabel="Add pet" />
@@ -42,7 +43,7 @@ export function PetStep({ value, onChange }: { value: string | null; onChange: (
           }
         >
           {(list) => (
-            <div className="grid gap-2">
+            <div className="grid grid-cols-1 gap-3">
               {list.map((pet) => (
                 <ChoiceCard
                   key={pet.id}
@@ -56,8 +57,8 @@ export function PetStep({ value, onChange }: { value: string | null; onChange: (
                 />
               ))}
               {adding ? (
-                <Card className="mt-2">
-                  <h3 className="mb-4 text-title font-semibold">Add a pet</h3>
+                <Card>
+                  <h3 className="mb-5 text-title font-semibold">Add a pet</h3>
                   <PetForm
                     onSaved={(pet) => {
                       onChange(pet.id);
@@ -69,7 +70,7 @@ export function PetStep({ value, onChange }: { value: string | null; onChange: (
               ) : (
                 <Button
                   variant="ghost"
-                  className="justify-self-start"
+                  className="-ml-4 justify-self-start"
                   onClick={() => setAdding(true)}
                   icon={<Plus className="size-4" aria-hidden />}
                 >

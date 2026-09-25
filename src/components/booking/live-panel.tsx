@@ -1,6 +1,6 @@
 "use client";
 
-import { Radio, Siren } from "lucide-react";
+import { Siren } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { formatAgo } from "@/lib/format";
@@ -12,14 +12,17 @@ import { SosDialog } from "./sos-dialog";
 export function LivePanel({ booking, updatedAt }: { booking: Booking; updatedAt: number }) {
   const [sosOpen, setSosOpen] = useState(false);
   return (
-    <section aria-labelledby="live-title" className="rounded-card border border-hairline bg-surface p-4 sm:p-5">
+    <section
+      aria-labelledby="live-title"
+      className="border-beam rounded-card border border-leash-tint bg-surface p-4 shadow-card sm:p-5"
+    >
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <div>
+        <div className="min-w-0">
           <h2 id="live-title" className="flex items-center gap-2 text-title font-semibold">
-            <Radio className="size-5 text-trail" aria-hidden />
+            <span className="pulse-dot size-2.5 rounded-full bg-trail text-trail" aria-hidden />
             Live
           </h2>
-          <p className="text-small text-ink-muted">
+          <p className="mt-1 text-small text-ink-muted">
             Updates every few seconds. Last checked {formatAgo(new Date(updatedAt).toISOString())}.
           </p>
         </div>

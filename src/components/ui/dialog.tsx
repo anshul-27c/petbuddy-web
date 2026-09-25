@@ -78,18 +78,22 @@ export function Dialog({
         "border-0 bg-surface p-0 text-ink shadow-float",
         variant === "sheet" &&
           cn(
-            "mx-0 mt-auto mb-0 max-h-[92dvh] w-full max-w-none rounded-t-card",
-            "sm:m-auto sm:max-h-[88dvh] sm:w-[calc(100%-2rem)] sm:rounded-card",
+            "mx-0 mt-auto mb-0 max-h-[92dvh] w-full max-w-none animate-sheet-in rounded-t-panel",
+            "sm:m-auto sm:max-h-[88dvh] sm:w-[calc(100%-2rem)] sm:animate-rise-in sm:rounded-panel",
             SIZES[size],
           ),
-        variant === "drawer" && "my-0 mr-0 ml-auto h-dvh max-h-dvh w-full max-w-md rounded-none sm:rounded-l-card",
+        variant === "drawer" &&
+          "my-0 mr-0 ml-auto h-dvh max-h-dvh w-full max-w-md animate-fade-in rounded-none sm:rounded-l-panel",
       )}
     >
       {open ? (
         <div className={cn("flex flex-col", variant === "drawer" ? "h-dvh" : "max-h-[inherit]")}>
-          <div className="flex items-start justify-between gap-3 px-5 pt-4 pb-2 sm:px-6 sm:pt-5">
+          {variant === "sheet" ? (
+            <div aria-hidden className="mx-auto mt-2 h-1 w-10 rounded-full bg-hairline sm:hidden" />
+          ) : null}
+          <div className="flex items-start justify-between gap-3 px-5 pt-4 pb-4 sm:px-6 sm:pt-6">
             <div className="min-w-0 pt-2">
-              <h2 id={titleId} className="text-subhead font-bold">
+              <h2 id={titleId} className="font-display text-subhead font-semibold">
                 {title}
               </h2>
               {description ? (
@@ -102,9 +106,9 @@ export function Dialog({
               <X className="size-5" aria-hidden />
             </IconButton>
           </div>
-          <div className="min-h-0 flex-1 overflow-y-auto px-5 pt-2 pb-5 sm:px-6">{children}</div>
+          <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-5 sm:px-6 sm:pb-6">{children}</div>
           {footer ? (
-            <div className="border-t border-hairline px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-6">
+            <div className="border-t border-hairline bg-mist px-5 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-6">
               {footer}
             </div>
           ) : null}
