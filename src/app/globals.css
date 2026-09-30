@@ -35,11 +35,20 @@
   --color-amber-soft: #fbf0da;
   --color-alert: #c4372c;
   --color-alert-soft: #fbe7e5;
+  /*
+   * Text on the soft status tints. The status colours themselves stay for
+   * icons, stars and fills; these deeper shades keep small text at 4.5:1.
+   */
+  --color-amber-ink: #8a5c0b;
+  --color-trail-ink: #286b4e;
+  --color-alert-ink: #ad3026;
   --color-surface: #ffffff;
   --color-mist: #f8fafd;
   --color-canvas: #f3f6fa;
   --color-hairline: #e2e8f2;
 
+  /* Radii: fields and buttons share one, cards one, sheets and dialogs one; pills are fully round. */
+  --radius-tile: 10px;
   --radius-field: 14px;
   --radius-card: 20px;
   --radius-panel: 28px;
@@ -54,27 +63,41 @@
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
-  /* Type scale from the app: display 34, headline 26, subhead 21, title 17, body 15, small 12.5, label 11.5. */
-  --text-hero: 2.5rem;
-  --text-hero--line-height: 1.08;
-  --text-hero--letter-spacing: -0.02em;
-  --text-mega: 3.5rem;
-  --text-mega--line-height: 1.04;
-  --text-mega--letter-spacing: -0.025em;
-  --text-display: 2.125rem;
-  --text-display--line-height: 1.15;
-  --text-headline: 1.625rem;
-  --text-headline--line-height: 1.2;
-  --text-subhead: 1.3125rem;
-  --text-subhead--line-height: 1.3;
-  --text-title: 1.0625rem;
-  --text-title--line-height: 1.35;
+  /*
+   * Type: one scale (size / line height) and nothing off it. Roles:
+   *   page title 24 → 30 (.title-page)      section title 18 → 20 (.title-section)
+   *   card title 16 (text-base semibold)     body 15 → 16 (text-body)
+   *   secondary 14 (text-sm)                 caption 13 (text-caption), 12 (text-xs)
+   *   landing headline 36 → 48 (.title-hero)
+   * Weights: 400 body, 600 titles and emphasis, 700 page titles.
+   */
+  --text-*: initial;
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1rem;
+  --text-caption: 0.8125rem;
+  --text-caption--line-height: 1.125rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.25rem;
   --text-body: 0.9375rem;
-  --text-body--line-height: 1.5;
-  --text-small: 0.78125rem;
-  --text-small--line-height: 1.4;
-  --text-label: 0.71875rem;
-  --text-label--line-height: 1.2;
+  --text-body--line-height: 1.5rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.5rem;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.625rem;
+  --text-xl: 1.25rem;
+  --text-xl--line-height: 1.75rem;
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: 2rem;
+  --text-2xl--letter-spacing: -0.01em;
+  --text-3xl: 1.875rem;
+  --text-3xl--line-height: 2.375rem;
+  --text-3xl--letter-spacing: -0.015em;
+  --text-4xl: 2.25rem;
+  --text-4xl--line-height: 2.75rem;
+  --text-4xl--letter-spacing: -0.02em;
+  --text-5xl: 3rem;
+  --text-5xl--line-height: 3.5rem;
+  --text-5xl--letter-spacing: -0.02em;
 
   --animate-rise-in: rise-in 320ms var(--ease-out-soft) both;
   --animate-fade-in: fade-in 200ms ease-out both;
@@ -84,7 +107,8 @@
 
 @theme inline {
   --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  /* The wordmark in the logo, and nothing else. */
+  --font-brand: var(--font-fraunces), ui-serif, Georgia, serif;
 }
 
 @layer base {
@@ -93,12 +117,21 @@
     scroll-padding-top: 5rem;
   }
 
+  /* Body copy is 15 px on phones and 16 px from 640 px up. */
+  @media (width >= 40rem) {
+    :root {
+      --text-body: 1rem;
+    }
+  }
+
   body {
     background-color: var(--color-canvas);
     color: var(--color-ink);
     font-family: var(--font-sans);
     font-size: var(--text-body);
     line-height: var(--text-body--line-height);
+    /* Money, counts and times line up in columns. */
+    font-variant-numeric: tabular-nums;
     -webkit-font-smoothing: antialiased;
   }
 
@@ -206,6 +239,29 @@
   }
 }
 
+/**
+ * The page area under the 64 px header: at least the rest of the screen, so
+ * the footer starts below the fold and a short page never floats.
+ */
+@utility min-h-page {
+  min-height: calc(100dvh - 4rem);
+}
+
+/**
+ * The space an empty, error or loading state owns when it is a page's main
+ * content (see <StateArea>). It grows to fill the page, and swaps the page's
+ * 64 / 96 px bottom padding for 24 / 32 px, the same gap the page header
+ * leaves above it, so the box sits centred between the two.
+ */
+@utility state-area {
+  padding-bottom: 1.5rem;
+  margin-bottom: -4rem;
+  @media (width >= 40rem) {
+    padding-bottom: 2rem;
+    margin-bottom: -6rem;
+  }
+}
+
 /** Room under the page for a fixed bottom bar (80 px plus the phone's safe area). */
 @utility pb-bar {
   padding-bottom: calc(5rem + env(safe-area-inset-bottom));
@@ -302,13 +358,50 @@
   }
 }
 
-/** Small caps label above a section title. */
+/** Small caps label above a section title: 12 px, spaced out. */
 @utility eyebrow {
-  font-size: var(--text-label);
-  line-height: var(--text-label--line-height);
-  font-weight: 700;
+  font-size: var(--text-xs);
+  line-height: var(--text-xs--line-height);
+  font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+/** A page's title: 24 px on phones, 30 px from 640 px, bold, slightly tight. */
+@utility title-page {
+  font-size: var(--text-2xl);
+  line-height: var(--text-2xl--line-height);
+  letter-spacing: var(--text-2xl--letter-spacing);
+  font-weight: 700;
+  @media (width >= 40rem) {
+    font-size: var(--text-3xl);
+    line-height: var(--text-3xl--line-height);
+    letter-spacing: var(--text-3xl--letter-spacing);
+  }
+}
+
+/** A section's title (and a dialog's): 18 px on phones, 20 px from 640 px, semibold. */
+@utility title-section {
+  font-size: var(--text-lg);
+  line-height: var(--text-lg--line-height);
+  font-weight: 600;
+  @media (width >= 40rem) {
+    font-size: var(--text-xl);
+    line-height: var(--text-xl--line-height);
+  }
+}
+
+/** The one big headline on a landing page: 36 px on phones, 48 px from 640 px. */
+@utility title-hero {
+  font-size: var(--text-4xl);
+  line-height: var(--text-4xl--line-height);
+  letter-spacing: var(--text-4xl--letter-spacing);
+  font-weight: 700;
+  @media (width >= 40rem) {
+    font-size: var(--text-5xl);
+    line-height: var(--text-5xl--line-height);
+    letter-spacing: var(--text-5xl--letter-spacing);
+  }
 }
 
 /* ---- Surfaces ---------------------------------------------------------- */

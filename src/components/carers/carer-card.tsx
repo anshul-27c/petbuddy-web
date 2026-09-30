@@ -11,8 +11,8 @@ import { Money } from "@/components/ui/money";
 import { trackPointer } from "@/components/ui/motion";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RatingInline } from "@/components/ui/stars";
-import { formatCount, formatDistance } from "@/lib/format";
-import { firstName, repeatPercent } from "@/lib/labels";
+import { carerPlace, carerTrackRecord } from "@/lib/format";
+import { firstName } from "@/lib/labels";
 import { useServiceCatalogue } from "@/lib/queries";
 import type { Earner } from "@/lib/types";
 import { useBookHref } from "./book-href";
@@ -31,6 +31,7 @@ export function CarerCard({ earner }: { earner: Earner }) {
   const bookHref = useBookHref(earner.id);
   const shown = earner.services.slice(0, 3);
   const more = earner.services.length - shown.length;
+  const place = carerPlace(earner.area, earner.distanceKm);
 
   return (
     <article
@@ -40,7 +41,7 @@ export function CarerCard({ earner }: { earner: Earner }) {
       <div className="flex min-w-0 flex-1 items-start gap-4">
         <Avatar name={earner.name} size="lg" verified={earner.idVerified} />
         <div className="min-w-0 flex-1">
-          <h3 className="truncate text-title font-semibold">
+          <h3 className="truncate text-base font-semibold">
             <Link
               href={`/carers/${earner.id}`}
               data-card-link
@@ -51,12 +52,12 @@ export function CarerCard({ earner }: { earner: Earner }) {
           </h3>
           <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink-muted">
             <RatingInline rating={earner.rating} count={earner.reviewCount} />
-            <span className="inline-flex min-w-0 items-center gap-1">
-              <MapPin className="size-3.5 shrink-0" aria-hidden />
-              <span className="truncate">
-                {earner.area}, {formatDistance(earner.distanceKm)}
+            {place ? (
+              <span className="inline-flex min-w-0 items-center gap-1">
+                <MapPin className="size-3.5 shrink-0" aria-hidden />
+                <span className="truncate">{place}</span>
               </span>
-            </span>
+            ) : null}
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
             <VerificationBadges idVerified={earner.idVerified} policeVerified={earner.policeVerified} />
@@ -67,18 +68,14 @@ export function CarerCard({ earner }: { earner: Earner }) {
             ))}
             {more > 0 ? <Tag>+{more} more</Tag> : null}
           </div>
-          <p className="mt-3 text-small text-ink-muted">
-            {earner.jobsDone > 0
-              ? `${formatCount(earner.jobsDone)} jobs finished · ${repeatPercent(earner)}% book again`
-              : "New on PetBuddy"}
-          </p>
+          <p className="mt-3 text-caption text-ink-muted">{carerTrackRecord(earner)}</p>
         </div>
       </div>
 
       {/* Phones: price and actions on one row, the next free slot under them. From 768 px: a right-hand column. */}
       <div className="mt-4 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-2 border-t border-hairline pt-4 md:mt-0 md:flex md:w-64 md:shrink-0 md:flex-col md:items-stretch md:justify-between md:border-t-0 md:border-l md:pt-0 md:pl-6">
         <div className="contents md:flex md:min-w-0 md:flex-col md:items-end md:gap-1 md:text-right">
-          <Money paise={earner.pricePerHourPaise} display suffix="/hr" className="col-start-1 row-start-1 text-subhead" />
+          <Money paise={earner.pricePerHourPaise} display suffix="/hr" className="col-start-1 row-start-1 text-xl" />
           <NextAvailable
             at={earner.nextAvailableAt}
             online={earner.isOnline}

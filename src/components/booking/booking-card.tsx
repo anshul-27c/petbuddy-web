@@ -33,14 +33,15 @@ export function BookingCard({ booking, pinned = false }: { booking: Booking; pin
           <ServiceIcon service={booking.service} />
         </IconTile>
         <div className="min-w-0 flex-1">
-          <p className="text-title font-semibold">
+          <p className="text-base font-semibold">
             {catalogue.label(booking.service)} for {booking.pet.name}
           </p>
           <p className="mt-1 text-sm text-ink-muted">{formatSlot(booking.start, booking.end)}</p>
+          {/* Below 1024 px the status sits under the time, so the title keeps the full width. */}
+          <BookingStatusPill status={booking.status} className="mt-2 lg:hidden" />
         </div>
-        <BookingStatusPill status={booking.status} className="lg:hidden" />
       </div>
-      <div className="mt-4 flex items-center gap-4 border-t border-hairline pt-4 text-small text-ink-muted lg:mt-0 lg:shrink-0 lg:border-0 lg:pt-0">
+      <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-hairline pt-4 text-caption text-ink-muted lg:mt-0 lg:shrink-0 lg:flex-nowrap lg:border-0 lg:pt-0">
         <span className="inline-flex min-w-0 items-center gap-2 lg:w-44">
           <Avatar name={booking.earner.name} size="xs" />
           <span className="truncate">{booking.earner.name}</span>
@@ -75,8 +76,8 @@ export function BookingCardSkeleton() {
         <div className="flex-1 space-y-2">
           <Skeleton className="h-4 w-1/2" />
           <Skeleton className="h-3 w-2/3" />
+          <Skeleton className="h-6 w-20 rounded-full lg:hidden" />
         </div>
-        <Skeleton className="h-6 w-20 rounded-full lg:hidden" />
       </div>
       <div className="mt-4 flex gap-4 border-t border-hairline pt-4 lg:mt-0 lg:border-0 lg:pt-0">
         <Skeleton className="h-4 w-28 lg:w-44" />

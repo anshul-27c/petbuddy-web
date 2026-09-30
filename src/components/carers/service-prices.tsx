@@ -25,15 +25,15 @@ function ServiceRow({ earner, serviceKey }: { earner: Earner; serviceKey: Earner
       </IconTile>
       <span className="min-w-0 flex-1">
         <span className="block font-semibold">{service.label}</span>
-        <span className="mt-1 block text-small text-ink-muted">
+        <span className="mt-1 block text-caption text-ink-muted">
           {service.blurb} · {formatDuration(service.defaultMinutes)}
         </span>
       </span>
       <span className="shrink-0 text-right">
         {price !== undefined ? (
-          <Money paise={price} display className="text-title" />
+          <Money paise={price} display className="text-base" />
         ) : (
-          <Money paise={earner.pricePerHourPaise} display suffix="/hr" className="text-title" />
+          <Money paise={earner.pricePerHourPaise} display suffix="/hr" className="text-base" />
         )}
       </span>
       {bookable ? (

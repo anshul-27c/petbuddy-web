@@ -13,10 +13,11 @@ export type ButtonVariant =
   | "danger-quiet"
   | "danger-outline"
   | "light";
-export type ButtonSize = "md" | "lg";
+export type ButtonSize = "sm" | "md" | "lg";
 
 const VARIANTS: Record<ButtonVariant, string> = {
-  primary: "bg-leash text-surface shadow-cta hover:bg-leash-dark active:bg-leash-dark",
+  // White text needs the deeper blue for 4.5:1; the brighter leash stays for icons, rings and fills without text.
+  primary: "bg-leash-dark text-surface shadow-cta hover:brightness-90 active:brightness-85",
   // Money moments only: "Book and pay", "Place order", "Pay". Set large and bold
   // so white on the accent meets the large-text contrast ratio.
   accent: "bg-tail text-surface shadow-cta-accent hover:brightness-95 active:brightness-90",
@@ -31,14 +32,23 @@ const VARIANTS: Record<ButtonVariant, string> = {
   light: "bg-surface text-ink shadow-float hover:bg-sky active:bg-sky",
 };
 
+/**
+ * Heights: 36 small, 44 default (the same as a field, so a button beside an
+ * input lines up), 52 large; a label that has to wrap (very large text) grows
+ * the button rather than being clipped. A small button keeps a 44 px hit area
+ * through an invisible margin around it.
+ */
 const SIZES: Record<ButtonSize, string> = {
+  sm: "min-h-9 px-3 before:absolute before:inset-x-0 before:-inset-y-1 before:content-['']",
   md: "min-h-11 px-4",
-  lg: "min-h-12 px-6",
+  lg: "min-h-13 px-6",
 };
 
 function textSize(variant: ButtonVariant, size: ButtonSize) {
-  if (variant === "accent") return "text-[1.1875rem] font-bold";
-  return size === "lg" ? "text-body font-semibold" : "text-sm font-semibold";
+  // White on the accent meets the contrast ratio for large text only: 20 px bold.
+  // Use it at the large size, where the label has room.
+  if (variant === "accent") return "text-xl font-bold";
+  return size === "lg" ? "text-base font-semibold" : "text-sm font-semibold";
 }
 
 export function buttonClasses({
@@ -131,7 +141,7 @@ export function ButtonLink({ variant, size, block, sheen, icon, className, child
 
 interface IconButtonProps extends ComponentProps<"button"> {
   label: string;
-  tone?: "plain" | "tonal";
+  tone?: "plain" | "tonal" | "danger";
 }
 
 /** A 44 px round button that always carries an accessible name. */
@@ -142,8 +152,10 @@ export function IconButton({ label, tone = "plain", className, children, type = 
       aria-label={label}
       title={label}
       className={cn(
-        "inline-flex size-11 shrink-0 items-center justify-center rounded-full transition duration-150 active:scale-95 disabled:opacity-50",
-        tone === "tonal" ? "bg-sky text-leash-dark hover:bg-leash-tint" : "text-ink hover:bg-canvas",
+        "inline-flex size-11 shrink-0 items-center justify-center rounded-full transition duration-150 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50",
+        tone === "tonal" && "bg-sky text-leash-dark hover:bg-leash-tint",
+        tone === "plain" && "text-ink hover:bg-canvas",
+        tone === "danger" && "text-alert hover:bg-alert-soft",
         className,
       )}
       {...rest}

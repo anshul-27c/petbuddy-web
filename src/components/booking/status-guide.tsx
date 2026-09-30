@@ -2,7 +2,7 @@ import { CalendarCheck, CircleCheck, Clock3, Footprints, MapPinned, XCircle } fr
 import type { ReactNode } from "react";
 import { IconTile } from "@/components/ui/icon-tile";
 import { Money } from "@/components/ui/money";
-import { formatDayTime, formatTime } from "@/lib/format";
+import { formatDayTimeInline, formatTime } from "@/lib/format";
 import { CANCELLED_BY_LABELS, firstName } from "@/lib/labels";
 import type { Booking } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -32,7 +32,7 @@ function Shell({
         {icon}
       </IconTile>
       <div className="min-w-0 pt-1">
-        <h2 className="text-title font-semibold">{title}</h2>
+        <h2 className="text-base font-semibold">{title}</h2>
         <div className="mt-1 space-y-1 text-sm text-ink-muted">{children}</div>
       </div>
     </div>
@@ -49,7 +49,7 @@ export function StatusGuide({ booking }: { booking: Booking }) {
           <p>
             Carers usually answer within a few minutes.
             {booking.respondBy
-              ? ` If ${first} has not confirmed by ${formatDayTime(booking.respondBy).toLowerCase()}, the request lapses and you are refunded in full.`
+              ? ` If ${first} has not confirmed by ${formatDayTimeInline(booking.respondBy)}, the request lapses and you are refunded in full.`
               : " If they cannot take it, you are refunded in full."}
           </p>
         </Shell>
@@ -93,7 +93,7 @@ export function StatusGuide({ booking }: { booking: Booking }) {
         <Shell icon={<XCircle />} tone="alert" title={c ? CANCELLED_BY_LABELS[c.by] : "This booking was cancelled"}>
           {c ? (
             <>
-              <p>Cancelled {formatDayTime(c.at).toLowerCase()}.</p>
+              <p>Cancelled {formatDayTimeInline(c.at)}.</p>
               {c.reason ? <p>Reason: {c.reason}</p> : null}
               <p>
                 {c.refundPaise > 0 ? (

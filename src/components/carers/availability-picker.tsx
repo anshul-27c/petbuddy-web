@@ -6,7 +6,7 @@ import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState, QueryView } from "@/components/ui/states";
 import { api } from "@/lib/api";
-import { availabilityDayParts, formatTime } from "@/lib/format";
+import { availabilityDayParts, businessHour, formatTime } from "@/lib/format";
 import { qk } from "@/lib/query-keys";
 import type { DayAvailability, ServiceKey, Slot } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -118,20 +118,20 @@ function PickerBody({
               className={cn(
                 "flex w-16 shrink-0 snap-start flex-col items-center rounded-field border py-3 transition duration-150 ease-out active:scale-95",
                 active
-                  ? "border-leash bg-leash text-surface shadow-cta"
+                  ? "border-leash-dark bg-leash-dark text-surface shadow-cta"
                   : free > 0
                     ? "border-hairline bg-surface text-ink shadow-card hover:border-leash"
-                    : "border-hairline bg-canvas text-ink-faint",
+                    : "border-hairline bg-canvas text-ink-muted",
               )}
             >
-              <span className={cn("text-label font-semibold", active ? "text-surface" : free ? "text-ink-muted" : "")}>
+              <span className={cn("text-xs font-semibold", active ? "text-surface" : "text-ink-muted")}>
                 {parts.weekday}
               </span>
-              <span className="mt-1 text-title font-bold tabular-nums">{parts.day}</span>
+              <span className="mt-1 text-base font-bold tabular-nums">{parts.day}</span>
               <span
                 className={cn(
-                  "mt-1 text-label font-semibold",
-                  active ? "text-surface" : free ? "text-trail" : "text-ink-faint",
+                  "mt-1 text-xs font-semibold",
+                  active ? "text-surface" : free ? "text-trail" : "text-ink-muted",
                 )}
               >
                 {free ? `${free} free` : "Full"}
@@ -149,11 +149,11 @@ function PickerBody({
       ) : (
         <div className="mt-3 space-y-4">
           {PERIODS.map((period) => {
-            const slots = day.slots.filter((slot) => period.test(new Date(slot.start).getHours()));
+            const slots = day.slots.filter((slot) => period.test(businessHour(slot.start)));
             if (slots.length === 0) return null;
             return (
               <div key={period.key} role="group" aria-label={period.label}>
-                <p className="mb-2 text-small font-semibold text-ink-muted">{period.label}</p>
+                <p className="mb-2 text-caption font-semibold text-ink-muted">{period.label}</p>
                 <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-5">
                   {slots.map((slot) => {
                     const active = sameInstant(slot.start, selected);
@@ -167,10 +167,10 @@ function PickerBody({
                         className={cn(
                           "min-h-11 rounded-field border px-2 text-sm font-semibold tabular-nums transition duration-150 ease-out",
                           active
-                            ? "border-leash bg-leash text-surface shadow-cta"
+                            ? "border-leash-dark bg-leash-dark text-surface shadow-cta"
                             : slot.available
                               ? "border-hairline bg-surface text-ink shadow-card hover:border-leash hover:text-leash-dark active:scale-95"
-                              : "cursor-not-allowed border-hairline bg-canvas font-medium text-ink-faint line-through",
+                              : "cursor-not-allowed border-hairline bg-canvas font-normal text-ink-faint line-through",
                         )}
                       >
                         {formatTime(slot.start)}

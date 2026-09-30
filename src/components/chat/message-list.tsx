@@ -2,14 +2,10 @@
 
 import Image from "next/image";
 import { Fragment, useEffect, useRef } from "react";
-import { formatDay, formatTime } from "@/lib/format";
+import { businessDate, formatDay, formatTime } from "@/lib/format";
 import type { ChatMessage } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-function dayKey(iso: string) {
-  const date = new Date(iso);
-  return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
-}
 
 /** Messages oldest first, with day separators. System messages sit centred and muted. */
 export function MessageList({ messages, className }: { messages: ChatMessage[]; className?: string }) {
@@ -45,18 +41,18 @@ export function MessageList({ messages, className }: { messages: ChatMessage[]; 
     >
       <ol className="space-y-2">
         {messages.map((message, index) => {
-          const newDay = index === 0 || dayKey(messages[index - 1].at) !== dayKey(message.at);
+          const newDay = index === 0 || businessDate(messages[index - 1].at) !== businessDate(message.at);
           return (
             <Fragment key={message.id}>
               {newDay ? (
                 <li className="flex justify-center py-2" aria-hidden>
-                  <span className="rounded-full bg-surface px-3 py-1 text-label font-semibold text-ink-muted shadow-card">
+                  <span className="rounded-full bg-surface px-3 py-1 text-xs font-semibold text-ink-muted shadow-card">
                     {formatDay(message.at)}
                   </span>
                 </li>
               ) : null}
               {message.isSystem ? (
-                <li className="px-6 py-1 text-center text-small text-ink-muted">
+                <li className="px-6 py-1 text-center text-caption text-ink-muted">
                   {message.text}
                   <span className="sr-only">, {formatTime(message.at)}</span>
                 </li>
@@ -66,7 +62,7 @@ export function MessageList({ messages, className }: { messages: ChatMessage[]; 
                     className={cn(
                       "max-w-[85%] animate-rise-in rounded-card px-4 py-3 sm:max-w-[70%]",
                       message.fromMe
-                        ? "rounded-br-md bg-linear-to-br from-leash to-leash-dark text-surface shadow-cta"
+                        ? "rounded-br-md bg-leash-dark text-surface shadow-cta"
                         : "rounded-bl-md border border-hairline bg-surface text-ink shadow-card",
                     )}
                   >
@@ -84,7 +80,7 @@ export function MessageList({ messages, className }: { messages: ChatMessage[]; 
                       </a>
                     ) : null}
                     {message.text ? <p className="whitespace-pre-line break-words">{message.text}</p> : null}
-                    <p className={cn("mt-1 text-right text-label", message.fromMe ? "text-sky" : "text-ink-muted")}>
+                    <p className={cn("mt-1 text-right text-xs", message.fromMe ? "text-sky" : "text-ink-muted")}>
                       {formatTime(message.at)}
                     </p>
                   </div>

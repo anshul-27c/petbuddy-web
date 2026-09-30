@@ -41,7 +41,7 @@ export function Stepper({
                 <span
                   className={cn(
                     "flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-bold transition-colors duration-200",
-                    active && "bg-leash text-surface shadow-cta",
+                    active && "bg-leash-dark text-surface shadow-cta",
                     done && !active && "bg-trail text-surface",
                     !done && !active && "border border-hairline bg-surface text-ink-muted",
                   )}
@@ -52,7 +52,7 @@ export function Stepper({
                     index + 1
                   )}
                 </span>
-                <span className={cn("text-small font-semibold sm:text-sm", active ? "text-leash-dark" : "text-ink-muted")}>
+                <span className={cn("text-caption font-semibold sm:text-sm", active ? "text-leash-dark" : "text-ink-muted")}>
                   {label}
                   {done && !active ? <span className="sr-only"> (done)</span> : null}
                 </span>

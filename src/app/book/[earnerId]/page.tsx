@@ -20,7 +20,7 @@ function Book({ earnerId }: { earnerId: string }) {
   const params = useSearchParams();
   const service = params.get("service");
   return (
-    <Container>
+    <Container grow>
       <PageHeader title="Book a visit" subtitle="Four quick steps. You see the full price before you pay." />
       <BookingFlow
         earnerId={earnerId}

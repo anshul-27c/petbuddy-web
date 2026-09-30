@@ -18,11 +18,11 @@ export function LivePanel({ booking, updatedAt }: { booking: Booking; updatedAt:
     >
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div className="min-w-0">
-          <h2 id="live-title" className="flex items-center gap-2 text-title font-semibold">
+          <h2 id="live-title" className="flex items-center gap-2 text-base font-semibold">
             <span className="pulse-dot size-2.5 rounded-full bg-trail text-trail" aria-hidden />
             Live
           </h2>
-          <p className="mt-1 text-small text-ink-muted">
+          <p className="mt-1 text-caption text-ink-muted">
             Updates every few seconds. Last checked {formatAgo(new Date(updatedAt).toISOString())}.
           </p>
         </div>

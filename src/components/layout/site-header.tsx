@@ -61,7 +61,7 @@ function CartButton() {
     >
       <ShoppingBag className="size-5" aria-hidden />
       {count > 0 ? (
-        <span className="absolute top-1 right-0.5 inline-flex min-w-4.5 animate-pop-in items-center justify-center rounded-full bg-leash px-1 text-[0.625rem] leading-4.5 font-bold text-surface tabular-nums ring-2 ring-surface">
+        <span className="absolute top-0 right-0 inline-flex h-5 min-w-5 animate-pop-in items-center justify-center rounded-full bg-leash-dark px-1 text-xs font-bold text-surface ring-2 ring-surface">
           {count > 99 ? "99+" : count}
         </span>
       ) : null}
@@ -98,15 +98,15 @@ export function SiteHeader() {
       ];
 
   return (
-    <header className="sticky top-0 z-40 border-b border-hairline/80 bg-surface/90 backdrop-blur-xl backdrop-saturate-150 supports-[backdrop-filter]:bg-surface/75">
+    <header className="sticky top-0 z-40 bg-surface/90 shadow-[inset_0_-1px_0_var(--color-hairline)] backdrop-blur-xl backdrop-saturate-150 supports-[backdrop-filter]:bg-surface/75">
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-field focus:bg-surface focus:px-4 focus:py-2 focus:shadow-float"
       >
         Skip to content
       </a>
-      <div className="container-page flex h-16 items-center gap-2">
-        <Logo className="mr-4 shrink-0" />
+      <div className="@container container-page flex h-16 items-center gap-2">
+        <Logo compact className="mr-2 sm:mr-4" />
 
         <nav aria-label="Main" className="hidden flex-1 items-center gap-1 md:flex">
           {nav.map((item) => (
@@ -114,7 +114,7 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <div className="-mr-3 ml-auto flex items-center gap-1 md:mr-0">
+        <div className="-mr-3 ml-auto flex shrink-0 items-center gap-1 md:mr-0">
           {status === "loading" ? (
             <Skeleton className="h-10 w-24 rounded-full" />
           ) : signedIn ? (

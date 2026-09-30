@@ -10,10 +10,10 @@ import { cn } from "@/lib/utils";
 export type PillTone = "amber" | "leash" | "trail" | "alert" | "muted";
 
 const TONES: Record<PillTone, string> = {
-  amber: "bg-amber-soft text-amber",
+  amber: "bg-amber-soft text-amber-ink",
   leash: "bg-sky text-leash-dark",
-  trail: "bg-trail-soft text-trail",
-  alert: "bg-alert-soft text-alert",
+  trail: "bg-trail-soft text-trail-ink",
+  alert: "bg-alert-soft text-alert-ink",
   muted: "bg-canvas text-ink-muted",
 };
 
@@ -61,7 +61,7 @@ export function Pill({
   return (
     <span
       className={cn(
-        "inline-flex shrink-0 items-center gap-2 rounded-full px-3 py-1 text-label font-semibold whitespace-nowrap",
+        "inline-flex shrink-0 items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold whitespace-nowrap",
         TONES[tone],
         className,
       )}

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { AvailabilityPicker, sameInstant } from "@/components/carers/availability-picker";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
+import { FieldError } from "@/components/ui/field";
 import { ErrorNotice } from "@/components/ui/notice";
 import { useToast } from "@/components/ui/toast";
 import { api } from "@/lib/api";
@@ -26,6 +27,7 @@ export function RescheduleDialog({
   onClose: () => void;
 }) {
   const [picked, setPicked] = useState<string | null>(null);
+  const [problem, setProblem] = useState<string | null>(null);
   const refresh = useBookingRefresh();
   const queryClient = useQueryClient();
   const toast = useToast();
@@ -51,6 +53,16 @@ export function RescheduleDialog({
   const pickedEnd = picked ? new Date(new Date(picked).getTime() + minutes * 60_000).toISOString() : null;
   const unchanged = sameInstant(picked, booking.start);
 
+  const submit = () => {
+    if (move.isPending) return;
+    if (!picked || unchanged) {
+      setProblem(picked ? "Pick a time other than the one it is booked for now." : "Pick a new day and time first.");
+      return;
+    }
+    setProblem(null);
+    move.mutate(picked);
+  };
+
   return (
     <Dialog
       open={open}
@@ -61,8 +73,10 @@ export function RescheduleDialog({
       dismissible={!move.isPending}
       footer={
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-ink-muted" aria-live="polite">
-            {unchanged ? (
+          <div className="text-sm text-ink-muted" aria-live="polite">
+            {problem ? (
+              <FieldError>{problem}</FieldError>
+            ) : unchanged ? (
               "That is the time it is booked for now."
             ) : picked && pickedEnd ? (
               <>
@@ -71,16 +85,12 @@ export function RescheduleDialog({
             ) : (
               "Pick a day and a time."
             )}
-          </p>
+          </div>
           <div className="flex flex-col-reverse gap-2 sm:flex-row">
             <Button variant="outline" onClick={onClose} disabled={move.isPending}>
               Cancel
             </Button>
-            <Button
-              onClick={() => picked && move.mutate(picked)}
-              disabled={!picked || unchanged}
-              loading={move.isPending}
-            >
+            <Button onClick={submit} loading={move.isPending}>
               Move booking
             </Button>
           </div>
@@ -101,6 +111,7 @@ export function RescheduleDialog({
           selected={picked}
           onSelect={(slot) => {
             setPicked(slot.start);
+            setProblem(null);
             move.reset();
           }}
         />

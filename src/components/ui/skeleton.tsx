@@ -59,10 +59,10 @@ export function PawLoader({ label = "Loading", className }: { label?: string; cl
   );
 }
 
-/** Neutral page placeholder used while the sign-in state is being read. */
+/** Neutral page placeholder used while the sign-in state is being read: centred in the page area. */
 export function PageSkeleton() {
   return (
-    <div className="container-page flex min-h-[60dvh] items-center justify-center py-16">
+    <div className="container-page state-area flex flex-1 items-center justify-center">
       <PawLoader />
     </div>
   );

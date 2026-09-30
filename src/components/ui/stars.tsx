@@ -16,7 +16,7 @@ export function RatingInline({
   className?: string;
 }) {
   if (!count) {
-    return <span className={cn("text-small font-semibold text-leash-dark", className)}>New</span>;
+    return <span className={cn("text-caption font-semibold text-leash-dark", className)}>New</span>;
   }
   return (
     <span className={cn("inline-flex items-center gap-1 text-sm", className)}>

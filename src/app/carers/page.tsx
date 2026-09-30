@@ -54,12 +54,12 @@ function BrowseCarers() {
   const count = query.data?.length ?? 0;
 
   return (
-    <Container>
+    <Container grow>
       <PageHeader title="Find a carer" subtitle={`Vetted carers for your pet in ${cityName}.`} />
 
       {/* Filters sit above the list up to 1279 px, and in a sticky panel beside it from 1280 px. */}
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[20rem_minmax(0,1fr)] xl:items-start xl:gap-8">
-        <aside aria-label="Search and filters" className="xl:sticky xl:top-24">
+      <div className="flex flex-1 flex-col gap-4 xl:grid xl:grid-cols-[20rem_minmax(0,1fr)] xl:items-stretch xl:gap-8">
+        <aside aria-label="Search and filters" className="xl:sticky xl:top-24 xl:self-start">
           <div className="xl:rounded-card xl:border xl:border-hairline xl:bg-surface xl:p-5 xl:shadow-card">
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_14rem_14rem] xl:grid-cols-1">
               <div className="sm:col-span-2 lg:col-span-1">
@@ -141,7 +141,7 @@ function BrowseCarers() {
           </div>
         </aside>
 
-        <div className="min-w-0">
+        <div className="flex min-w-0 flex-1 flex-col">
           <div className="mb-3 flex min-h-11 items-center justify-between gap-3">
             <p className="text-sm text-ink-muted" aria-live="polite">
               {query.data ? (
@@ -164,6 +164,7 @@ function BrowseCarers() {
 
           <QueryView
             query={query}
+            fill
             loading={
               <div className="grid grid-cols-1 gap-3 sm:gap-4" role="status" aria-label="Loading carers">
                 {Array.from({ length: 4 }, (_, i) => (
@@ -175,6 +176,8 @@ function BrowseCarers() {
             empty={
               state.favouritesOnly && activeCount === 1 ? (
                 <EmptyState
+                  fill
+                  areaClassName="pt-3 sm:pt-5"
                   icon={<Heart />}
                   title="No favourites yet"
                   body="Tap the heart on a carer to save them here. Only carers who are online right now are listed."
@@ -182,6 +185,8 @@ function BrowseCarers() {
                 />
               ) : (
                 <EmptyState
+                  fill
+                  areaClassName="pt-3 sm:pt-5"
                   icon={<SearchX />}
                   title="No carers match those filters"
                   body="Try widening the distance, or clear a filter or two."

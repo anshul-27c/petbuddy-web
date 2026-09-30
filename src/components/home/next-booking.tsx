@@ -19,7 +19,7 @@ export function NextBooking() {
   if (!query.data) return null;
   return (
     <section aria-labelledby="next-booking">
-      <SectionHeader id="next-booking" eyebrow="Upcoming" title="Your next booking" />
+      <SectionHeader landing id="next-booking" eyebrow="Upcoming" title="Your next booking" />
       <Reveal self>
         <BookingCard booking={query.data} pinned />
       </Reveal>

@@ -17,8 +17,8 @@ function Line({ icon, label, value }: { icon: ReactNode; label: string; value: R
         {icon}
       </IconTile>
       <div className="min-w-0">
-        <dt className="text-small text-ink-muted">{label}</dt>
-        <dd className="mt-1 text-sm font-medium">{value ?? <span className="text-ink-muted">Not chosen yet</span>}</dd>
+        <dt className="text-caption text-ink-muted">{label}</dt>
+        <dd className="mt-1 text-sm font-semibold">{value ?? <span className="text-ink-muted">Not chosen yet</span>}</dd>
       </div>
     </div>
   );
@@ -48,7 +48,7 @@ export function BookingSummary({
       <div className="flex items-center gap-3">
         <Avatar name={earner.name} verified={earner.idVerified} />
         <div className="min-w-0">
-          <p className="truncate text-title font-semibold">{earner.name}</p>
+          <p className="truncate text-base font-semibold">{earner.name}</p>
           <RatingInline rating={earner.rating} count={earner.reviewCount} className="mt-1" />
         </div>
       </div>
@@ -65,7 +65,7 @@ export function BookingSummary({
       {totalPaise !== null ? (
         <div className="mt-4 flex items-baseline justify-between border-t border-hairline pt-4">
           <span className="font-semibold">Total</span>
-          <Money paise={totalPaise} display className="text-subhead" />
+          <Money paise={totalPaise} display className="text-xl" />
         </div>
       ) : null}
     </Card>

@@ -40,14 +40,17 @@ function Pets() {
     <AccountShell
       title="Your pets"
       action={
-        <Button onClick={() => setEditing("new")} icon={<Plus className="size-4" aria-hidden />}>
-          Add a pet
-        </Button>
+        // With no pets yet, the empty state below carries the one "Add a pet".
+        pets.data?.length ? (
+          <Button onClick={() => setEditing("new")} icon={<Plus className="size-4" aria-hidden />}>
+            Add a pet
+          </Button>
+        ) : undefined
       }
     >
-      <div>
-        <QueryView
+      <QueryView
           query={pets}
+          fill
           loading={
             <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2" role="status" aria-label="Loading pets">
               <CardSkeleton />
@@ -57,6 +60,7 @@ function Pets() {
           isEmpty={(list) => list.length === 0}
           empty={
             <EmptyState
+              fill
               icon={<PawPrint />}
               title="No pets yet"
               body="Add your pet so carers know who they are meeting."
@@ -87,7 +91,6 @@ function Pets() {
             </Reveal>
           )}
         </QueryView>
-      </div>
 
       <Dialog
         open={editing !== null}

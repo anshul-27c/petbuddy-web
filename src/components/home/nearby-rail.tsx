@@ -12,7 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState, QueryView } from "@/components/ui/states";
 import { RatingInline } from "@/components/ui/stars";
 import { api } from "@/lib/api";
-import { formatDistance } from "@/lib/format";
+import { carerPlace } from "@/lib/format";
 import { qk } from "@/lib/query-keys";
 import { cn } from "@/lib/utils";
 
@@ -94,18 +94,18 @@ export function NearbyRail() {
                   <div className="flex items-center gap-3">
                     <Avatar name={earner.name} verified={earner.idVerified} />
                     <div className="min-w-0">
-                      <p className="truncate text-title font-semibold">{earner.name}</p>
-                      <p className="mt-1 flex items-center gap-1 truncate text-small text-ink-muted">
-                        <MapPin className="size-3.5 shrink-0" aria-hidden />
-                        <span className="truncate">
-                          {earner.area} · {formatDistance(earner.distanceKm)}
-                        </span>
-                      </p>
+                      <p className="truncate text-base font-semibold">{earner.name}</p>
+                      {carerPlace(earner.area, earner.distanceKm) ? (
+                        <p className="mt-1 flex items-center gap-1 truncate text-caption text-ink-muted">
+                          <MapPin className="size-3.5 shrink-0" aria-hidden />
+                          <span className="truncate">{carerPlace(earner.area, earner.distanceKm)}</span>
+                        </p>
+                      ) : null}
                     </div>
                   </div>
                   <div className="mt-4 flex items-baseline justify-between gap-2">
                     <RatingInline rating={earner.rating} count={earner.reviewCount} />
-                    <Money paise={earner.pricePerHourPaise} display suffix="/hr" className="text-title" />
+                    <Money paise={earner.pricePerHourPaise} display suffix="/hr" className="text-base" />
                   </div>
                   <div className="mt-auto pt-4">
                     <div className="border-t border-hairline pt-4">

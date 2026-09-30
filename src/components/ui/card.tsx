@@ -25,13 +25,13 @@ export function Card({ tone = "plain", inset = "standard", className, ...rest }:
   );
 }
 
-/** A card-level heading: sans, semibold, 17 px. */
+/** A card-level heading: 16 px, semibold. */
 export function CardTitle({
   as: Tag = "h2",
   className,
   ...rest
 }: ComponentProps<"h2"> & { as?: "h2" | "h3" }) {
-  return <Tag className={cn("text-title font-semibold text-ink", className)} {...rest} />;
+  return <Tag className={cn("text-base font-semibold text-ink", className)} {...rest} />;
 }
 
 export function Divider({ className }: { className?: string }) {

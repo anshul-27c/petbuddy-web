@@ -12,15 +12,17 @@ import { formatAgo } from "@/lib/format";
 import { useServiceCatalogue } from "@/lib/queries";
 import { cn } from "@/lib/utils";
 
-export function ThreadList({ className }: { className?: string }) {
+/** `fill`: the list is the page's main content, so its empty state centres in the page. */
+export function ThreadList({ className, fill = false }: { className?: string; fill?: boolean }) {
   const threads = useChatThreads();
   const catalogue = useServiceCatalogue();
   const pathname = usePathname();
 
   return (
-    <div className={className}>
+    <div className={cn(fill && "flex flex-1 flex-col", className)}>
       <QueryView
         query={threads}
+        fill={fill}
         loading={
           <div className="space-y-2" role="status" aria-label="Loading conversations">
             {[0, 1, 2].map((i) => (
@@ -37,6 +39,7 @@ export function ThreadList({ className }: { className?: string }) {
         isEmpty={(list) => list.length === 0}
         empty={
           <EmptyState
+            fill={fill}
             icon={<MessagesSquare />}
             title="No messages yet"
             body="Once you book, you can message your carer here."
@@ -66,9 +69,9 @@ export function ThreadList({ className }: { className?: string }) {
                         <p className={cn("truncate", thread.unread > 0 ? "font-bold" : "font-semibold")}>
                           {thread.withName}
                         </p>
-                        <span className="shrink-0 text-small text-ink-muted">{formatAgo(thread.lastAt)}</span>
+                        <span className="shrink-0 text-caption text-ink-muted">{formatAgo(thread.lastAt)}</span>
                       </div>
-                      <p className="mt-1 truncate text-small text-ink-muted">
+                      <p className="mt-1 truncate text-caption text-ink-muted">
                         {catalogue.label(thread.service)} · {thread.bookingCode}
                       </p>
                       <div className="mt-1 flex items-center justify-between gap-2">
@@ -76,7 +79,7 @@ export function ThreadList({ className }: { className?: string }) {
                           {thread.lastMessage || "No messages yet"}
                         </p>
                         {thread.unread > 0 ? (
-                          <span className="inline-flex min-w-5 shrink-0 animate-pop-in items-center justify-center rounded-full bg-leash px-2 text-label leading-5 font-bold text-surface">
+                          <span className="inline-flex h-5 min-w-5 shrink-0 animate-pop-in items-center justify-center rounded-full bg-leash-dark px-2 text-xs font-bold text-surface">
                             {thread.unread}
                             <span className="sr-only"> unread</span>
                           </span>

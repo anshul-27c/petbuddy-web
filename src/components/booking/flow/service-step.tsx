@@ -21,7 +21,7 @@ export function ServiceStep({
   const catalogue = useServiceCatalogue();
   return (
     <fieldset>
-      <legend className="font-display text-subhead font-semibold sm:text-headline">What do you need?</legend>
+      <legend className="title-section">What do you need?</legend>
       <p className="mt-2 text-body text-ink-muted">Prices are for one booking at the usual length.</p>
       <div className="mt-4 grid gap-3 sm:mt-5">
         {earner.services.map((key) => {
@@ -39,9 +39,9 @@ export function ServiceStep({
               description={`${service.blurb} · ${formatDuration(service.defaultMinutes)}`}
               trailing={
                 price !== undefined ? (
-                  <Money paise={price} display className="text-title" />
+                  <Money paise={price} display className="text-base" />
                 ) : (
-                  <Money paise={earner.pricePerHourPaise} display suffix="/hr" className="text-title" />
+                  <Money paise={earner.pricePerHourPaise} display suffix="/hr" className="text-base" />
                 )
               }
             />

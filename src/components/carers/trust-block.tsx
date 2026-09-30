@@ -5,16 +5,16 @@ import type { ReactNode } from "react";
 import { Card } from "@/components/ui/card";
 import { IconTile } from "@/components/ui/icon-tile";
 import { CountUp } from "@/components/ui/motion";
-import { formatCount } from "@/lib/format";
-import { isNewCarer, repeatPercent } from "@/lib/labels";
+import { formatCount, formatYear, repeatPercent, showsRepeatRate } from "@/lib/format";
+import { isNewCarer } from "@/lib/labels";
 import type { Earner } from "@/lib/types";
 
 function Stat({ icon, value, label }: { icon: ReactNode; value: ReactNode; label: string }) {
   return (
     <div className="flex flex-col items-center rounded-field bg-mist px-2 py-4 text-center">
       <IconTile size="sm">{icon}</IconTile>
-      <span className="mt-2 font-display text-subhead font-semibold sm:text-headline">{value}</span>
-      <span className="text-small text-ink-muted">{label}</span>
+      <span className="mt-2 title-section">{value}</span>
+      <span className="text-caption text-ink-muted">{label}</span>
     </div>
   );
 }
@@ -32,7 +32,7 @@ function Check({ done, label, detail }: { done: boolean; label: string; detail: 
       </span>
       <div>
         <p className="text-sm font-semibold">{label}</p>
-        <p className="mt-1 text-small text-ink-muted">{detail}</p>
+        <p className="mt-1 text-caption text-ink-muted">{detail}</p>
       </div>
     </li>
   );
@@ -40,25 +40,25 @@ function Check({ done, label, detail }: { done: boolean; label: string; detail: 
 
 /** Why this carer can be trusted, in facts rather than a badge level. The figures count up as they appear. */
 export function TrustBlock({ earner }: { earner: Earner }) {
-  const repeat = repeatPercent(earner);
   return (
     <Card>
       <div className="grid grid-cols-3 gap-2 sm:gap-3">
         <Stat
           icon={<BriefcaseBusiness />}
           value={<CountUp value={earner.jobsDone} format={(n) => formatCount(Math.round(n))} />}
-          label="jobs finished"
+          label={earner.jobsDone === 1 ? "job finished" : "jobs finished"}
         />
-        <Stat
-          icon={<Repeat />}
-          value={<CountUp value={repeat} format={(n) => `${Math.round(n)}%`} />}
-          label="book again"
-        />
-        <Stat
-          icon={<CalendarHeart />}
-          value={<span className="tabular-nums">{new Date(earner.joinedAt).getFullYear()}</span>}
-          label="joined"
-        />
+        {/* The book-again rate means little on a handful of jobs, so a newer carer shows "New". */}
+        {showsRepeatRate(earner) ? (
+          <Stat
+            icon={<Repeat />}
+            value={<CountUp value={repeatPercent(earner)} format={(n) => `${Math.round(n)}%`} />}
+            label="book again"
+          />
+        ) : (
+          <Stat icon={<Repeat />} value="New" label="carer" />
+        )}
+        <Stat icon={<CalendarHeart />} value={formatYear(earner.joinedAt)} label="joined" />
       </div>
       <ul className="mt-5 grid gap-4 border-t border-hairline pt-5 sm:grid-cols-2">
         <Check
@@ -81,7 +81,7 @@ export function TrustBlock({ earner }: { earner: Earner }) {
         />
       </ul>
       {isNewCarer(earner) ? (
-        <p className="mt-5 flex gap-2 rounded-field bg-amber-soft p-3 text-sm text-amber">
+        <p className="mt-5 flex gap-2 rounded-field bg-amber-soft p-3 text-sm text-amber-ink">
           <span className="flex h-5 shrink-0 items-center" aria-hidden>
             <Info className="size-4" />
           </span>

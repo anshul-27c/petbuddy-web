@@ -18,6 +18,7 @@ export function CarerBand() {
       <ShaderBackdrop tone="night" />
       <div className="relative grid gap-6 p-6 sm:p-10 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-10 lg:p-12">
         <SectionHeader
+          landing
           id="carer-band"
           inverse
           flush

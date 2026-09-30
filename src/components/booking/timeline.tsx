@@ -57,7 +57,7 @@ export function Timeline({ events }: { events: TimelineEvent[] }) {
           <Dot kind={event.kind} />
           <div className="min-w-0 flex-1 pt-1">
             <p className="text-sm font-semibold">{TIMELINE_LABELS[event.kind] ?? "Update"}</p>
-            <p className="mt-1 text-small text-ink-muted">
+            <p className="mt-1 text-caption text-ink-muted">
               <time dateTime={event.at}>{formatDayTime(event.at)}</time>
             </p>
             {event.note ? (

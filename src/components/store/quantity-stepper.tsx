@@ -2,8 +2,9 @@
 
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { LIMITS } from "@/lib/validation";
 
-/** Minus, count, plus, in one pill. At one item the minus becomes remove. */
+/** Minus, count, plus, in one pill. At one item the minus becomes remove; plus stops at the basket's limit of 20. */
 export function QuantityStepper({
   name,
   quantity,
@@ -25,7 +26,7 @@ export function QuantityStepper({
     >
       <button
         type="button"
-        className="inline-flex size-11 items-center justify-center rounded-full transition duration-150 hover:bg-leash-tint active:scale-90 disabled:opacity-50"
+        className="inline-flex size-11 items-center justify-center rounded-full transition duration-150 hover:bg-leash-tint active:scale-90 disabled:cursor-not-allowed disabled:opacity-50"
         onClick={() => onChange(quantity - 1)}
         disabled={disabled}
         aria-label={quantity <= 1 ? `Remove ${name}` : `Remove one ${name}`}
@@ -39,8 +40,9 @@ export function QuantityStepper({
         type="button"
         className="inline-flex size-11 items-center justify-center rounded-full transition duration-150 hover:bg-leash-tint active:scale-90 disabled:opacity-50"
         onClick={() => onChange(quantity + 1)}
-        disabled={disabled}
+        disabled={disabled || quantity >= LIMITS.cartQuantity}
         aria-label={`Add one ${name}`}
+        title={quantity >= LIMITS.cartQuantity ? `Up to ${LIMITS.cartQuantity} of each item` : undefined}
       >
         <Plus className="size-4" aria-hidden />
       </button>

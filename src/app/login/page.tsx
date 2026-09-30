@@ -3,31 +3,33 @@
 import { useMutation } from "@tanstack/react-query";
 import { ArrowLeft, FlaskConical } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState, type FormEvent } from "react";
+import { Suspense, useEffect, useRef, useState, type FormEvent } from "react";
 import { useAuth } from "@/components/auth/auth-provider";
 import { OtpInput } from "@/components/auth/otp-input";
 import { Container } from "@/components/layout/container";
 import { LogoMark } from "@/components/layout/logo";
 import { Button } from "@/components/ui/button";
-import { TextField } from "@/components/ui/field";
+import { FieldError, TextField } from "@/components/ui/field";
 import { ErrorNotice, Notice } from "@/components/ui/notice";
 import { PageSkeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/toast";
 import { api, isApiError } from "@/lib/api";
-import { formatPhone } from "@/lib/format";
+import { formatPhone, plural } from "@/lib/format";
 import { useCountdown } from "@/lib/hooks";
 import type { OtpSent } from "@/lib/types";
 import { safeNext } from "@/lib/utils";
-import { isValidPhone, normalisePhone } from "@/lib/validation";
+import { normalisePhone, otpError, phoneError } from "@/lib/validation";
 import { PageTitle } from "@/components/layout/page-title";
 import { ShaderBackdrop } from "@/components/ui/shader-backdrop";
 
 function PhoneStep({ onSent }: { onSent: (phone: string, sent: OtpSent) => void }) {
   const [phone, setPhone] = useState("");
   const [clientError, setClientError] = useState<string | undefined>();
+  const inputRef = useRef<HTMLInputElement>(null);
   const send = useMutation({
     mutationFn: (value: string) => api.auth.sendOtp(value),
     onSuccess: (sent, value) => onSent(value, sent),
+    onError: () => inputRef.current?.focus(),
   });
 
   const serverFieldError = isApiError(send.error) ? send.error.fieldErrors.phone : undefined;
@@ -36,18 +38,19 @@ function PhoneStep({ onSent }: { onSent: (phone: string, sent: OtpSent) => void 
   const submit = (event: FormEvent) => {
     event.preventDefault();
     if (send.isPending) return;
-    if (!isValidPhone(phone)) {
-      setClientError("Enter a 10-digit mobile number starting with 6, 7, 8 or 9.");
+    const problem = phoneError(phone);
+    setClientError(problem);
+    if (problem) {
+      inputRef.current?.focus();
       return;
     }
-    setClientError(undefined);
     send.mutate(phone);
   };
 
   return (
     <form onSubmit={submit} noValidate className="space-y-6">
       <div>
-        <h1 className="font-display text-headline font-semibold">What&apos;s your number?</h1>
+        <h1 className="text-2xl font-bold">What&apos;s your number?</h1>
         <p className="mt-2 text-ink-muted">We&apos;ll send a six-digit code to confirm it&apos;s you.</p>
       </div>
       <TextField
@@ -59,9 +62,11 @@ function PhoneStep({ onSent }: { onSent: (phone: string, sent: OtpSent) => void 
         placeholder="98765 43210"
         value={phone}
         autoFocus
+        ref={inputRef}
         onChange={(event) => {
           setPhone(normalisePhone(event.target.value));
           setClientError(undefined);
+          if (send.error) send.reset();
         }}
         error={error}
       />
@@ -89,6 +94,8 @@ function CodeStep({
   const { signIn } = useAuth();
   const toast = useToast();
   const [code, setCode] = useState("");
+  const [codeProblem, setCodeProblem] = useState<string | undefined>();
+  const otpRef = useRef<HTMLDivElement>(null);
   const [deadline, setDeadline] = useState(() => Date.now() + sent.resendInSeconds * 1000);
   const secondsLeft = useCountdown(deadline);
 
@@ -98,7 +105,11 @@ function CodeStep({
       signIn(session);
       onVerified();
     },
-    onError: () => setCode(""),
+    // A wrong code is cleared so the next one can be typed straight in.
+    onError: () => {
+      setCode("");
+      requestAnimationFrame(() => otpRef.current?.querySelector("input")?.focus());
+    },
   });
 
   const resend = useMutation({
@@ -112,7 +123,7 @@ function CodeStep({
     },
   });
 
-  const codeError = isApiError(verify.error) ? verify.error.fieldErrors.code : undefined;
+  const codeError = codeProblem ?? (isApiError(verify.error) ? verify.error.fieldErrors.code : undefined);
 
   return (
     <form
@@ -120,7 +131,16 @@ function CodeStep({
       className="space-y-6"
       onSubmit={(event) => {
         event.preventDefault();
-        if (code.length === 6 && !verify.isPending) verify.mutate(code);
+        if (verify.isPending || verify.isSuccess) return;
+        const problem = otpError(code);
+        setCodeProblem(problem);
+        if (problem) {
+          // Focus the first empty box.
+          const boxes = otpRef.current?.querySelectorAll("input");
+          boxes?.[Math.min(code.length, 5)]?.focus();
+          return;
+        }
+        verify.mutate(code);
       }}
     >
       <div>
@@ -132,7 +152,7 @@ function CodeStep({
           <ArrowLeft className="size-4 transition-transform duration-150 group-hover:-translate-x-1" aria-hidden />
           <span className="group-hover:underline">Change number</span>
         </button>
-        <h1 className="font-display text-headline font-semibold">Enter the code</h1>
+        <h1 className="text-2xl font-bold">Enter the code</h1>
         <p className="mt-2 text-ink-muted">Sent to {formatPhone(phone)}.</p>
       </div>
 
@@ -145,11 +165,12 @@ function CodeStep({
         </Notice>
       ) : null}
 
-      <div>
+      <div ref={otpRef}>
         <OtpInput
           value={code}
           onChange={(value) => {
             setCode(value);
+            setCodeProblem(undefined);
             if (verify.error) verify.reset();
             // Submit as soon as all six digits are in.
             if (value.length === 6 && !verify.isPending && !verify.isSuccess) verify.mutate(value);
@@ -159,9 +180,9 @@ function CodeStep({
           describedBy={codeError ? "otp-error" : undefined}
         />
         {codeError ? (
-          <p id="otp-error" className="mt-2 text-small font-medium text-alert">
+          <FieldError id="otp-error" className="mt-2">
             {codeError}
-          </p>
+          </FieldError>
         ) : null}
       </div>
 
@@ -174,7 +195,6 @@ function CodeStep({
         block
         sheen
         loading={verify.isPending || verify.isSuccess}
-        disabled={code.length < 6}
       >
         Verify
       </Button>
@@ -193,8 +213,8 @@ function CodeStep({
           </button>
         )}
       </p>
-      <p className="text-center text-small text-ink-muted">
-        Codes last {Math.max(1, Math.round(sent.expiresInSeconds / 60))} minutes.
+      <p className="text-center text-caption text-ink-muted">
+        Codes last {plural(Math.max(1, Math.round(sent.expiresInSeconds / 60)), "minute")}.
       </p>
     </form>
   );
@@ -235,7 +255,7 @@ function SignIn() {
             )}
           </div>
         </div>
-        <p className="mx-auto mt-6 max-w-md text-center text-small text-ink-muted">
+        <p className="mx-auto mt-6 max-w-md text-center text-caption text-balance text-ink-muted">
           One account works on the website and in the PetBuddy app.
         </p>
       </Container>

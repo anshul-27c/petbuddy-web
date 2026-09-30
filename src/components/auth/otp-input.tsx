@@ -107,7 +107,7 @@ export function OtpInput({
             }
           }}
           className={cn(
-            "focus-glow h-14 w-full min-w-0 rounded-field border text-center font-display text-headline font-semibold tabular-nums text-ink shadow-card transition duration-150 ease-out disabled:bg-canvas",
+            "focus-glow h-13 w-full min-w-0 rounded-field border text-center text-2xl font-semibold text-ink shadow-card transition duration-150 ease-out disabled:bg-canvas",
             invalid ? "border-alert bg-surface" : digit ? "border-leash-tint bg-sky" : "border-hairline bg-surface",
           )}
         />

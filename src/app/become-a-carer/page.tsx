@@ -56,7 +56,7 @@ function JoinStep({
       </span>
       <div className="min-w-0 pt-1">
         <p className="eyebrow text-leash-dark">Step {n}</p>
-        <h3 className="mt-1 text-title font-semibold">{title}</h3>
+        <h3 className="mt-1 text-base font-semibold">{title}</h3>
         <div className="mt-1 space-y-2 text-ink-muted">{children}</div>
       </div>
     </li>
@@ -70,7 +70,7 @@ function Point({ icon, title, children, index }: { icon: ReactNode; title: strin
         <IconTile tone="trail" size="lg">
           {icon}
         </IconTile>
-        <h3 className="mt-4 text-title font-semibold">{title}</h3>
+        <h3 className="mt-4 text-base font-semibold">{title}</h3>
         <p className="mt-1 text-sm text-ink-muted">{children}</p>
       </Card>
     </li>
@@ -114,15 +114,15 @@ export default function BecomeACarerPage() {
           <Reveal>
             <p
               {...revealItem(0)}
-              className="shine inline-flex items-center gap-2 rounded-full border border-leash/15 bg-sky px-3 py-1 text-small font-semibold text-leash-dark"
+              className="shine inline-flex items-center gap-2 rounded-full border border-leash/15 bg-sky px-3 py-1 text-caption font-semibold text-leash-dark"
             >
               <HandCoins className="size-4" aria-hidden />
               For carers
             </p>
-            <h1 id="become-title" {...revealItem(1)} className="mt-4 font-display text-hero font-semibold sm:text-mega">
+            <h1 id="become-title" {...revealItem(1)} className="mt-4 title-hero">
               Earn with <span className="text-gradient">PetBuddy</span>
             </h1>
-            <p {...revealItem(2)} className="mt-4 max-w-xl text-title leading-relaxed text-ink/80">
+            <p {...revealItem(2)} className="mt-4 max-w-xl text-lg text-pretty text-ink/80">
               Look after pets near you, on your own hours. Set your own rates, take the bookings you want and get
               paid for every visit.
             </p>
@@ -140,7 +140,7 @@ export default function BecomeACarerPage() {
               <div className="flex items-center gap-4">
                 <LogoMark size="lg" />
                 <div className="min-w-0">
-                  <p className="text-title font-semibold">Carers join in the PetBuddy app</p>
+                  <p className="text-base font-semibold">Carers join in the PetBuddy app</p>
                   <p className="mt-1 text-sm text-ink-muted">This website is for booking care.</p>
                 </div>
               </div>
@@ -163,6 +163,7 @@ export default function BecomeACarerPage() {
           <div>
             <div className="lg:sticky lg:top-24">
               <SectionHeader
+                landing
                 id="join-title"
                 eyebrow="Joining"
                 title="How to join"
@@ -208,7 +209,7 @@ export default function BecomeACarerPage() {
         </section>
 
         <section id="getting-paid" aria-labelledby="paid-title">
-          <SectionHeader id="paid-title" eyebrow="Payouts" title="How you get paid" />
+          <SectionHeader landing id="paid-title" eyebrow="Payouts" title="How you get paid" />
           <Reveal as="ul" className="grid grid-cols-1 gap-3 sm:gap-6 md:grid-cols-3">
             <Point index={0} icon={<HandCoins />} title="Your rate, your call">
               You set an hourly rate and each service is priced from it. Owners see the full price before they pay.
@@ -225,7 +226,7 @@ export default function BecomeACarerPage() {
         </section>
 
         <section aria-labelledby="safety-title">
-          <SectionHeader id="safety-title" eyebrow="Safety" title="Looked after on every job" />
+          <SectionHeader landing id="safety-title" eyebrow="Safety" title="Looked after on every job" />
           <Reveal as="ul" className="grid grid-cols-1 gap-3 sm:gap-6 md:grid-cols-3">
             <Point index={0} icon={<Wallet />} title="Paid before you go">
               Owners pay when they book, so every request you accept is already paid for.
@@ -241,6 +242,7 @@ export default function BecomeACarerPage() {
 
         <section aria-labelledby="faq-title">
           <SectionHeader
+            landing
             id="faq-title"
             eyebrow={
               <>

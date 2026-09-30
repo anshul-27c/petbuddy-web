@@ -1,9 +1,12 @@
 /**
  * All user-facing formatting. Money is integer paise everywhere; this is the
- * only place it becomes rupees.
+ * only place it becomes rupees. Dates and times are shown in the business
+ * timezone (India), whatever the viewer's device is set to, so a visit at
+ * 9:00 am in Dehradun reads 9:00 am everywhere.
  */
+import type { Earner } from "./types";
 
-/** The business timezone: "today", day buckets and availability use it. */
+/** The business timezone: every day, time and "today" on the site uses it. */
 export const BUSINESS_TZ = "Asia/Kolkata";
 
 const LOCALE = "en-IN";
@@ -42,6 +45,11 @@ export function formatCount(value: number): string {
   return plainNumber.format(value);
 }
 
+/** "1 job", "12 jobs", "1,248 reviews". Pass the plural when it is not just an added "s". */
+export function plural(count: number, singular: string, pluralForm = `${singular}s`): string {
+  return `${formatCount(count)} ${count === 1 ? singular : pluralForm}`;
+}
+
 /** "4.8" — one decimal so 5.0 does not read as 5. */
 export function formatRating(value: number): string {
   return value.toFixed(1);
@@ -55,17 +63,49 @@ export function formatDistance(km: number): string {
   return `${Math.round(km)} km away`;
 }
 
+/** "Dalanwala, 1.2 km away", or only the part that is known. Never a dangling separator. */
+export function carerPlace(area: string | null | undefined, distanceKm: number | null | undefined): string {
+  const distance = typeof distanceKm === "number" ? formatDistance(distanceKm) : "";
+  return [area?.trim(), distance].filter(Boolean).join(", ");
+}
+
+// ---- Carer track record ---------------------------------------------------
+
+/** Below this many finished jobs a repeat-booking rate means little, so it is not shown. */
+export const REPEAT_RATE_MIN_JOBS = 5;
+
+/** Share of jobs that came from returning clients, as a whole percentage. */
+export function repeatPercent(earner: Pick<Earner, "jobsDone" | "repeatClients">): number {
+  if (!earner.jobsDone) return 0;
+  return Math.min(100, Math.round((earner.repeatClients / earner.jobsDone) * 100));
+}
+
+/** True once a carer has done enough jobs for "N% book again" to be shown. */
+export function showsRepeatRate(earner: Pick<Earner, "jobsDone">): boolean {
+  return earner.jobsDone >= REPEAT_RATE_MIN_JOBS;
+}
+
+/** "New on PetBuddy", "3 jobs finished", or "12 jobs finished · 75% book again". */
+export function carerTrackRecord(earner: Pick<Earner, "jobsDone" | "repeatClients">): string {
+  if (earner.jobsDone <= 0) return "New on PetBuddy";
+  const jobs = `${plural(earner.jobsDone, "job")} finished`;
+  return showsRepeatRate(earner) ? `${jobs} · ${repeatPercent(earner)}% book again` : jobs;
+}
+
+// ---- Times and days (business timezone) -------------------------------------
+
 function clean(text: string): string {
   return text.replace(/[  ]/g, " ").toLowerCase();
 }
 
 const timeFormat = new Intl.DateTimeFormat(LOCALE, {
+  timeZone: BUSINESS_TZ,
   hour: "numeric",
   minute: "2-digit",
   hour12: true,
 });
 
-/** "9:00 am" in the viewer's local time. */
+/** "9:00 am" */
 export function formatTime(iso: string | Date): string {
   return clean(timeFormat.format(new Date(iso)));
 }
@@ -79,44 +119,76 @@ export function formatTimeRange(startIso: string, endIso: string): string {
   return `${start} – ${end}`;
 }
 
+const hourFormat = new Intl.DateTimeFormat("en-GB", { timeZone: BUSINESS_TZ, hour: "2-digit", hourCycle: "h23" });
+
+/** The hour of the day (0–23) an instant falls in. */
+export function businessHour(iso: string | Date): number {
+  return Number(hourFormat.format(new Date(iso))) % 24;
+}
+
+const businessDateKey = new Intl.DateTimeFormat("en-CA", {
+  timeZone: BUSINESS_TZ,
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+
+/** "2026-09-24" for the business day an instant falls in. */
+export function businessDate(iso: string | Date): string {
+  return businessDateKey.format(new Date(iso));
+}
+
+/** True when the instant falls on today's business day. */
+export function isBusinessToday(iso: string | Date, now: Date = new Date()): boolean {
+  return businessDate(iso) === businessDate(now);
+}
+
+/** Whole business days from `now` to `iso`: 0 today, 1 tomorrow, -1 yesterday. */
+function businessDayOffset(iso: string | Date, now: Date): number {
+  const a = Date.parse(`${businessDate(iso)}T00:00:00Z`);
+  const b = Date.parse(`${businessDate(now)}T00:00:00Z`);
+  return Math.round((a - b) / 86_400_000);
+}
+
 const dayFormat = new Intl.DateTimeFormat(LOCALE, {
+  timeZone: BUSINESS_TZ,
   weekday: "short",
   day: "numeric",
   month: "short",
 });
 
-function localDayNumber(date: Date): number {
-  return Math.floor(
-    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86_400_000,
-  );
-}
-
-/** "Today", "Tomorrow", "Yesterday", else "Mon, 14 Sept" — viewer's local time. */
+/** "Today", "Tomorrow", "Yesterday", else "Mon, 14 Sept". */
 export function formatDay(iso: string | Date, now: Date = new Date()): string {
-  const date = new Date(iso);
-  const diff = localDayNumber(date) - localDayNumber(now);
+  const diff = businessDayOffset(iso, now);
   if (diff === 0) return "Today";
   if (diff === 1) return "Tomorrow";
   if (diff === -1) return "Yesterday";
-  return dayFormat.format(date);
+  return dayFormat.format(new Date(iso));
 }
 
 /** "Today, 9:00 am" */
-export function formatDayTime(iso: string): string {
-  return `${formatDay(iso)}, ${formatTime(iso)}`;
+export function formatDayTime(iso: string, now: Date = new Date()): string {
+  return `${formatDay(iso, now)}, ${formatTime(iso)}`;
+}
+
+/**
+ * The same, for the middle of a sentence: "today, 9:00 am" but "Fri, 2 Oct,
+ * 9:00 am" (only the relative words drop their capital).
+ */
+export function formatDayTimeInline(iso: string, now: Date = new Date()): string {
+  return formatDayTime(iso, now).replace(/^(Today|Tomorrow|Yesterday)\b/, (word) => word.toLowerCase());
 }
 
 /** "Tue, 24 Sept, 5:00 – 6:00 pm", or both days when it runs overnight. */
 export function formatSlot(startIso: string, endIso: string): string {
-  const start = new Date(startIso);
-  const end = new Date(endIso);
-  if (localDayNumber(start) === localDayNumber(end)) {
-    return `${formatDay(start)}, ${formatTimeRange(startIso, endIso)}`;
+  if (businessDate(startIso) === businessDate(endIso)) {
+    return `${formatDay(startIso)}, ${formatTimeRange(startIso, endIso)}`;
   }
-  return `${formatDay(start)}, ${formatTime(start)} – ${formatDay(end)}, ${formatTime(end)}`;
+  return `${formatDay(startIso)}, ${formatTime(startIso)} – ${formatDay(endIso)}, ${formatTime(endIso)}`;
 }
 
 const dateFormat = new Intl.DateTimeFormat(LOCALE, {
+  timeZone: BUSINESS_TZ,
   day: "numeric",
   month: "short",
   year: "numeric",
@@ -125,6 +197,13 @@ const dateFormat = new Intl.DateTimeFormat(LOCALE, {
 /** "14 Sept 2026" */
 export function formatDate(iso: string | Date): string {
   return dateFormat.format(new Date(iso));
+}
+
+const yearFormat = new Intl.DateTimeFormat("en-GB", { timeZone: BUSINESS_TZ, year: "numeric" });
+
+/** "2024" */
+export function formatYear(iso: string | Date): string {
+  return yearFormat.format(new Date(iso));
 }
 
 /** "just now", "5 min ago", "2 hours ago", "3 days ago", else a date. */
@@ -161,24 +240,7 @@ export function formatMaskedPhone(masked: string): string {
   return `+91 ${compact.slice(0, 5)} ${compact.slice(5)}`;
 }
 
-// ---- Business-day helpers (Asia/Kolkata) ---------------------------------
-
-const businessDateKey = new Intl.DateTimeFormat("en-CA", {
-  timeZone: BUSINESS_TZ,
-  year: "numeric",
-  month: "2-digit",
-  day: "2-digit",
-});
-
-/** "2026-09-24" for the business day an instant falls in. */
-export function businessDate(iso: string | Date): string {
-  return businessDateKey.format(new Date(iso));
-}
-
-/** True when the instant falls on today's business day. */
-export function isBusinessToday(iso: string | Date, now: Date = new Date()): boolean {
-  return businessDate(iso) === businessDate(now);
-}
+// ---- Availability day chips -------------------------------------------------
 
 const businessWeekday = new Intl.DateTimeFormat(LOCALE, {
   timeZone: BUSINESS_TZ,
@@ -199,13 +261,7 @@ const businessMonth = new Intl.DateTimeFormat(LOCALE, {
   month: "short",
 });
 
-function businessDayOffset(iso: string, now: Date): number {
-  const a = Date.parse(`${businessDate(iso)}T00:00:00Z`);
-  const b = Date.parse(`${businessDate(now)}T00:00:00Z`);
-  return Math.round((a - b) / 86_400_000);
-}
-
-/** Labels for an availability day chip, computed in the business timezone. */
+/** Labels for an availability day chip. */
 export function availabilityDayParts(iso: string, now: Date = new Date()) {
   const offset = businessDayOffset(iso, now);
   const date = new Date(iso);

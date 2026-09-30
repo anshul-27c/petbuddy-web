@@ -18,7 +18,7 @@ function Line({
     <span
       className={cn(
         "inline-flex items-start gap-2",
-        size === "sm" ? "text-sm" : "text-small",
+        size === "sm" ? "text-sm" : "text-caption",
         tone === "trail" ? "font-semibold text-trail" : "text-ink-muted",
         className,
       )}

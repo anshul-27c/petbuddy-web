@@ -1,19 +1,18 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState, type FormEvent } from "react";
+import { useId, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Chip } from "@/components/ui/chip";
-import { TextArea, TextField, Toggle } from "@/components/ui/field";
+import { FieldError, TextArea, TextField, Toggle } from "@/components/ui/field";
 import { SpeciesIcon } from "@/components/ui/icons";
 import { ErrorNotice } from "@/components/ui/notice";
-import { api, isApiError } from "@/lib/api";
+import { api } from "@/lib/api";
 import { SPECIES_LABELS, SPECIES_ORDER, TEMPERAMENT_LABELS, TEMPERAMENT_ORDER } from "@/lib/labels";
 import { qk } from "@/lib/query-keys";
 import type { Pet, PetInput, PetSpecies, PetTemperament } from "@/lib/types";
-import { hasErrors, parseDecimal, parseWhole, type FieldErrors } from "@/lib/validation";
-
-type Field = "name" | "species" | "breed" | "age" | "weightKg" | "vaccinationNote" | "vetName";
+import { useFieldErrors } from "@/lib/use-field-errors";
+import { decimalInput, digitsOnly, LIMITS, validatePet, type PetField } from "@/lib/validation";
 
 interface Draft {
   name: string;
@@ -43,62 +42,30 @@ function draftFrom(pet?: Pet): Draft {
   };
 }
 
-function validate(draft: Draft): { errors: FieldErrors<Field>; input: PetInput | null } {
-  const errors: FieldErrors<Field> = {};
-  const name = draft.name.trim();
-  if (!name) errors.name = "Enter your pet's name.";
-  else if (name.length > 40) errors.name = "Keep the name under 40 characters.";
+/** The API's field names, mapped onto this form's fields. */
+const SERVER_FIELDS: Record<string, PetField> = {
+  name: "name",
+  species: "species",
+  breed: "breed",
+  ageMonths: "age",
+  weightKg: "weightKg",
+  temperament: "temperament",
+  vaccinationNote: "vaccinationNote",
+  vetName: "vetName",
+};
 
-  if (draft.breed.trim().length > 60) errors.breed = "Keep the breed under 60 characters.";
-
-  const years = draft.years.trim() === "" ? 0 : parseWhole(draft.years);
-  const months = draft.months.trim() === "" ? 0 : parseWhole(draft.months);
-  if (draft.years.trim() === "" && draft.months.trim() === "") {
-    errors.age = "Enter an age in years and months. Use 0 years for a puppy or kitten.";
-  } else if (years === null || months === null || months > 11) {
-    errors.age = "Use whole numbers: years, and 0 to 11 months.";
-  } else if (years * 12 + months > 360) {
-    errors.age = "Age can be at most 30 years.";
-  }
-
-  const weight = parseDecimal(draft.weight);
-  if (weight === null) errors.weightKg = "Enter a weight in kg, for example 12.5.";
-  else if (weight < 0.1 || weight > 120) errors.weightKg = "Weight must be between 0.1 and 120 kg.";
-
-  if (hasErrors(errors) || years === null || months === null || weight === null) {
-    return { errors, input: null };
-  }
-
-  return {
-    errors,
-    input: {
-      name,
-      species: draft.species,
-      breed: draft.breed.trim(),
-      ageMonths: years * 12 + months,
-      weightKg: Math.round(weight * 10) / 10,
-      temperament: draft.temperament,
-      vaccinated: draft.vaccinated,
-      vaccinationNote: draft.vaccinationNote.trim() || null,
-      vetName: draft.vetName.trim() || null,
-    },
-  };
-}
-
-/** Maps the API's field names onto this form's fields. */
-function serverErrors(error: unknown): FieldErrors<Field> {
-  if (!isApiError(error)) return {};
-  const f = error.fieldErrors;
-  return {
-    name: f.name,
-    species: f.species,
-    breed: f.breed,
-    age: f.ageMonths,
-    weightKg: f.weightKg,
-    vaccinationNote: f.vaccinationNote,
-    vetName: f.vetName,
-  };
-}
+/** Which field a draft key's message belongs to, so editing it clears the right one. */
+const FIELD_OF: Partial<Record<keyof Draft, PetField>> = {
+  name: "name",
+  species: "species",
+  breed: "breed",
+  years: "age",
+  months: "age",
+  weight: "weightKg",
+  temperament: "temperament",
+  vaccinationNote: "vaccinationNote",
+  vetName: "vetName",
+};
 
 export function PetForm({
   pet,
@@ -113,7 +80,10 @@ export function PetForm({
 }) {
   const queryClient = useQueryClient();
   const [draft, setDraft] = useState<Draft>(() => draftFrom(pet));
-  const [errors, setErrors] = useState<FieldErrors<Field>>({});
+  const { errors, show, clear, fromServer, ref } = useFieldErrors<PetField>();
+  // The server's message, when none of its field errors landed on a field here.
+  const [unmappedError, setUnmappedError] = useState<unknown>(null);
+  const ageErrorId = useId();
 
   const save = useMutation({
     mutationFn: (input: PetInput) =>
@@ -122,40 +92,52 @@ export function PetForm({
       void queryClient.invalidateQueries({ queryKey: qk.pets });
       onSaved(saved);
     },
-    onError: (error) => setErrors(serverErrors(error)),
+    onError: (error) => {
+      if (!fromServer(error, SERVER_FIELDS)) setUnmappedError(error);
+    },
   });
 
   const set = <K extends keyof Draft>(key: K, value: Draft[K]) => {
     setDraft((current) => ({ ...current, [key]: value }));
+    const field = FIELD_OF[key];
+    if (field) clear(field);
   };
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
     event.stopPropagation();
     if (save.isPending) return;
-    const result = validate(draft);
-    setErrors(result.errors);
-    if (result.input) save.mutate(result.input);
+    setUnmappedError(null);
+    const { errors: found, numbers } = validatePet(draft);
+    if (show(found) || !numbers) return;
+    save.mutate({
+      name: draft.name.trim(),
+      species: draft.species,
+      breed: draft.breed.trim(),
+      ageMonths: numbers.ageMonths,
+      weightKg: numbers.weightKg,
+      temperament: draft.temperament,
+      vaccinated: draft.vaccinated,
+      vaccinationNote: draft.vaccinationNote.trim() || null,
+      vetName: draft.vetName.trim() || null,
+    });
   };
 
-  // Show the server's message when none of its field errors land on a visible field.
-  const unmappedError = save.error && !hasErrors(serverErrors(save.error)) ? save.error : null;
-
   return (
-    <form onSubmit={submit} noValidate className="space-y-6">
+    <form ref={ref} onSubmit={submit} noValidate className="space-y-6">
       <TextField
         label="Name"
         value={draft.name}
         onChange={(event) => set("name", event.target.value)}
         error={errors.name}
         autoComplete="off"
-        maxLength={40}
+        maxLength={LIMITS.petName}
         placeholder="Your pet's name"
       />
 
-      <fieldset>
+      <fieldset data-invalid={errors.species ? "true" : undefined} tabIndex={-1} className="outline-none">
         <legend className="text-sm font-semibold">Species</legend>
-        <div className="mt-3 flex flex-wrap gap-2">
+        <div className="mt-2 flex flex-wrap gap-2">
           {SPECIES_ORDER.map((species) => (
             <Chip
               key={species}
@@ -167,7 +149,7 @@ export function PetForm({
             </Chip>
           ))}
         </div>
-        {errors.species ? <p className="mt-2 text-small font-medium text-alert">{errors.species}</p> : null}
+        {errors.species ? <FieldError className="mt-2">{errors.species}</FieldError> : null}
       </fieldset>
 
       <TextField
@@ -176,46 +158,51 @@ export function PetForm({
         value={draft.breed}
         onChange={(event) => set("breed", event.target.value)}
         error={errors.breed}
-        maxLength={60}
+        maxLength={LIMITS.breed}
         placeholder="Labrador, Indie, Persian"
       />
 
       <fieldset>
         <legend className="text-sm font-semibold">Age</legend>
+        <p className="mt-1 text-caption text-ink-muted">For a puppy or kitten, put 0 years and the months.</p>
         <div className="mt-2 grid grid-cols-2 gap-3">
           <TextField
             label="Years"
             inputMode="numeric"
             value={draft.years}
-            onChange={(event) => set("years", event.target.value.replace(/\D/g, "").slice(0, 2))}
-            placeholder="2"
+            onChange={(event) => set("years", digitsOnly(event.target.value, 2))}
             invalid={Boolean(errors.age)}
+            aria-describedby={errors.age ? ageErrorId : undefined}
           />
           <TextField
             label="Months"
             inputMode="numeric"
             value={draft.months}
-            onChange={(event) => set("months", event.target.value.replace(/\D/g, "").slice(0, 2))}
-            placeholder="3"
+            onChange={(event) => set("months", digitsOnly(event.target.value, 2))}
             invalid={Boolean(errors.age)}
+            aria-describedby={errors.age ? ageErrorId : undefined}
           />
         </div>
-        {errors.age ? <p className="mt-2 text-small font-medium text-alert">{errors.age}</p> : null}
+        {errors.age ? (
+          <FieldError id={ageErrorId} className="mt-2">
+            {errors.age}
+          </FieldError>
+        ) : null}
       </fieldset>
 
       <TextField
         label="Weight in kg"
         inputMode="decimal"
         value={draft.weight}
-        onChange={(event) => set("weight", event.target.value.replace(/[^\d.,]/g, "").slice(0, 6))}
+        onChange={(event) => set("weight", decimalInput(event.target.value))}
         error={errors.weightKg}
-        placeholder="12.5"
+        hint="Up to one decimal place, for example 12.5."
       />
 
-      <fieldset>
+      <fieldset data-invalid={errors.temperament ? "true" : undefined} tabIndex={-1} className="outline-none">
         <legend className="text-sm font-semibold">Temperament</legend>
-        <p className="mt-1 text-small text-ink-muted">Pick any that fit. Carers read this before they accept.</p>
-        <div className="mt-3 flex flex-wrap gap-2">
+        <p className="mt-1 text-caption text-ink-muted">Pick any that fit. Carers read this before they accept.</p>
+        <div className="mt-2 flex flex-wrap gap-2">
           {TEMPERAMENT_ORDER.map((trait) => {
             const on = draft.temperament.includes(trait);
             return (
@@ -234,6 +221,7 @@ export function PetForm({
             );
           })}
         </div>
+        {errors.temperament ? <FieldError className="mt-2">{errors.temperament}</FieldError> : null}
       </fieldset>
 
       <div className="rounded-field border border-hairline bg-mist p-4">
@@ -250,6 +238,7 @@ export function PetForm({
           value={draft.vaccinationNote}
           onChange={(event) => set("vaccinationNote", event.target.value)}
           error={errors.vaccinationNote}
+          maxLength={LIMITS.vaccinationNote}
           placeholder="Rabies booster due in March"
         />
       </div>
@@ -260,6 +249,7 @@ export function PetForm({
         value={draft.vetName}
         onChange={(event) => set("vetName", event.target.value)}
         error={errors.vetName}
+        maxLength={LIMITS.vetName}
         placeholder="Your vet or clinic"
       />
 

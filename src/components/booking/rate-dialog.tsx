@@ -6,7 +6,7 @@ import { usePay } from "@/components/payments/payment-provider";
 import { Button } from "@/components/ui/button";
 import { Chip } from "@/components/ui/chip";
 import { Dialog } from "@/components/ui/dialog";
-import { TextArea } from "@/components/ui/field";
+import { FieldError, TextArea } from "@/components/ui/field";
 import { ErrorNotice } from "@/components/ui/notice";
 import { StarInput } from "@/components/ui/stars";
 import { useToast } from "@/components/ui/toast";
@@ -16,6 +16,8 @@ import { firstName } from "@/lib/labels";
 import { isPaymentCancelled } from "@/lib/payments/errors";
 import { qk } from "@/lib/query-keys";
 import type { Booking, PaymentMethod, RateInput } from "@/lib/types";
+import { useFieldErrors } from "@/lib/use-field-errors";
+import { LIMITS, validateReview, type ReviewField } from "@/lib/validation";
 import { PaymentMethodPicker } from "./payment-method-picker";
 import { useBookingRefresh } from "./use-booking-refresh";
 
@@ -34,6 +36,7 @@ export function RateDialog({ booking, open, onClose }: { booking: Booking; open:
   const [method, setMethod] = useState<PaymentMethod>("upi");
   const [paying, setPaying] = useState(false);
   const [error, setError] = useState<unknown>(null);
+  const { errors, show, clear, fromServer, ref } = useFieldErrors<ReviewField>();
 
   const rate = useMutation({
     mutationFn: (input: RateInput) => api.bookings.rate(booking.id, input),
@@ -52,8 +55,9 @@ export function RateDialog({ booking, open, onClose }: { booking: Booking; open:
   const busy = paying || rate.isPending;
 
   const submit = async () => {
-    if (busy || rating === 0) return;
+    if (busy) return;
     setError(null);
+    if (show(validateReview(rating, text))) return;
     try {
       let tipPayment;
       if (tip > 0) {
@@ -62,7 +66,8 @@ export function RateDialog({ booking, open, onClose }: { booking: Booking; open:
       }
       await rate.mutateAsync({ rating, text: text.trim() || null, tipPaise: tip, tipPayment });
     } catch (caught) {
-      if (!isPaymentCancelled(caught)) setError(caught);
+      if (isPaymentCancelled(caught)) return;
+      if (!fromServer(caught, { rating: "rating", text: "text" })) setError(caught);
     } finally {
       setPaying(false);
     }
@@ -82,31 +87,45 @@ export function RateDialog({ booking, open, onClose }: { booking: Booking; open:
           block
           onClick={() => void submit()}
           loading={busy}
-          disabled={rating === 0}
         >
           {tip > 0 ? `Pay ${formatMoney(tip)} tip and submit` : "Submit rating"}
         </Button>
       }
     >
-      <div className="space-y-5">
-        <div>
-          <StarInput value={rating} onChange={setRating} label={`Rate ${first}`} />
-          <p className="mt-1 text-center text-sm text-ink-muted" aria-live="polite">
-            {rating === 0 ? "Tap a star" : `${rating} out of 5`}
-          </p>
+      <div ref={ref} className="space-y-5">
+        <div data-invalid={errors.rating ? "true" : undefined} tabIndex={-1} className="rounded-field outline-none">
+          <StarInput
+            value={rating}
+            onChange={(value) => {
+              setRating(value);
+              clear("rating");
+            }}
+            label={`Rate ${first}`}
+          />
+          {errors.rating ? (
+            <FieldError className="mt-1 justify-center">{errors.rating}</FieldError>
+          ) : (
+            <p className="mt-1 text-center text-sm text-ink-muted" aria-live="polite">
+              {rating === 0 ? "Tap a star" : `${rating} out of 5`}
+            </p>
+          )}
         </div>
         <TextArea
           label="Anything to add?"
           optional
           value={text}
-          onChange={(event) => setText(event.target.value)}
+          onChange={(event) => {
+            setText(event.target.value);
+            clear("text");
+          }}
+          error={errors.text}
           placeholder="What went well, or what could be better"
-          maxLength={1000}
+          maxLength={LIMITS.reviewText}
           rows={3}
         />
         <fieldset>
           <legend className="text-sm font-semibold">Add a tip</legend>
-          <p className="text-small text-ink-muted">Tips go to your carer in full.</p>
+          <p className="text-caption text-ink-muted">Tips go to your carer in full.</p>
           <div className="mt-2 flex flex-wrap gap-2">
             {TIPS.map((amount) => (
               <Chip key={amount} selected={tip === amount} onClick={() => setTip(amount)}>

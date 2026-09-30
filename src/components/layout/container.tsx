@@ -6,18 +6,26 @@ import { cn } from "@/lib/utils";
 /**
  * The page column: 16 / 24 / 32 px gutters and a 1216 px cap, shared with the
  * header and footer so every page starts on the same left edge. `narrow` is a
- * centred 672 px column for single-card screens (sign in, not found).
+ * centred 672 px column for single-card screens (sign in, not found). `grow`
+ * makes it a column that fills the page area, so an empty or error state
+ * inside can centre in the space left under the page header.
  */
 export function Container({
   children,
   className,
   width = "wide",
+  grow = false,
 }: {
   children: ReactNode;
   className?: string;
   width?: "wide" | "narrow";
+  grow?: boolean;
 }) {
-  return <div className={cn("container-page", width === "narrow" && "max-w-2xl", className)}>{children}</div>;
+  return (
+    <div className={cn("container-page", width === "narrow" && "max-w-2xl", grow && "flex flex-1 flex-col", className)}>
+      {children}
+    </div>
+  );
 }
 
 /**
@@ -49,10 +57,10 @@ export function PageHeader({
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-            <h1 className="font-display text-headline font-semibold text-ink sm:text-display">{title}</h1>
+            <h1 className="title-page text-balance text-ink">{title}</h1>
             {meta}
           </div>
-          {subtitle ? <div className="mt-2 text-body text-ink-muted">{subtitle}</div> : null}
+          {subtitle ? <div className="mt-2 text-body text-pretty text-ink-muted">{subtitle}</div> : null}
         </div>
         {/* The negative margin keeps a 44 px button from making this row taller than a bare title. */}
         {action ? <div className="-my-2 shrink-0">{action}</div> : null}

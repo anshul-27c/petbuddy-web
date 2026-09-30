@@ -11,12 +11,26 @@ import { ErrorNotice } from "@/components/ui/notice";
 import { api } from "@/lib/api";
 import { formatPhone } from "@/lib/format";
 import type { Booking } from "@/lib/types";
+import { useFieldErrors } from "@/lib/use-field-errors";
+import { LIMITS, maxLengthError } from "@/lib/validation";
 
 /** Raises an urgent incident, then says exactly what happens next. */
 export function SosDialog({ booking, open, onClose }: { booking: Booking; open: boolean; onClose: () => void }) {
   const { user } = useAuth();
   const [note, setNote] = useState("");
-  const sos = useMutation({ mutationFn: () => api.bookings.sos(booking.id, note.trim() || null) });
+  const { errors, show, clear, fromServer, ref } = useFieldErrors<"note">();
+  const [unmapped, setUnmapped] = useState<unknown>(null);
+  const sos = useMutation({
+    mutationFn: () => api.bookings.sos(booking.id, note.trim() || null),
+    onError: (error) => setUnmapped(fromServer(error, { note: "note" }) ? null : error),
+  });
+  const send = () => {
+    if (sos.isPending) return;
+    setUnmapped(null);
+    if (show({ note: maxLengthError(note, LIMITS.sosNote, "the note") })) return;
+    sos.mutate();
+  };
+  const notice = unmapped;
 
   const close = () => {
     onClose();
@@ -39,28 +53,34 @@ export function SosDialog({ booking, open, onClose }: { booking: Booking; open: 
           </Button>
         }
       >
-        <div className="flex items-center gap-3 rounded-field bg-trail-soft p-4 text-trail">
+        <div className="flex items-center gap-3 rounded-field bg-trail-soft p-4 text-trail-ink">
           <CircleCheck className="size-6 shrink-0" aria-hidden />
           <p className="text-sm font-semibold">Your alert reached the PetBuddy operations team.</p>
         </div>
-        <h3 className="mt-5 text-title font-semibold">What happens next</h3>
+        <h3 className="mt-5 text-base font-semibold">What happens next</h3>
         <ol className="mt-3 space-y-3 text-sm">
           <li className="flex gap-3">
-            <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-sky text-label font-bold text-leash-dark">
-              1
+            <span className="flex h-5 shrink-0 items-center" aria-hidden>
+              <span className="flex size-6 items-center justify-center rounded-full bg-sky text-xs font-bold text-leash-dark">
+                1
+              </span>
             </span>
             The team can see this booking, your carer and the live location.
           </li>
           <li className="flex gap-3">
-            <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-sky text-label font-bold text-leash-dark">
-              2
+            <span className="flex h-5 shrink-0 items-center" aria-hidden>
+              <span className="flex size-6 items-center justify-center rounded-full bg-sky text-xs font-bold text-leash-dark">
+                2
+              </span>
             </span>
             They will call you{user?.phone ? ` on ${formatPhone(user.phone)}` : ""} as soon as they can. Keep your
             phone close.
           </li>
           <li className="flex gap-3">
-            <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-sky text-label font-bold text-leash-dark">
-              3
+            <span className="flex h-5 shrink-0 items-center" aria-hidden>
+              <span className="flex size-6 items-center justify-center rounded-full bg-sky text-xs font-bold text-leash-dark">
+                3
+              </span>
             </span>
             If anyone is hurt or in danger, contact local emergency services first.
           </li>
@@ -83,7 +103,7 @@ export function SosDialog({ booking, open, onClose }: { booking: Booking; open: 
           </Button>
           <Button
             variant="danger"
-            onClick={() => sos.mutate()}
+            onClick={send}
             loading={sos.isPending}
             icon={<Siren className="size-4" aria-hidden />}
           >
@@ -92,7 +112,7 @@ export function SosDialog({ booking, open, onClose }: { booking: Booking; open: 
         </div>
       }
     >
-      <div className="space-y-4">
+      <div ref={ref} className="space-y-4">
         <p className="text-body">
           This alerts the PetBuddy operations team straight away, with this booking&apos;s details and your
           carer&apos;s live location.
@@ -101,12 +121,16 @@ export function SosDialog({ booking, open, onClose }: { booking: Booking; open: 
           label="What is happening?"
           optional
           value={note}
-          onChange={(event) => setNote(event.target.value)}
+          onChange={(event) => {
+            setNote(event.target.value);
+            clear("note");
+          }}
+          error={errors.note}
           placeholder="Carer is not answering"
-          maxLength={500}
+          maxLength={LIMITS.sosNote}
           rows={3}
         />
-        {sos.error ? <ErrorNotice error={sos.error} /> : null}
+        {notice ? <ErrorNotice error={notice} /> : null}
       </div>
     </Dialog>
   );

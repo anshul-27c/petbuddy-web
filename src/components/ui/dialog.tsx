@@ -93,7 +93,7 @@ export function Dialog({
           ) : null}
           <div className="flex items-start justify-between gap-3 px-5 pt-4 pb-4 sm:px-6 sm:pt-6">
             <div className="min-w-0 pt-2">
-              <h2 id={titleId} className="font-display text-subhead font-semibold">
+              <h2 id={titleId} className="title-section text-balance">
                 {title}
               </h2>
               {description ? (

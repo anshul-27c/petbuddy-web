@@ -4,20 +4,22 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, ArrowRight, UserX } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { isOpenSlot, useAvailability } from "@/components/carers/availability-picker";
 import { usePay } from "@/components/payments/payment-provider";
 import { Button, ButtonLink } from "@/components/ui/button";
+import { FieldError } from "@/components/ui/field";
 import { Notice } from "@/components/ui/notice";
 import { CardSkeleton, Skeleton } from "@/components/ui/skeleton";
 import { EmptyState, ErrorState } from "@/components/ui/states";
 import { api, isApiError } from "@/lib/api";
 import { isConflict } from "@/lib/errors";
-import { bookingNotes, firstName } from "@/lib/labels";
+import { firstName } from "@/lib/labels";
 import { isPaymentCancelled } from "@/lib/payments/errors";
 import { useAddresses, usePets, useServiceCatalogue } from "@/lib/queries";
 import { qk } from "@/lib/query-keys";
 import type { EarnerDetail, PaymentMethod, ServiceKey } from "@/lib/types";
+import { bookingNotes, hasErrors, validateBookingNotes, type BookingNotesField, type FieldErrors } from "@/lib/validation";
 import { PayPanel } from "./pay-panel";
 import { PetStep } from "./pet-step";
 import { ServiceStep } from "./service-step";
@@ -63,6 +65,10 @@ function Flow({
   const [conflict, setConflict] = useState<unknown>(null);
   const [payError, setPayError] = useState<unknown>(null);
   const [paying, setPaying] = useState(false);
+  // Why "Next" or "Book and pay" cannot go on yet, shown under the step.
+  const [stepError, setStepError] = useState<string | null>(null);
+  const [noteErrors, setNoteErrors] = useState<FieldErrors<BookingNotesField>>({});
+  const stepRef = useRef<HTMLDivElement>(null);
 
   const minutes = service ? catalogue.get(service).defaultMinutes : 60;
   // Only send a length once the live catalogue is loaded, so it matches the server's.
@@ -94,8 +100,29 @@ function Flow({
 
   const create = useMutation({ mutationFn: api.bookings.create });
 
+  /** Moves focus to the step's message (or first invalid field) so it is seen and read out. */
+  const focusProblem = () =>
+    requestAnimationFrame(() => {
+      const target = stepRef.current?.querySelector<HTMLElement>('[aria-invalid="true"], [data-step-error]');
+      target?.focus({ preventScroll: true });
+      target?.scrollIntoView({ block: "center", behavior: "smooth" });
+    });
+
   const book = async () => {
-    if (paying || !service || !pet || !address || !start || !quote.data) return;
+    if (paying || !service || !pet || !address || !quote.data) return;
+    const found = validateBookingNotes(notes, effectiveGateCode);
+    setNoteErrors(found);
+    const blocker = !earner.isOnline
+      ? `${first} is not taking bookings right now, so this cannot be booked.`
+      : !start || !slotOpen
+        ? "That time is no longer free. Go back to When and pick another time."
+        : null;
+    setStepError(blocker);
+    if (hasErrors(found) || blocker) {
+      focusProblem();
+      return;
+    }
+    if (!start) return;
     setPaying(true);
     setPayError(null);
     setConflict(null);
@@ -143,7 +170,23 @@ function Flow({
 
   const goTo = (target: number) => {
     setStep(target);
+    setStepError(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const STEP_PROBLEMS = [
+    "Choose a service to continue.",
+    petList.length === 0 ? "Add your pet to continue." : "Choose which pet this visit is for.",
+    "Pick a day and a time to continue.",
+  ];
+
+  const next = () => {
+    if (complete[step]) {
+      goTo(step + 1);
+      return;
+    }
+    setStepError(STEP_PROBLEMS[step] ?? null);
+    focusProblem();
   };
 
   return (
@@ -160,7 +203,7 @@ function Flow({
           </Notice>
         ) : null}
 
-        <div key={step} className="mt-8 animate-rise-in">
+        <div key={step} ref={stepRef} className="mt-8 animate-rise-in">
           {step === SERVICE ? (
             <ServiceStep
               earner={earner}
@@ -168,10 +211,19 @@ function Flow({
               onChange={(next) => {
                 setService(next);
                 setPayError(null);
+                setStepError(null);
               }}
             />
           ) : null}
-          {step === PET ? <PetStep value={effectivePetId} onChange={setPetId} /> : null}
+          {step === PET ? (
+            <PetStep
+              value={effectivePetId}
+              onChange={(id) => {
+                setPetId(id);
+                setStepError(null);
+              }}
+            />
+          ) : null}
           {step === WHEN && service ? (
             <WhenStep
               earnerId={earner.id}
@@ -183,6 +235,7 @@ function Flow({
               onChange={(slot) => {
                 setStart(slot.start);
                 setConflict(null);
+                setStepError(null);
               }}
               conflict={conflict}
             />
@@ -194,9 +247,16 @@ function Flow({
                 addressId={effectiveAddressId}
                 onAddress={setAddressId}
                 gateCode={effectiveGateCode}
-                onGateCode={setGateCode}
+                onGateCode={(value) => {
+                  setGateCode(value);
+                  setNoteErrors((current) => ({ ...current, gateCode: undefined, notes: undefined }));
+                }}
                 notes={notes}
-                onNotes={setNotes}
+                onNotes={(value) => {
+                  setNotes(value);
+                  setNoteErrors((current) => ({ ...current, notes: undefined }));
+                }}
+                errors={noteErrors}
               />
               {address ? (
                 <div className="lg:hidden">
@@ -220,14 +280,18 @@ function Flow({
                   onPay={() => void book()}
                   busy={paying}
                   error={payError}
-                  ready={complete.every(Boolean) && earner.isOnline}
                 />
               ) : null}
-              {!slotOpen && availability.data ? (
+              {!slotOpen && availability.data && !stepError ? (
                 <Notice tone="warning" title="That time is no longer free">
                   Go back to When and pick another time.
                 </Notice>
               ) : null}
+            </div>
+          ) : null}
+          {stepError ? (
+            <div data-step-error tabIndex={-1} role="alert" className="mt-6 rounded-field outline-none">
+              <FieldError>{stepError}</FieldError>
             </div>
           ) : null}
         </div>
@@ -243,7 +307,7 @@ function Flow({
             </ButtonLink>
           )}
           {step < WHERE ? (
-            <Button onClick={() => goTo(step + 1)} disabled={!complete[step]} className="group">
+            <Button onClick={next} className="group">
               Next
               <ArrowRight className="size-4 transition-transform duration-150 group-hover:translate-x-1" aria-hidden />
             </Button>
@@ -286,6 +350,7 @@ export function BookingFlow({
     if (isApiError(query.error) && query.error.status === 404) {
       return (
         <EmptyState
+          fill
           icon={<UserX />}
           title="This carer is not on PetBuddy any more"
           body="Their profile may have been removed. There are plenty of other carers near you."
@@ -293,7 +358,7 @@ export function BookingFlow({
         />
       );
     }
-    return <ErrorState error={query.error} onRetry={() => void query.refetch()} retrying={query.isFetching} />;
+    return <ErrorState fill error={query.error} onRetry={() => void query.refetch()} retrying={query.isFetching} />;
   }
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-10" role="status" aria-label="Loading">

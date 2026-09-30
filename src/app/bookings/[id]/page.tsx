@@ -39,7 +39,7 @@ function Detail({ icon, label, children }: { icon: ReactNode; label: string; chi
     <div className="flex items-start gap-3">
       <IconTile size="sm">{icon}</IconTile>
       <div className="min-w-0 flex-1">
-        <dt className="text-small font-semibold text-ink-muted">{label}</dt>
+        <dt className="text-caption font-semibold text-ink-muted">{label}</dt>
         <dd className="mt-1 text-body">{children}</dd>
       </div>
     </div>
@@ -114,16 +114,20 @@ function BookingView({ booking, updatedAt }: { booking: Booking; updatedAt: numb
             <ServiceIcon service={booking.service} />
           </IconTile>
           <div className="min-w-0">
-            <h1 className="font-display text-headline font-semibold sm:text-display">
+            <h1 className="title-page">
               {serviceLabel} for {booking.pet.name}
             </h1>
             <p className="mt-1 text-sm text-ink-muted">Reference {booking.code}</p>
+            {/* Phones: the status sits under the title rather than wrapping to its own row. */}
+            <BookingStatusPill status={booking.status} className="mt-3 sm:hidden" />
           </div>
         </div>
-        <BookingStatusPill status={booking.status} className="mt-2" />
+        <span className="mt-2 hidden sm:block">
+          <BookingStatusPill status={booking.status} />
+        </span>
       </header>
 
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-10">
+      <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-10">
         <div className="grid grid-cols-1 min-w-0 content-start gap-3 sm:gap-4">
           <StatusGuide booking={booking} />
           {live ? <LivePanel booking={booking} updatedAt={updatedAt} /> : null}
@@ -208,20 +212,28 @@ function BookingDetail() {
   return (
     <>
       <PageTitle title={query.data ? `${catalogue.label(query.data.service)} for ${query.data.pet.name}` : "Booking"} />
-      <Container>
+      <Container grow>
         <PageBack href="/bookings">All bookings</PageBack>
         {query.data ? (
           <BookingView booking={query.data} updatedAt={query.dataUpdatedAt} />
         ) : query.isError ? (
           isApiError(query.error) && query.error.status === 404 ? (
             <EmptyState
+              fill
+              areaClassName="pt-2 sm:pt-4"
               icon={<CalendarX2 />}
               title="We could not find that booking"
               body="It may belong to another account, or the link is wrong."
               action={<ButtonLink href="/bookings">See your bookings</ButtonLink>}
             />
           ) : (
-            <ErrorState error={query.error} onRetry={() => void query.refetch()} retrying={query.isFetching} />
+            <ErrorState
+              fill
+              areaClassName="pt-2 sm:pt-4"
+              error={query.error}
+              onRetry={() => void query.refetch()}
+              retrying={query.isFetching}
+            />
           )
         ) : (
           <div role="status" aria-label="Loading booking">
@@ -232,7 +244,7 @@ function BookingDetail() {
                 <Skeleton className="h-4 w-32" />
               </div>
             </div>
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-10">
+            <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-10">
               <div className="grid grid-cols-1 content-start gap-3 sm:gap-4">
                 <CardSkeleton lines={2} />
                 <CardSkeleton lines={4} />

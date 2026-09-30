@@ -1,7 +1,7 @@
 import { formatMoney } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-/** An amount in paise, with tabular figures. `display` sets it in Fraunces. */
+/** An amount in paise, with tabular figures. `display` sets it semibold, for prices and totals that lead. */
 export function Money({
   paise,
   suffix,
@@ -25,9 +25,9 @@ export function Money({
     );
   }
   return (
-    <span className={cn("tabular-nums", display && "font-display font-semibold", className)}>
+    <span className={cn("tabular-nums", display && "font-semibold", className)}>
       {text}
-      {suffix ? <span className="font-sans text-small font-medium text-ink-muted">{suffix}</span> : null}
+      {suffix ? <span className="text-caption font-normal tracking-normal text-ink-muted">{suffix}</span> : null}
     </span>
   );
 }

@@ -11,6 +11,7 @@ import { ListSkeleton } from "@/components/ui/skeleton";
 import { QueryView } from "@/components/ui/states";
 import { Pill } from "@/components/ui/status-pill";
 import { addressLine } from "@/lib/labels";
+import { LIMITS, notesLimit, type BookingNotesField, type FieldErrors } from "@/lib/validation";
 import { useAddresses } from "@/lib/queries";
 
 export function WhereStep({
@@ -21,6 +22,7 @@ export function WhereStep({
   onGateCode,
   notes,
   onNotes,
+  errors,
 }: {
   carerName: string;
   addressId: string | null;
@@ -29,6 +31,7 @@ export function WhereStep({
   onGateCode: (value: string) => void;
   notes: string;
   onNotes: (value: string) => void;
+  errors: FieldErrors<BookingNotesField>;
 }) {
   const name = useId();
   const addresses = useAddresses();
@@ -37,7 +40,7 @@ export function WhereStep({
   return (
     <div className="space-y-8">
       <fieldset>
-        <legend className="font-display text-subhead font-semibold sm:text-headline">Where should {carerName} come?</legend>
+        <legend className="title-section">Where should {carerName} come?</legend>
         <div className="mt-4 sm:mt-5">
           <QueryView
             query={addresses}
@@ -50,7 +53,7 @@ export function WhereStep({
                     <MapPin />
                   </IconTile>
                   <div>
-                    <p className="text-title font-semibold">Add your address</p>
+                    <p className="text-base font-semibold">Add your address</p>
                     <p className="mt-1 text-sm text-ink-muted">Where your pet is, so your carer can find you.</p>
                   </div>
                 </div>
@@ -83,7 +86,7 @@ export function WhereStep({
                 ))}
                 {adding ? (
                   <Card>
-                    <h3 className="mb-5 text-title font-semibold">Add an address</h3>
+                    <h3 className="mb-5 text-base font-semibold">Add an address</h3>
                     <AddressForm
                       onSaved={(address) => {
                         onAddress(address.id);
@@ -115,7 +118,8 @@ export function WhereStep({
           value={gateCode}
           onChange={(event) => onGateCode(event.target.value)}
           placeholder="4821"
-          maxLength={20}
+          maxLength={LIMITS.gateCode}
+          error={errors.gateCode}
           hint="Added to your notes for the carer."
         />
         <TextArea
@@ -124,7 +128,9 @@ export function WhereStep({
           value={notes}
           onChange={(event) => onNotes(event.target.value)}
           placeholder="Pulls near the park gate. Bowl is under the sink."
-          maxLength={1000}
+          // The gate code is sent inside the notes, so it shares their 1,000 characters.
+          maxLength={notesLimit(gateCode)}
+          error={errors.notes}
           rows={3}
         />
       </div>

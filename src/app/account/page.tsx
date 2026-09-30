@@ -11,19 +11,22 @@ import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardTitle } from "@/components/ui/card";
 import { Dialog } from "@/components/ui/dialog";
-import { ChoiceCard, TextField } from "@/components/ui/field";
+import { ChoiceCard, FieldError, TextField } from "@/components/ui/field";
 import { ErrorNotice } from "@/components/ui/notice";
 import { CardSkeleton } from "@/components/ui/skeleton";
 import { ErrorState } from "@/components/ui/states";
 import { useToast } from "@/components/ui/toast";
-import { api, isApiError } from "@/lib/api";
+import { api } from "@/lib/api";
 import { formatPhone } from "@/lib/format";
 import { qk } from "@/lib/query-keys";
 import type { LanguageCode, ProfileInput, UserProfile } from "@/lib/types";
-import { EMAIL_PATTERN, hasErrors, type FieldErrors } from "@/lib/validation";
+import { useFieldErrors } from "@/lib/use-field-errors";
+import { LIMITS, validateProfile } from "@/lib/validation";
 import { PageTitle } from "@/components/layout/page-title";
 
 type Field = "name" | "email" | "languageCode";
+
+const SERVER_FIELDS: Record<string, Field> = { name: "name", email: "email", languageCode: "languageCode" };
 
 function ProfileForm({ user }: { user: UserProfile }) {
   const queryClient = useQueryClient();
@@ -32,7 +35,9 @@ function ProfileForm({ user }: { user: UserProfile }) {
   const [name, setName] = useState(user.name ?? "");
   const [email, setEmail] = useState(user.email ?? "");
   const [language, setLanguage] = useState<LanguageCode>(user.languageCode === "hi" ? "hi" : "en");
-  const [errors, setErrors] = useState<FieldErrors<Field>>({});
+  const { errors, show, clear, fromServer, ref } = useFieldErrors<Field>();
+  // The server's message, when none of its field errors landed on a field here.
+  const [unmappedError, setUnmappedError] = useState<unknown>(null);
 
   const save = useMutation({
     mutationFn: (input: ProfileInput) => api.me.update(input),
@@ -41,37 +46,30 @@ function ProfileForm({ user }: { user: UserProfile }) {
       toast({ title: "Profile saved" });
     },
     onError: (error) => {
-      if (isApiError(error)) {
-        setErrors({
-          name: error.fieldErrors.name,
-          email: error.fieldErrors.email,
-          languageCode: error.fieldErrors.languageCode,
-        });
-      }
+      if (!fromServer(error, SERVER_FIELDS)) setUnmappedError(error);
     },
   });
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
     if (save.isPending) return;
-    const next: FieldErrors<Field> = {};
-    if (name.trim().length > 80) next.name = "Keep your name under 80 characters.";
-    if (email.trim() && !EMAIL_PATTERN.test(email.trim())) next.email = "Enter a complete email address, with an @ and a domain.";
-    setErrors(next);
-    if (hasErrors(next)) return;
+    setUnmappedError(null);
+    if (show(validateProfile({ name, email }))) return;
     save.mutate({ name: name.trim() || null, email: email.trim() || null, languageCode: language });
   };
 
-  const mapped = isApiError(save.error) && hasErrors({ ...save.error.fieldErrors });
-
   return (
-    <form onSubmit={submit} noValidate className="space-y-6">
+    <form ref={ref} onSubmit={submit} noValidate className="space-y-6">
       <TextField
         label="Name"
         value={name}
-        onChange={(event) => setName(event.target.value)}
+        onChange={(event) => {
+          setName(event.target.value);
+          clear("name");
+        }}
         error={errors.name}
         autoComplete="name"
+        maxLength={LIMITS.profileName}
         hint="Carers see this name on your bookings."
       />
       <TextField
@@ -79,34 +77,44 @@ function ProfileForm({ user }: { user: UserProfile }) {
         optional
         type="email"
         value={email}
-        onChange={(event) => setEmail(event.target.value)}
+        onChange={(event) => {
+          setEmail(event.target.value);
+          clear("email");
+        }}
         error={errors.email}
         autoComplete="email"
+        maxLength={LIMITS.email}
         hint="Carers do not see your email."
       />
-      <fieldset>
+      <fieldset data-invalid={errors.languageCode ? "true" : undefined} tabIndex={-1} className="outline-none">
         <legend className="text-sm font-semibold">Language</legend>
-        <p className="mt-1 text-small text-ink-muted">Used for app screens and messages. This website is in English.</p>
+        <p className="mt-1 text-caption text-ink-muted">Used for app screens and messages. This website is in English.</p>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <ChoiceCard
             name={languageName}
             value="en"
             checked={language === "en"}
-            onChange={() => setLanguage("en")}
+            onChange={() => {
+              setLanguage("en");
+              clear("languageCode");
+            }}
             title="English"
           />
           <ChoiceCard
             name={languageName}
             value="hi"
             checked={language === "hi"}
-            onChange={() => setLanguage("hi")}
+            onChange={() => {
+              setLanguage("hi");
+              clear("languageCode");
+            }}
             title={<span lang="hi">हिन्दी</span>}
             description="Hindi"
           />
         </div>
-        {errors.languageCode ? <p className="mt-2 text-small font-medium text-alert">{errors.languageCode}</p> : null}
+        {errors.languageCode ? <FieldError className="mt-2">{errors.languageCode}</FieldError> : null}
       </fieldset>
-      {save.error && !mapped ? <ErrorNotice error={save.error} /> : null}
+      {unmappedError ? <ErrorNotice error={unmappedError} /> : null}
       <div className="flex justify-end border-t border-hairline pt-5">
         <Button type="submit" loading={save.isPending}>
           Save profile
@@ -180,10 +188,11 @@ function Account() {
   const user = me.data?.user;
   return (
     <AccountShell title="Your account">
+      {me.isError && !user ? (
+        <ErrorState fill error={me.error} onRetry={() => void me.refetch()} retrying={me.isFetching} />
+      ) : (
       <div className="grid grid-cols-1 gap-3 sm:gap-4">
-        {me.isError && !user ? (
-          <ErrorState error={me.error} onRetry={() => void me.refetch()} retrying={me.isFetching} />
-        ) : user ? (
+        {user ? (
           <>
             <Card>
               <div className="mb-6 flex items-center gap-4 border-b border-hairline pb-6">
@@ -193,7 +202,7 @@ function Account() {
                   icon={user.name?.trim() ? undefined : <UserRound className="size-6" aria-hidden />}
                 />
                 <div className="min-w-0">
-                  <p className="truncate text-title font-semibold">{user.name?.trim() || "Add your name"}</p>
+                  <p className="truncate text-base font-semibold">{user.name?.trim() || "Add your name"}</p>
                   <p className="mt-1 text-sm text-ink-muted">{formatPhone(user.phone)}</p>
                 </div>
               </div>
@@ -214,6 +223,7 @@ function Account() {
           <CardSkeleton lines={4} />
         )}
       </div>
+      )}
     </AccountShell>
   );
 }

@@ -20,7 +20,7 @@ export function ReviewSummaryBlock({ summary }: { summary: ReviewSummary }) {
   return (
     <div className="grid grid-cols-1 gap-6 sm:grid-cols-[auto_1fr] sm:items-center sm:gap-8">
       <div className="flex flex-col items-center sm:items-start">
-        <p className="font-display text-display font-semibold">
+        <p className="text-4xl font-semibold">
           <CountUp value={summary.average} format={(n) => formatRating(n)} />
         </p>
         <StarRow value={summary.average} className="mt-1" />
@@ -65,16 +65,16 @@ export function ReviewItem({ review, carerFirstName }: { review: Review; carerFi
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
             <p className="font-semibold">{review.authorName}</p>
-            <p className="text-small text-ink-muted">{formatAgo(review.at)}</p>
+            <p className="text-caption text-ink-muted">{formatAgo(review.at)}</p>
           </div>
           <div className="mt-1 flex flex-wrap items-center gap-2">
             <StarRow value={review.rating} />
-            <span className="text-small text-ink-muted">{catalogue.label(review.service)}</span>
+            <span className="text-caption text-ink-muted">{catalogue.label(review.service)}</span>
           </div>
           {review.text ? <p className="mt-2 text-body whitespace-pre-line">{review.text}</p> : null}
           {review.reply ? (
             <div className="mt-3 rounded-field border-l-2 border-leash-tint bg-mist p-3">
-              <p className="text-small font-semibold text-ink-muted">Reply from {carerFirstName}</p>
+              <p className="text-caption font-semibold text-ink-muted">Reply from {carerFirstName}</p>
               <p className="mt-1 text-sm whitespace-pre-line">{review.reply}</p>
             </div>
           ) : null}
@@ -151,7 +151,7 @@ export function AllReviewsDialog({
               Show more reviews
             </Button>
           ) : (
-            <p className="pt-2 text-center text-small text-ink-muted">That is every review so far.</p>
+            <p className="pt-2 text-center text-caption text-ink-muted">That is every review so far.</p>
           )}
           {query.isFetchNextPageError ? (
             <p className="mt-2 text-center text-sm text-alert">Could not load more reviews. Try again.</p>

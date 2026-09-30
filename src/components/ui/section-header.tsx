@@ -5,9 +5,10 @@ import { ButtonLink } from "./button";
 
 /**
  * The one section header used on every page: optional eyebrow, the title
- * (Fraunces, 21 px on phones and 26 px from 640 px up), an optional subtitle,
- * and an optional action that sits on the title's baseline. It ends with the
- * 16 / 20 px gap to the section's content.
+ * (18 px on phones and 20 px from 640 px up; on the landing pages, where each
+ * section stands on its own, 24 / 30 px like a page title), an optional
+ * subtitle, and an optional action that sits on the title's baseline. It ends
+ * with the 16 / 20 px gap to the section's content.
  */
 export function SectionHeader({
   id,
@@ -18,6 +19,7 @@ export function SectionHeader({
   as: Tag = "h2",
   inverse = false,
   flush = false,
+  landing = false,
   className,
 }: {
   id?: string;
@@ -30,6 +32,8 @@ export function SectionHeader({
   inverse?: boolean;
   /** Drop the gap below, when the header is not followed by content (a band). */
   flush?: boolean;
+  /** A section of a landing page: the title is set at page-title size. */
+  landing?: boolean;
   className?: string;
 }) {
   return (
@@ -43,7 +47,8 @@ export function SectionHeader({
         <Tag
           id={id}
           className={cn(
-            "min-w-0 font-display text-subhead font-semibold sm:text-headline",
+            "min-w-0 text-balance",
+            landing ? "title-page" : "title-section",
             inverse ? "text-surface" : "text-ink",
           )}
         >
@@ -60,10 +65,13 @@ export function SectionHeader({
   );
 }
 
-/** The trailing "See all" link in a section header. Its arrow lines up with the right gutter. */
-export function SectionLink({ href, children }: { href: string; children: ReactNode }) {
+/**
+ * The trailing "See all" link in a section header. Its arrow lines up with the
+ * right gutter. `label` names it in full for screen readers ("See all carers").
+ */
+export function SectionLink({ href, children, label }: { href: string; children: ReactNode; label?: string }) {
   return (
-    <ButtonLink href={href} variant="ghost" className="group -mr-4">
+    <ButtonLink href={href} variant="ghost" className="group -mr-4" aria-label={label}>
       {children}
       <ArrowRight className="size-4 transition-transform duration-150 group-hover:translate-x-1" aria-hidden />
     </ButtonLink>

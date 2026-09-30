@@ -36,15 +36,15 @@ export default function HomePage() {
           <Reveal>
             <p
               {...revealItem(0)}
-              className="shine inline-flex items-center gap-2 rounded-full border border-leash/15 bg-sky px-3 py-1 text-small font-semibold text-leash-dark"
+              className="shine inline-flex items-center gap-2 rounded-full border border-leash/15 bg-sky px-3 py-1 text-caption font-semibold text-leash-dark"
             >
               <MapPinned className="size-4" aria-hidden />
               Now booking in {cityName}
             </p>
-            <h1 id="hero-title" {...revealItem(1)} className="mt-4 font-display text-hero font-semibold sm:text-mega">
+            <h1 id="hero-title" {...revealItem(1)} className="mt-4 title-hero">
               Pet care, <span className="text-gradient">close to home</span>
             </h1>
-            <p {...revealItem(2)} className="mt-4 max-w-xl text-title leading-relaxed text-ink/80">
+            <p {...revealItem(2)} className="mt-4 max-w-xl text-lg text-pretty text-ink/80">
               Walks, sitting, grooming and vet runs from carers your neighbours already trust. Book in a minute and
               follow every visit live.
             </p>
@@ -82,6 +82,7 @@ export default function HomePage() {
 
         <section aria-labelledby="services">
           <SectionHeader
+            landing
             id="services"
             eyebrow="Services"
             title="What does your pet need?"
@@ -92,6 +93,7 @@ export default function HomePage() {
 
         <section id="how-it-works" aria-labelledby="how-title">
           <SectionHeader
+            landing
             id="how-title"
             eyebrow="Three steps"
             title="How it works"
@@ -101,6 +103,7 @@ export default function HomePage() {
 
         <section aria-labelledby="trust-title">
           <SectionHeader
+            landing
             id="trust-title"
             eyebrow="Safety"
             title="Trust and safety, built in"
@@ -111,17 +114,23 @@ export default function HomePage() {
 
         <section aria-labelledby="near-title">
           <SectionHeader
+            landing
             id="near-title"
             eyebrow="Carers"
             title="Carers near you"
             subtitle="Closest first, with the next time they are free."
-            action={<SectionLink href="/carers">See all</SectionLink>}
+            action={
+              <SectionLink href="/carers" label="See all carers">
+                See all
+              </SectionLink>
+            }
           />
           <NearbyRail />
         </section>
 
         <section aria-labelledby="store-title">
           <SectionHeader
+            landing
             id="store-title"
             eyebrow={
               <>
@@ -131,7 +140,12 @@ export default function HomePage() {
             }
             title="The PetBuddy store"
             subtitle="Food and treats, toys, grooming kits and everyday gear, picked for pets like yours."
-            action={<SectionLink href="/store">Visit the store</SectionLink>}
+            // Short, like the carers rail's, so it keeps its place beside the title on a phone.
+            action={
+              <SectionLink href="/store" label="See the whole store">
+                See all
+              </SectionLink>
+            }
           />
           <StoreTeaser />
         </section>

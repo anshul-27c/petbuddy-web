@@ -9,8 +9,8 @@ import { useToast } from "@/components/ui/toast";
 import { formatPhone } from "@/lib/format";
 
 export const ACCOUNT_LINKS = [
-  { href: "/account", label: "Account", icon: UserRound },
-  { href: "/account/pets", label: "My pets", icon: PawPrint },
+  { href: "/account", label: "Profile", icon: UserRound },
+  { href: "/account/pets", label: "Pets", icon: PawPrint },
   { href: "/account/addresses", label: "Addresses", icon: MapPin },
   { href: "/account/favourites", label: "Favourites", icon: Heart },
   { href: "/orders", label: "Store orders", icon: Package },
@@ -61,7 +61,7 @@ export function AccountMenu() {
                 <Link
                   href={href}
                   onClick={close}
-                  className="flex min-h-11 items-center gap-3 rounded-field px-3 text-sm font-medium transition-colors duration-150 hover:bg-canvas"
+                  className="flex min-h-11 items-center gap-3 rounded-field px-3 text-sm font-semibold transition-colors duration-150 hover:bg-canvas"
                 >
                   <Icon className="size-4 text-ink-muted" aria-hidden />
                   {label}
@@ -76,7 +76,7 @@ export function AccountMenu() {
                 close();
                 void signOutAndLeave();
               }}
-              className="flex min-h-11 w-full items-center gap-3 rounded-field px-3 text-sm font-medium text-alert hover:bg-alert-soft"
+              className="flex min-h-11 w-full items-center gap-3 rounded-field px-3 text-sm font-semibold text-alert hover:bg-alert-soft"
             >
               <LogOut className="size-4" aria-hidden />
               Sign out

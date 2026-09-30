@@ -7,36 +7,100 @@ import { errorCopy } from "@/lib/errors";
 import { cn } from "@/lib/utils";
 import { Button } from "./button";
 
-/** An empty list: an icon on a tinted squircle over a faint dot grid, a line of copy and an optional action. */
+/**
+ * The space a page's empty or error state owns: everything between what sits
+ * above it (the page header, filters) and the footer. It grows to fill the
+ * page and centres its box in both directions. It eats the page's usual
+ * 64 / 96 px bottom padding and keeps 24 / 32 px instead, the same as the page
+ * header leaves above it, so the gaps above and below the box match.
+ */
+export function StateArea({ children, className }: { children: ReactNode; className?: string }) {
+  return (
+    <div className={cn("state-area flex flex-1 flex-col items-center justify-center", className)}>
+      <div className="w-full max-w-xl">{children}</div>
+    </div>
+  );
+}
+
+function StateBox({
+  tone,
+  icon,
+  title,
+  body,
+  action,
+  compact,
+  bare,
+  role,
+  className,
+}: {
+  tone: "empty" | "error";
+  icon: ReactNode;
+  title: string;
+  body: string;
+  action?: ReactNode;
+  compact?: boolean;
+  bare?: boolean;
+  role?: "alert";
+  className?: string;
+}) {
+  return (
+    <div
+      role={role}
+      className={cn(
+        "relative isolate flex flex-col items-center overflow-hidden rounded-card px-6 text-center",
+        compact ? "py-8" : "py-12",
+        !bare && "bg-surface",
+        !bare && (tone === "empty" ? "border border-dashed border-hairline" : "border border-hairline shadow-card"),
+        className,
+      )}
+    >
+      {tone === "empty" && !bare ? <div aria-hidden className="bg-dot-grid absolute inset-0 -z-10 opacity-70" /> : null}
+      <div
+        aria-hidden
+        className={cn(
+          "flex size-14 items-center justify-center rounded-card [&_svg]:size-6",
+          tone === "empty" ? "bg-sky text-leash shadow-card ring-8 ring-sky/50" : "bg-alert-soft text-alert ring-8 ring-alert-soft/50",
+        )}
+      >
+        {icon}
+      </div>
+      <h3 className="mt-6 text-base font-semibold text-balance text-ink">{title}</h3>
+      <p className="mt-1 max-w-sm text-sm text-pretty text-ink-muted">{body}</p>
+      {action ? <div className="mt-6">{action}</div> : null}
+    </div>
+  );
+}
+
+/**
+ * An empty list: an icon on a tinted squircle over a faint dot grid, a line of
+ * copy and an optional action. With `fill` it is the page's main content and
+ * sits centred in the space it owns (see StateArea).
+ */
 export function EmptyState({
   icon,
   title,
   body,
   action,
+  fill = false,
+  areaClassName,
+  compact = false,
   className,
 }: {
   icon: ReactNode;
   title: string;
   body: string;
   action?: ReactNode;
+  fill?: boolean;
+  /** Extra room above the box, when what sits above it leaves less than the page header does. */
+  areaClassName?: string;
+  /** Less padding, inside a card or a dialog. */
+  compact?: boolean;
   className?: string;
 }) {
-  return (
-    <div
-      className={cn(
-        "relative isolate flex flex-col items-center overflow-hidden rounded-card border border-dashed border-hairline bg-surface px-6 py-12 text-center",
-        className,
-      )}
-    >
-      <div aria-hidden className="bg-dot-grid absolute inset-0 -z-10 opacity-70" />
-      <div className="flex size-14 items-center justify-center rounded-card bg-sky text-leash shadow-card ring-8 ring-sky/50 [&_svg]:size-6">
-        {icon}
-      </div>
-      <h3 className="mt-6 text-title font-semibold">{title}</h3>
-      <p className="mt-1 max-w-sm text-sm text-ink-muted">{body}</p>
-      {action ? <div className="mt-6">{action}</div> : null}
-    </div>
+  const box = (
+    <StateBox tone="empty" icon={icon} title={title} body={body} action={action} compact={compact} className={className} />
   );
+  return fill ? <StateArea className={areaClassName}>{box}</StateArea> : box;
 }
 
 export function ErrorState({
@@ -45,6 +109,8 @@ export function ErrorState({
   retrying = false,
   compact = false,
   bare = false,
+  fill = false,
+  areaClassName,
   className,
 }: {
   error: unknown;
@@ -54,42 +120,39 @@ export function ErrorState({
   compact?: boolean;
   /** No border or shadow, for errors inside a menu. */
   bare?: boolean;
+  /** The page's main content: centred in the space it owns. */
+  fill?: boolean;
+  areaClassName?: string;
   className?: string;
 }) {
   const { title, body } = errorCopy(error);
-  return (
-    <div
+  const box = (
+    <StateBox
+      tone="error"
       role="alert"
-      className={cn(
-        "flex flex-col items-center rounded-card bg-surface px-6 text-center",
-        compact ? "py-6" : "py-12",
-        !bare && "border border-hairline shadow-card",
-        className,
-      )}
-    >
-      <div className="flex size-14 items-center justify-center rounded-card bg-alert-soft text-alert ring-8 ring-alert-soft/50">
-        <CircleAlert className="size-6" aria-hidden />
-      </div>
-      <h3 className="mt-6 text-title font-semibold">{title}</h3>
-      <p className="mt-1 max-w-sm text-sm text-ink-muted">{body}</p>
-      {onRetry ? (
-        <Button
-          variant="outline"
-          className="mt-6"
-          onClick={onRetry}
-          loading={retrying}
-          icon={<RotateCcw className="size-4" aria-hidden />}
-        >
-          Try again
-        </Button>
-      ) : null}
-    </div>
+      icon={<CircleAlert />}
+      title={title}
+      body={body}
+      compact={compact}
+      bare={bare}
+      className={className}
+      action={
+        onRetry ? (
+          <Button variant="outline" onClick={onRetry} loading={retrying} icon={<RotateCcw className="size-4" aria-hidden />}>
+            Try again
+          </Button>
+        ) : undefined
+      }
+    />
   );
+  return fill ? <StateArea className={areaClassName}>{box}</StateArea> : box;
 }
 
 /**
  * Renders the four states of a query: loading, error with retry, empty and
- * content. Cached data stays on screen while a background refetch runs.
+ * content. Cached data stays on screen while a background refetch runs. With
+ * `fill`, the error state is the page's main content (the empty one says so
+ * itself, with its own `fill`).
  */
 export function QueryView<T>({
   query,
@@ -97,6 +160,7 @@ export function QueryView<T>({
   isEmpty,
   empty,
   children,
+  fill = false,
   errorClassName,
 }: {
   query: Pick<UseQueryResult<T>, "data" | "error" | "isError" | "isFetching" | "refetch">;
@@ -104,6 +168,7 @@ export function QueryView<T>({
   isEmpty?: (data: T) => boolean;
   empty?: ReactNode;
   children: (data: T) => ReactNode;
+  fill?: boolean;
   errorClassName?: string;
 }) {
   if (query.data === undefined) {
@@ -113,6 +178,7 @@ export function QueryView<T>({
           error={query.error}
           onRetry={() => void query.refetch()}
           retrying={query.isFetching}
+          fill={fill}
           className={errorClassName}
         />
       );

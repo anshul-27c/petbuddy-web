@@ -50,10 +50,10 @@ export function Tag({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-full px-3 py-1 text-small font-medium",
+        "inline-flex items-center gap-1 rounded-full px-3 py-1 text-caption font-semibold",
         tone === "canvas" && "bg-canvas text-ink-muted",
         tone === "sky" && "bg-sky text-leash-dark",
-        tone === "trail" && "bg-trail-soft text-trail",
+        tone === "trail" && "bg-trail-soft text-trail-ink",
         className,
       )}
     >

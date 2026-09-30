@@ -26,7 +26,7 @@ export function WhenStep({
 }) {
   return (
     <div>
-      <h2 className="font-display text-subhead font-semibold sm:text-headline">When should {carerName} come?</h2>
+      <h2 className="title-section">When should {carerName} come?</h2>
       <p className="mt-2 text-body text-ink-muted">
         {serviceLabel} takes about {formatDuration(minutes)}. Times that are taken, or too short for it, are crossed out.
       </p>

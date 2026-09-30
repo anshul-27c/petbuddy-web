@@ -25,7 +25,7 @@ export function LinkTabs({
     >
       <span
         aria-hidden
-        className="absolute inset-y-1 left-1 rounded-full bg-leash shadow-cta transition-transform duration-300 ease-out-soft"
+        className="absolute inset-y-1 left-1 rounded-full bg-leash-dark shadow-cta transition-transform duration-300 ease-out-soft"
         style={{ width: `calc((100% - 0.5rem) / ${items.length})`, transform: `translateX(${index * 100}%)` }}
       />
       {items.map((item) => {
@@ -38,7 +38,8 @@ export function LinkTabs({
             scroll={false}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "relative inline-flex min-h-10 min-w-28 items-center justify-center rounded-full px-4 text-sm font-semibold transition-colors duration-200",
+              // 40 px to look at, 48 px to press: the hit area reaches the control's edge.
+              "relative inline-flex h-10 min-w-28 items-center justify-center rounded-full px-4 text-sm font-semibold transition-colors duration-200 before:absolute before:-inset-y-1 before:inset-x-0 before:content-['']",
               active ? "text-surface" : "text-ink-muted hover:text-ink",
             )}
           >

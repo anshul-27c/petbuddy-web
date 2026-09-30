@@ -13,7 +13,7 @@ const TONES: Record<IconTileTone, string> = {
 };
 
 const SIZES = {
-  sm: "size-8 rounded-[10px] [&_svg]:size-4",
+  sm: "size-8 rounded-tile [&_svg]:size-4",
   md: "size-10 rounded-field [&_svg]:size-5",
   lg: "size-12 rounded-field [&_svg]:size-6",
   xl: "size-14 rounded-card [&_svg]:size-7",

@@ -37,7 +37,7 @@ export function OrderSteps({ status }: { status: OrderStatus }) {
                 )}
               />
             </div>
-            <span className={cn("mt-2 text-small font-semibold", done ? "text-ink" : "text-ink-muted")}>
+            <span className={cn("mt-2 text-caption font-semibold", done ? "text-ink" : "text-ink-muted")}>
               {ORDER_STATUS_LABELS[step]}
               <span className="sr-only">{done ? " (done)" : " (not yet)"}</span>
             </span>

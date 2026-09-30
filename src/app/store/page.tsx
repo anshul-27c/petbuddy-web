@@ -53,7 +53,7 @@ function Store() {
   });
 
   return (
-    <Container>
+    <Container grow>
       <PageHeader
         title="Pet store"
         subtitle="Food, treats, toys and grooming supplies, delivered to your door."
@@ -100,9 +100,11 @@ function Store() {
         </div>
       </div>
 
-      <div className="mt-6 sm:mt-8">
+      {/* The chip rail keeps 4 px under it below 1024 px, so this gap is 4 px less there. */}
+      <div className="mt-5 flex flex-1 flex-col sm:mt-7 lg:mt-8">
         <QueryView
           query={products}
+          fill
           loading={
             <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4" role="status" aria-label="Loading products">
               {Array.from({ length: 8 }, (_, i) => (
@@ -113,6 +115,7 @@ function Store() {
           isEmpty={(list) => list.length === 0}
           empty={
             <EmptyState
+              fill
               icon={<PackageSearch />}
               title={q ? "No products match that search" : "Nothing in this category yet"}
               body={q ? "Try a different word, or clear the search." : "Try another category."}

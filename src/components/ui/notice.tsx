@@ -7,9 +7,9 @@ type Tone = "info" | "success" | "warning" | "error";
 
 const TONES: Record<Tone, string> = {
   info: "bg-sky text-leash-dark",
-  success: "bg-trail-soft text-trail",
-  warning: "bg-amber-soft text-amber",
-  error: "bg-alert-soft text-alert",
+  success: "bg-trail-soft text-trail-ink",
+  warning: "bg-amber-soft text-amber-ink",
+  error: "bg-alert-soft text-alert-ink",
 };
 
 const ICONS: Record<Tone, ReactNode> = {

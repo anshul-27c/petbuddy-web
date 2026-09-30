@@ -19,9 +19,9 @@ function Favourites() {
   const query = useQuery({ queryKey: qk.earners(FILTERS), queryFn: () => api.earners.list(FILTERS) });
   return (
     <AccountShell title="Favourite carers" subtitle="Carers you have saved, ready to book again.">
-      <div>
-        <QueryView
+      <QueryView
           query={query}
+          fill
           loading={
             <div className="grid grid-cols-1 gap-3 sm:gap-4" role="status" aria-label="Loading favourites">
               <CarerCardSkeleton />
@@ -31,6 +31,7 @@ function Favourites() {
           isEmpty={(list) => list.length === 0}
           empty={
             <EmptyState
+              fill
               icon={<Heart />}
               title="No favourite carers yet"
               body="Tap the heart on a carer to save them here."
@@ -47,13 +48,12 @@ function Favourites() {
                   </li>
                 ))}
               </Reveal>
-              <p className="mt-4 text-small text-ink-muted">
+              <p className="mt-4 text-caption text-ink-muted">
                 A carer who is offline can be booked again as soon as they are back.
               </p>
             </>
           )}
         </QueryView>
-      </div>
     </AccountShell>
   );
 }

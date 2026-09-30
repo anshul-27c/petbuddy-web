@@ -24,7 +24,7 @@ import { CardSkeleton, Skeleton } from "@/components/ui/skeleton";
 import { EmptyState, ErrorState } from "@/components/ui/states";
 import { RatingInline } from "@/components/ui/stars";
 import { api, isApiError } from "@/lib/api";
-import { formatDistance } from "@/lib/format";
+import { carerPlace, plural } from "@/lib/format";
 import { firstName } from "@/lib/labels";
 import { usePolicy } from "@/lib/queries";
 import { qk } from "@/lib/query-keys";
@@ -39,7 +39,7 @@ function BookPanel({ earner }: { earner: EarnerDetail }) {
   return (
     <Card className="space-y-4">
       <div className="flex items-baseline justify-between gap-3">
-        <Money paise={earner.pricePerHourPaise} display suffix="/hr" className="text-headline" />
+        <Money paise={earner.pricePerHourPaise} display suffix="/hr" className="text-2xl" />
         <RatingInline rating={earner.rating} count={earner.reviewCount} />
       </div>
       <NextAvailable at={earner.nextAvailableAt} />
@@ -52,7 +52,7 @@ function BookPanel({ earner }: { earner: EarnerDetail }) {
           Save them to your favourites and check back later, or find another carer.
         </Notice>
       )}
-      <p className="flex gap-2 border-t border-hairline pt-4 text-small text-ink-muted">
+      <p className="flex gap-2 border-t border-hairline pt-4 text-caption text-ink-muted">
         <span className="flex h-[1lh] shrink-0 items-center" aria-hidden>
           <ShieldCheck className="size-4 text-trail" />
         </span>
@@ -73,7 +73,7 @@ function MobileBookBar({ earner }: { earner: EarnerDetail }) {
     <div className="fixed inset-x-0 bottom-0 z-30 bg-surface/90 shadow-[0_-1px_0_var(--color-hairline)] pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden">
       <div className="container-page flex h-20 items-center justify-between gap-3">
         <div className="min-w-0">
-          <Money paise={earner.pricePerHourPaise} display suffix="/hr" className="text-title" />
+          <Money paise={earner.pricePerHourPaise} display suffix="/hr" className="text-base" />
           <NextAvailable at={earner.nextAvailableAt} size="xs" className="mt-1" />
         </div>
         <ButtonLink href={href} size="lg" sheen className="shrink-0">
@@ -110,15 +110,17 @@ function ProfileHero({ earner }: { earner: EarnerDetail }) {
             />
           ) : null}
         </div>
-        <h1 id="carer-name" className="mt-4 font-display text-headline font-semibold sm:text-display">
+        <h1 id="carer-name" className="mt-4 title-page">
           {earner.name}
         </h1>
         <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink-muted">
           <RatingInline rating={earner.rating} count={earner.reviewCount} />
-          <span className="inline-flex items-center gap-1">
-            <MapPin className="size-3.5" aria-hidden />
-            {earner.area}, {formatDistance(earner.distanceKm)}
-          </span>
+          {carerPlace(earner.area, earner.distanceKm) ? (
+            <span className="inline-flex items-center gap-1">
+              <MapPin className="size-3.5" aria-hidden />
+              {carerPlace(earner.area, earner.distanceKm)}
+            </span>
+          ) : null}
         </div>
         {earner.idVerified || earner.policeVerified ? (
           <div className="mt-4 flex flex-wrap gap-2">
@@ -212,7 +214,7 @@ function Profile({ earner }: { earner: EarnerDetail }) {
                 </div>
                 {earner.reviewSummary.total > earner.recentReviews.length ? (
                   <Button variant="outline" block onClick={() => setAllReviews(true)}>
-                    See all {earner.reviewSummary.total} reviews
+                    See all {plural(earner.reviewSummary.total, "review")}
                   </Button>
                 ) : null}
               </Card>
@@ -264,20 +266,28 @@ export default function CarerProfilePage() {
   return (
     <>
       <PageTitle title={query.data?.name ?? "Carer"} />
-      <Container>
+      <Container grow>
         <PageBack href="/carers">All carers</PageBack>
         {query.data ? (
           <Profile earner={query.data} />
         ) : query.isError ? (
           isApiError(query.error) && query.error.status === 404 ? (
             <EmptyState
+              fill
+              areaClassName="pt-2 sm:pt-4"
               icon={<UserX />}
               title="This carer is not on PetBuddy any more"
               body="Their profile may have been removed. There are plenty of other carers near you."
               action={<ButtonLink href="/carers">Find another carer</ButtonLink>}
             />
           ) : (
-            <ErrorState error={query.error} onRetry={() => void query.refetch()} retrying={query.isFetching} />
+            <ErrorState
+              fill
+              areaClassName="pt-2 sm:pt-4"
+              error={query.error}
+              onRetry={() => void query.refetch()}
+              retrying={query.isFetching}
+            />
           )
         ) : (
           <ProfileSkeleton />

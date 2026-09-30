@@ -21,7 +21,6 @@ export function PayPanel({
   onPay,
   busy,
   error,
-  ready,
 }: {
   quote: UseQueryResult<Price>;
   serviceLabel: string;
@@ -30,7 +29,6 @@ export function PayPanel({
   onPay: () => void;
   busy: boolean;
   error: unknown;
-  ready: boolean;
 }) {
   const { freeCancelHours, lateCancelFeePercent } = usePolicy();
   const hours = `${freeCancelHours} ${freeCancelHours === 1 ? "hour" : "hours"}`;
@@ -38,7 +36,7 @@ export function PayPanel({
   return (
     <Card className="space-y-5">
       <div>
-        <h2 className="text-title font-semibold">What you&apos;ll pay</h2>
+        <h2 className="text-base font-semibold">What you&apos;ll pay</h2>
         <div className="mt-4">
           {quote.data ? (
             <PriceBreakdown price={quote.data} serviceLabel={serviceLabel} />
@@ -76,11 +74,12 @@ export function PayPanel({
         sheen
         onClick={onPay}
         loading={busy}
-        disabled={!quote.data || !ready || quote.isFetching}
+        // Nothing to pay until the price is known; every other problem is explained when pressed.
+        disabled={!quote.data}
       >
         {quote.data ? `Book and pay ${formatMoney(quote.data.totalPaise)}` : "Book and pay"}
       </Button>
-      <p className="text-center text-small text-ink-muted">
+      <p className="text-center text-caption text-ink-muted">
         Your carer confirms the request after you pay. If they do not, you are refunded in full.
       </p>
     </Card>

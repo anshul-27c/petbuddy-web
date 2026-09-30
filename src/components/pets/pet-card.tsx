@@ -1,5 +1,5 @@
 import { Pencil, Stethoscope, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button, IconButton } from "@/components/ui/button";
 import { Tag } from "@/components/ui/chip";
 import { IconTile } from "@/components/ui/icon-tile";
 import { SpeciesIcon } from "@/components/ui/icons";
@@ -15,7 +15,7 @@ export function PetCard({ pet, onEdit, onDelete }: { pet: Pet; onEdit: () => voi
           <SpeciesIcon species={pet.species} />
         </IconTile>
         <div className="min-w-0 flex-1 pt-1">
-          <h3 className="truncate text-title font-semibold">{pet.name}</h3>
+          <h3 className="truncate text-base font-semibold">{pet.name}</h3>
           <p className="mt-1 text-sm text-ink-muted">
             <span className="sr-only">{SPECIES_LABELS[pet.species]}, </span>
             {petSummary(pet)}
@@ -47,14 +47,9 @@ export function PetCard({ pet, onEdit, onDelete }: { pet: Pet; onEdit: () => voi
           >
             Edit
           </Button>
-          <Button
-            variant="danger-quiet"
-            onClick={onDelete}
-            icon={<Trash2 className="size-4" aria-hidden />}
-            aria-label={`Remove ${pet.name}`}
-          >
-            Remove
-          </Button>
+          <IconButton label={`Remove ${pet.name}`} onClick={onDelete} tone="danger" className="ml-auto">
+            <Trash2 className="size-5" aria-hidden />
+          </IconButton>
         </div>
       </div>
     </article>

@@ -1,12 +1,16 @@
 "use client";
 
 import { SendHorizontal } from "lucide-react";
-import { useId, useState, type FormEvent, type KeyboardEvent } from "react";
+import { useId, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
+import { FieldError } from "@/components/ui/field";
 import { ErrorNotice } from "@/components/ui/notice";
+import { LIMITS, messageError } from "@/lib/validation";
 
-const MAX = 2000;
-
-/** Enter sends, Shift+Enter adds a line. Text is kept if sending fails. */
+/**
+ * Enter sends, Shift+Enter adds a line. Text is kept if sending fails. The
+ * field stops at the API's 2,000 characters; an empty message is refused with
+ * a short note rather than a dead button.
+ */
 export function Composer({
   onSend,
   sending,
@@ -18,14 +22,20 @@ export function Composer({
 }) {
   const id = useId();
   const [text, setText] = useState("");
-  const trimmed = text.trim();
-  const tooLong = trimmed.length > MAX;
+  const [problem, setProblem] = useState<string | undefined>();
+  const field = useRef<HTMLTextAreaElement>(null);
 
   const submit = async (event?: FormEvent) => {
     event?.preventDefault();
-    if (!trimmed || tooLong || sending) return;
+    if (sending) return;
+    const found = messageError(text);
+    setProblem(found);
+    if (found) {
+      field.current?.focus();
+      return;
+    }
     try {
-      await onSend(trimmed);
+      await onSend(text.trim());
       setText("");
     } catch {
       // The error is shown below; the text stays so it can be sent again.
@@ -47,29 +57,34 @@ export function Composer({
           Message
         </label>
         <textarea
+          ref={field}
           id={id}
           value={text}
-          onChange={(event) => setText(event.target.value)}
+          onChange={(event) => {
+            setText(event.target.value);
+            setProblem(undefined);
+          }}
           onKeyDown={onKeyDown}
           rows={1}
+          maxLength={LIMITS.chatMessage}
           placeholder="Type a message"
-          className="field-sizing-content focus-glow max-h-40 min-h-12 flex-1 resize-none rounded-field border border-hairline bg-surface px-4 py-3 text-body placeholder:text-ink-muted"
-          aria-invalid={tooLong || undefined}
-          aria-describedby={tooLong ? `${id}-long` : undefined}
+          className={`field-sizing-content focus-glow max-h-40 min-h-11 flex-1 resize-none rounded-field border bg-surface px-4 py-2 text-base placeholder:text-ink-muted ${problem ? "border-alert" : "border-hairline"}`}
+          aria-invalid={problem ? true : undefined}
+          aria-describedby={problem ? `${id}-error` : undefined}
         />
         <button
           type="submit"
-          disabled={!trimmed || tooLong || sending}
+          disabled={sending}
           aria-label="Send message"
-          className="inline-flex size-12 shrink-0 items-center justify-center rounded-field bg-leash text-surface shadow-cta transition duration-150 hover:bg-leash-dark active:scale-95 disabled:opacity-50 disabled:shadow-none"
+          className="inline-flex size-11 shrink-0 items-center justify-center rounded-field bg-leash-dark text-surface shadow-cta transition duration-150 hover:brightness-90 active:scale-95 disabled:opacity-50 disabled:shadow-none"
         >
           <SendHorizontal className="size-5" aria-hidden />
         </button>
       </div>
-      {tooLong ? (
-        <p id={`${id}-long`} className="mt-2 text-small font-medium text-alert">
-          Messages can be up to {MAX} characters. This one is {trimmed.length}.
-        </p>
+      {problem ? (
+        <FieldError id={`${id}-error`} className="mt-2">
+          {problem}
+        </FieldError>
       ) : null}
     </form>
   );

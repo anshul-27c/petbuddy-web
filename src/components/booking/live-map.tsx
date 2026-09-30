@@ -93,7 +93,7 @@ export function LiveMap({ booking }: { booking: Booking }) {
           </g>
         ) : null}
       </svg>
-      <figcaption className="flex flex-wrap items-center justify-between gap-2 border-t border-hairline bg-surface px-4 py-3 text-small text-ink-muted">
+      <figcaption className="flex flex-wrap items-center justify-between gap-2 border-t border-hairline bg-surface px-4 py-3 text-caption text-ink-muted">
         <span className="inline-flex items-center gap-4">
           <span className="inline-flex items-center gap-2">
             <span className="size-2.5 rounded-full bg-leash" aria-hidden />

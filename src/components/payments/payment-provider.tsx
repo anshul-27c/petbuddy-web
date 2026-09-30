@@ -91,10 +91,10 @@ export function PaymentProvider({ children }: { children: ReactNode }) {
         size="sm"
         footer={
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-            <Button variant="outline" onClick={cancel}>
+            <Button variant="outline" size="lg" onClick={cancel}>
               Cancel
             </Button>
-            <Button variant="accent" onClick={confirm} autoFocus>
+            <Button variant="accent" size="lg" onClick={confirm} autoFocus>
               Pay {pending ? formatMoney(pending.request.amountPaise) : ""}
             </Button>
           </div>
@@ -104,7 +104,7 @@ export function PaymentProvider({ children }: { children: ReactNode }) {
           <div className="space-y-4">
             <div className="rounded-card bg-mist p-5 text-center">
               <p className="text-sm text-ink-muted">{pending.request.description}</p>
-              <p className="mt-1 font-display text-display font-semibold tabular-nums">
+              <p className="mt-1 text-3xl font-semibold">
                 {formatMoney(pending.request.amountPaise)}
               </p>
             </div>
@@ -119,7 +119,7 @@ export function PaymentProvider({ children }: { children: ReactNode }) {
                 <p className="text-ink-muted">Choose Pay to continue as if the payment went through.</p>
               </div>
             </div>
-            <p className="flex items-center gap-2 text-small text-ink-muted">
+            <p className="flex items-center gap-2 text-caption text-ink-muted">
               <ShieldCheck className="size-4 text-trail" aria-hidden />
               Live builds open a secure payment page here instead.
             </p>

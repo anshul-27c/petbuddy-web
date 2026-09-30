@@ -6,7 +6,7 @@ function Row({ label, paise, negative = false }: { label: string; paise: number;
   return (
     <div className="flex items-baseline justify-between gap-4">
       <dt className="text-sm text-ink-muted">{label}</dt>
-      <dd className="text-sm font-medium">
+      <dd className="text-sm text-ink">
         <Money paise={negative ? -paise : paise} />
       </dd>
     </div>
@@ -25,7 +25,7 @@ export function PriceBreakdown({ price, serviceLabel }: { price: Price; serviceL
       <div className="flex items-baseline justify-between gap-4 border-t border-dashed border-hairline pt-4">
         <dt className="font-semibold">Total</dt>
         <dd>
-          <Money paise={price.totalPaise} display className="text-subhead" />
+          <Money paise={price.totalPaise} display className="text-xl" />
         </dd>
       </div>
     </dl>

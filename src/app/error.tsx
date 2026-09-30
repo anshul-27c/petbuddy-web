@@ -6,9 +6,9 @@ import { ErrorState } from "@/components/ui/states";
 
 export default function RouteError({ error, retry }: { error: Error & { digest?: string }; retry: () => void }) {
   return (
-    <Container width="narrow" className="pt-10 sm:pt-16">
+    <Container width="narrow" grow className="pt-6 sm:pt-10">
       <PageTitle title="Something went wrong" />
-      <ErrorState error={error} onRetry={retry} />
+      <ErrorState fill error={error} onRetry={retry} />
     </Container>
   );
 }

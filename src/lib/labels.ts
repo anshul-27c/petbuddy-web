@@ -223,12 +223,6 @@ export function initials(name: string): string {
   return letters.toUpperCase();
 }
 
-/** Share of jobs that came from returning clients, as a whole percentage. */
-export function repeatPercent(earner: Pick<Earner, "jobsDone" | "repeatClients">): number {
-  if (!earner.jobsDone) return 0;
-  return Math.round((earner.repeatClients / earner.jobsDone) * 100);
-}
-
 export function isNewCarer(earner: Pick<Earner, "jobsDone">): boolean {
   return earner.jobsDone < 10;
 }
@@ -257,10 +251,4 @@ export function addressLine(address: Pick<Address, "line1" | "line2" | "area" | 
   return [address.line1, address.line2, address.area, `${address.city} ${address.pincode}`.trim()]
     .filter((part) => part && part.trim())
     .join(", ");
-}
-
-/** Notes sent with a booking: the owner's note, then the gate code on its own line. */
-export function bookingNotes(notes: string, gateCode: string): string | null {
-  const parts = [notes.trim(), gateCode.trim() ? `Gate code: ${gateCode.trim()}` : ""].filter(Boolean);
-  return parts.length ? parts.join("\n") : null;
 }

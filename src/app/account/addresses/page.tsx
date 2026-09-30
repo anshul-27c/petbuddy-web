@@ -6,7 +6,7 @@ import { useState } from "react";
 import { AccountShell, AddTile } from "@/components/account/account-nav";
 import { AddressForm } from "@/components/addresses/address-form";
 import { RequireAuth } from "@/components/auth/require-auth";
-import { Button } from "@/components/ui/button";
+import { Button, IconButton } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Dialog } from "@/components/ui/dialog";
 import { IconTile } from "@/components/ui/icon-tile";
@@ -77,14 +77,17 @@ function Addresses() {
     <AccountShell
       title="Addresses"
       action={
-        <Button onClick={() => setEditing("new")} icon={<Plus className="size-4" aria-hidden />}>
-          Add an address
-        </Button>
+        // With no addresses yet, the empty state below carries the one "Add an address".
+        count > 0 ? (
+          <Button onClick={() => setEditing("new")} icon={<Plus className="size-4" aria-hidden />}>
+            Add an address
+          </Button>
+        ) : undefined
       }
     >
-      <div>
-        <QueryView
+      <QueryView
           query={addresses}
+          fill
           loading={
             <div
               className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2"
@@ -98,6 +101,7 @@ function Addresses() {
           isEmpty={(list) => list.length === 0}
           empty={
             <EmptyState
+              fill
               icon={<MapPin />}
               title="No addresses yet"
               body="Add where your pet is so carers can find you."
@@ -115,7 +119,7 @@ function Addresses() {
                         <MapPin />
                       </IconTile>
                       <div className="min-w-0 flex-1">
-                        <h3 className="flex flex-wrap items-center gap-2 text-title font-semibold">
+                        <h3 className="flex flex-wrap items-center gap-2 text-base font-semibold">
                           {address.label}
                           {address.isDefault ? (
                             <Pill tone="leash" dot={false}>
@@ -125,10 +129,10 @@ function Addresses() {
                         </h3>
                         <p className="mt-1 text-sm text-ink-muted">{addressLine(address)}</p>
                         {address.landmark ? (
-                          <p className="mt-1 text-small text-ink-muted">Landmark: {address.landmark}</p>
+                          <p className="mt-1 text-caption text-ink-muted">Landmark: {address.landmark}</p>
                         ) : null}
                         {address.gateCode ? (
-                          <p className="mt-1 flex items-center gap-2 text-small text-ink-muted">
+                          <p className="mt-1 flex items-center gap-2 text-caption text-ink-muted">
                             <KeyRound className="size-3.5" aria-hidden />
                             Gate code {address.gateCode}
                           </p>
@@ -155,17 +159,18 @@ function Addresses() {
                             Make default
                           </Button>
                         ) : null}
-                        <Button
-                          variant="danger-quiet"
+                        {/* Icon only, so the three actions fit one row in a two-column list. */}
+                        <IconButton
+                          label={`Remove ${address.label}`}
                           onClick={() => {
                             remove.reset();
                             setRemoving(address);
                           }}
-                          icon={<Trash2 className="size-4" aria-hidden />}
-                          aria-label={`Remove ${address.label}`}
+                          tone="danger"
+                          className="ml-auto"
                         >
-                          Remove
-                        </Button>
+                          <Trash2 className="size-5" aria-hidden />
+                        </IconButton>
                       </div>
                     </div>
                   </article>
@@ -180,7 +185,6 @@ function Addresses() {
             </Reveal>
           )}
         </QueryView>
-      </div>
 
       <Dialog
         open={editing !== null}

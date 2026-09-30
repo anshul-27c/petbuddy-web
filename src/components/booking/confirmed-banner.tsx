@@ -2,7 +2,7 @@
 
 import { CircleCheck, X } from "lucide-react";
 import { IconButton } from "@/components/ui/button";
-import { formatDayTime } from "@/lib/format";
+import { formatDayTimeInline } from "@/lib/format";
 import { firstName } from "@/lib/labels";
 import type { Booking } from "@/lib/types";
 
@@ -37,11 +37,11 @@ export function ConfirmedBanner({
           <CircleCheck className="size-6" aria-hidden />
         </span>
         <div className="min-w-0">
-          <h2 id="booked-title" className="font-display text-headline font-semibold">
+          <h2 id="booked-title" className="title-section">
             Booked
           </h2>
           <p className="mt-1 text-ink-muted">
-            {serviceLabel} for {booking.pet.name}, {formatDayTime(booking.start).toLowerCase()}. Reference{" "}
+            {serviceLabel} for {booking.pet.name}, {formatDayTimeInline(booking.start)}. Reference{" "}
             <span className="font-semibold text-ink">{booking.code}</span>.
           </p>
         </div>
@@ -50,8 +50,10 @@ export function ConfirmedBanner({
       <ol className="mt-3 grid gap-3 sm:grid-cols-3">
         {NEXT_STEPS(first).map((text, index) => (
           <li key={text} className="flex gap-3 rounded-field border border-hairline bg-surface p-4 text-sm shadow-card">
-            <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-sky text-label font-bold text-leash-dark">
-              {index + 1}
+            <span className="flex h-5 shrink-0 items-center" aria-hidden>
+              <span className="flex size-6 items-center justify-center rounded-full bg-sky text-xs font-bold text-leash-dark">
+                {index + 1}
+              </span>
             </span>
             {text}
           </li>

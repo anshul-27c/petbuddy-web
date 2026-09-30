@@ -46,7 +46,7 @@ export function NotificationsMenu() {
 
   return (
     <Popover
-      panelClassName="fixed inset-x-3 top-16 sm:absolute sm:inset-x-auto sm:top-full sm:right-0 sm:mt-2 sm:w-96"
+      panelClassName="fixed inset-x-4 top-18 sm:absolute sm:inset-x-auto sm:top-full sm:right-0 sm:mt-2 sm:w-96"
       trigger={(props) => (
         <button
           type="button"
@@ -56,7 +56,7 @@ export function NotificationsMenu() {
         >
           <Bell className="size-5" aria-hidden />
           {unread > 0 ? (
-            <span className="absolute top-1 right-1 inline-flex animate-pop-in ring-2 ring-surface min-w-4.5 items-center justify-center rounded-full bg-alert px-1 text-[0.625rem] leading-4.5 font-bold text-surface">
+            <span className="absolute top-0 right-0 inline-flex h-5 min-w-5 animate-pop-in items-center justify-center rounded-full bg-alert px-1 text-xs font-bold text-surface ring-2 ring-surface">
               {unread > 9 ? "9+" : unread}
             </span>
           ) : null}
@@ -66,7 +66,7 @@ export function NotificationsMenu() {
       {(close) => (
         <div>
           <div className="flex items-center justify-between gap-2 border-b border-hairline px-4 py-3">
-            <h2 className="text-title font-semibold">Notifications</h2>
+            <h2 className="text-base font-semibold">Notifications</h2>
             {unread > 0 ? (
               <button
                 type="button"
@@ -124,7 +124,7 @@ export function NotificationsMenu() {
                           if (href) router.push(href);
                         }}
                       >
-                        <span className="flex size-8 shrink-0 items-center justify-center rounded-[10px] bg-sky text-leash">
+                        <span className="flex size-8 shrink-0 items-center justify-center rounded-tile bg-sky text-leash">
                           <KindIcon kind={notification.kind} />
                         </span>
                         <span className="min-w-0 flex-1">
@@ -137,7 +137,7 @@ export function NotificationsMenu() {
                             ) : null}
                           </span>
                           <span className="mt-1 block text-sm text-ink-muted">{notification.body}</span>
-                          <span className="mt-1 block text-small text-ink-muted">
+                          <span className="mt-1 block text-caption text-ink-muted">
                             {formatAgo(notification.createdAt)}
                           </span>
                         </span>

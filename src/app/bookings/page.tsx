@@ -23,6 +23,7 @@ function BookingList({ scope }: { scope: BookingScope }) {
   return (
     <QueryView
       query={query}
+      fill
       loading={
         <div className="grid grid-cols-1 gap-3 sm:gap-4" role="status" aria-label="Loading bookings">
           {[0, 1, 2].map((i) => (
@@ -34,6 +35,7 @@ function BookingList({ scope }: { scope: BookingScope }) {
       empty={
         scope === "upcoming" ? (
           <EmptyState
+            fill
             icon={<CalendarPlus />}
             title="No bookings coming up"
             body="Find a carer near you and book your first visit."
@@ -41,6 +43,7 @@ function BookingList({ scope }: { scope: BookingScope }) {
           />
         ) : (
           <EmptyState
+            fill
             icon={<History />}
             title="Nothing in your history yet"
             body="Finished and cancelled bookings will show up here."
@@ -88,7 +91,7 @@ function Bookings() {
   const params = useSearchParams();
   const scope: BookingScope = params.get("tab") === "past" ? "past" : "upcoming";
   return (
-    <Container>
+    <Container grow>
       <PageHeader
         title="Bookings"
         action={
@@ -105,7 +108,7 @@ function Bookings() {
           { key: "past", label: "Past", href: "/bookings?tab=past" },
         ]}
       />
-      <div className="mt-8">
+      <div className="mt-6 flex flex-1 flex-col sm:mt-8">
         <BookingList key={scope} scope={scope} />
       </div>
     </Container>

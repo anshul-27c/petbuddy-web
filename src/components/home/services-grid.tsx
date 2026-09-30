@@ -93,14 +93,14 @@ export function ServicesGrid() {
                     </IconTile>
                     <span className="flex min-w-0 flex-1 flex-col sm:mt-4">
                       <span className="flex items-baseline justify-between gap-3">
-                        <span className="text-title font-semibold text-ink">{service.label}</span>
+                        <span className="text-base font-semibold text-ink">{service.label}</span>
                         <span className="shrink-0 text-sm font-semibold text-leash-dark tabular-nums sm:hidden">
                           from {formatMoney(service.fromPaise)}
                         </span>
                       </span>
                       <span
                         className={cn(
-                          "mt-1 text-small text-ink-muted",
+                          "mt-1 text-caption text-ink-muted",
                           feature ? "sm:max-w-xs sm:text-body" : "line-clamp-2",
                         )}
                       >

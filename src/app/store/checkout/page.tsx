@@ -12,7 +12,7 @@ import { usePay } from "@/components/payments/payment-provider";
 import { ProductImage } from "@/components/store/product-image";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Card, CardTitle } from "@/components/ui/card";
-import { ChoiceCard } from "@/components/ui/field";
+import { ChoiceCard, FieldError } from "@/components/ui/field";
 import { Money } from "@/components/ui/money";
 import { ErrorNotice } from "@/components/ui/notice";
 import { CardSkeleton, ListSkeleton } from "@/components/ui/skeleton";
@@ -35,7 +35,7 @@ function AddressPicker({ value, onChange }: { value: string | null; onChange: (i
   const [adding, setAdding] = useState(false);
   return (
     <fieldset>
-      <legend className="font-display text-subhead font-semibold sm:text-headline">Deliver to</legend>
+      <legend className="title-section">Deliver to</legend>
       <div className="mt-4 sm:mt-5">
         <QueryView
           query={addresses}
@@ -43,7 +43,7 @@ function AddressPicker({ value, onChange }: { value: string | null; onChange: (i
           isEmpty={(list) => list.length === 0}
           empty={
             <Card>
-              <p className="mb-5 text-title font-semibold">Add a delivery address</p>
+              <p className="mb-5 text-base font-semibold">Add a delivery address</p>
               <AddressForm isFirst onSaved={(address) => onChange(address.id)} />
             </Card>
           }
@@ -73,7 +73,7 @@ function AddressPicker({ value, onChange }: { value: string | null; onChange: (i
               ))}
               {adding ? (
                 <Card>
-                  <h3 className="mb-5 text-title font-semibold">Add an address</h3>
+                  <h3 className="mb-5 text-base font-semibold">Add an address</h3>
                   <AddressForm
                     onSaved={(address) => {
                       onChange(address.id);
@@ -95,6 +95,10 @@ function AddressPicker({ value, onChange }: { value: string | null; onChange: (i
   );
 }
 
+function hasOutOfStockNow(summary: CartSummary) {
+  return summary.lines.some((line) => !line.product.inStock);
+}
+
 function Checkout({ summary }: { summary: CartSummary }) {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -104,16 +108,26 @@ function Checkout({ summary }: { summary: CartSummary }) {
   const [method, setMethod] = useState<PaymentMethod>("upi");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>(null);
+  const [problem, setProblem] = useState<string | null>(null);
   const summaryQuery = useCartSummary();
 
   const list = addresses.data ?? [];
   const effectiveAddressId = addressId ?? list.find((a) => a.isDefault)?.id ?? list[0]?.id ?? null;
-  const hasOutOfStock = summary.lines.some((line) => !line.product.inStock);
+  // A problem shown under the button goes as soon as its cause does.
+  if (problem && effectiveAddressId && !hasOutOfStockNow(summary)) setProblem(null);
+  const hasOutOfStock = hasOutOfStockNow(summary);
 
   const place = useMutation({ mutationFn: api.store.placeOrder });
 
   const placeOrder = async () => {
-    if (busy || !effectiveAddressId) return;
+    if (busy) return;
+    const blocker = !effectiveAddressId
+      ? "Add a delivery address first."
+      : hasOutOfStock
+        ? "Remove the out-of-stock item from your basket first."
+        : null;
+    setProblem(blocker);
+    if (blocker || !effectiveAddressId) return;
     setBusy(true);
     setError(null);
     try {
@@ -143,7 +157,7 @@ function Checkout({ summary }: { summary: CartSummary }) {
   };
 
   return (
-    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-10">
+    <div className="grid grid-cols-1 gap-10 sm:gap-14 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-10">
       <div className="stack-sections min-w-0">
         <AddressPicker value={effectiveAddressId} onChange={setAddressId} />
         <section aria-labelledby="items">
@@ -160,11 +174,12 @@ function Checkout({ summary }: { summary: CartSummary }) {
                 />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-semibold">{line.product.name}</p>
-                  <p className="mt-1 text-small text-ink-muted">
+                  <p className="mt-1 text-caption text-ink-muted">
                     {line.quantity} × <Money paise={line.product.pricePaise} />
                   </p>
-                  {!line.product.inStock ? <p className="mt-1 text-small font-semibold text-alert">Out of stock</p> : null}
+                  {!line.product.inStock ? <p className="mt-1 text-caption font-semibold text-alert">Out of stock</p> : null}
                 </div>
+                <Money paise={line.product.pricePaise * line.quantity} className="shrink-0 text-sm font-semibold" />
               </li>
             ))}
           </ul>
@@ -190,17 +205,22 @@ function Checkout({ summary }: { summary: CartSummary }) {
             <div className="flex items-baseline justify-between border-t border-dashed border-hairline pt-4">
               <dt className="font-semibold">Total</dt>
               <dd>
-                <Money paise={summary.totalPaise} display className="text-subhead" />
+                <Money paise={summary.totalPaise} display className="text-xl" />
               </dd>
             </div>
           </dl>
           <PaymentMethodPicker value={method} onChange={setMethod} disabled={busy} />
           {hasOutOfStock ? (
-            <p className="rounded-field bg-alert-soft p-4 text-sm text-alert">
+            <p className="rounded-field bg-alert-soft p-4 text-sm text-alert-ink">
               Something in your basket is out of stock. Remove it to place your order.
             </p>
           ) : null}
           {error ? <ErrorNotice error={error} /> : null}
+          {problem ? (
+            <div role="alert">
+              <FieldError>{problem}</FieldError>
+            </div>
+          ) : null}
           <Button
             variant="accent"
             size="lg"
@@ -208,11 +228,10 @@ function Checkout({ summary }: { summary: CartSummary }) {
             sheen
             onClick={() => void placeOrder()}
             loading={busy}
-            disabled={!effectiveAddressId || hasOutOfStock || summaryQuery.isFetching}
           >
             Place order {formatMoney(summary.totalPaise)}
           </Button>
-          <p className="text-center text-small text-ink-muted">We will let you know when it ships.</p>
+          <p className="text-center text-caption text-ink-muted">We will let you know when it ships.</p>
         </Card>
       </aside>
     </div>
@@ -224,6 +243,7 @@ function CheckoutPageBody() {
   return (
     <QueryView
       query={summary}
+      fill
       loading={
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-10" role="status" aria-label="Loading checkout">
           <ListSkeleton count={2} />
@@ -233,6 +253,7 @@ function CheckoutPageBody() {
       isEmpty={(data) => data.lines.length === 0}
       empty={
         <EmptyState
+          fill
           icon={<ShoppingBag />}
           title="Your basket is empty"
           body="Add something from the store, then come back here to check out."
@@ -250,7 +271,7 @@ export default function CheckoutPage() {
     <>
       <PageTitle title={"Checkout"} />
       <RequireAuth>
-        <Container>
+        <Container grow>
           <PageHeader title="Checkout" back={<BackLink href="/store">Back to the store</BackLink>} />
           <CheckoutPageBody />
         </Container>

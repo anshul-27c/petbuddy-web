@@ -5,6 +5,7 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { Providers } from "@/components/providers";
 import "./globals.css";
 
+// The logo wordmark only.
 const fraunces = Fraunces({
   variable: "--font-fraunces",
   subsets: ["latin"],
@@ -12,10 +13,11 @@ const fraunces = Fraunces({
   display: "swap",
 });
 
+// Everything else: 400 body, 600 titles and emphasis, 700 page titles.
 const jakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "600", "700"],
   display: "swap",
 });
 
@@ -38,7 +40,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col">
         <Providers>
           <SiteHeader />
-          <main id="main" className="flex-1 pb-16 sm:pb-24">
+          {/* A column that fills the screen under the header, so a page's empty state can centre in it. */}
+          <main id="main" className="flex min-h-page flex-1 flex-col pb-16 sm:pb-24">
             {children}
           </main>
           <SiteFooter />

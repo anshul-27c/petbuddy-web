@@ -20,7 +20,7 @@ export function PetStep({ value, onChange }: { value: string | null; onChange: (
 
   return (
     <fieldset>
-      <legend className="font-display text-subhead font-semibold sm:text-headline">Which pet?</legend>
+      <legend className="title-section">Which pet?</legend>
       <p className="mt-2 text-body text-ink-muted">Your carer sees their breed, temperament and vaccinations.</p>
       <div className="mt-4 sm:mt-5">
         <QueryView
@@ -34,7 +34,7 @@ export function PetStep({ value, onChange }: { value: string | null; onChange: (
                   <PawPrint />
                 </IconTile>
                 <div>
-                  <p className="text-title font-semibold">Add your pet</p>
+                  <p className="text-base font-semibold">Add your pet</p>
                   <p className="mt-1 text-sm text-ink-muted">So your carer knows who they are meeting.</p>
                 </div>
               </div>
@@ -58,7 +58,7 @@ export function PetStep({ value, onChange }: { value: string | null; onChange: (
               ))}
               {adding ? (
                 <Card>
-                  <h3 className="mb-5 text-title font-semibold">Add a pet</h3>
+                  <h3 className="mb-5 text-base font-semibold">Add a pet</h3>
                   <PetForm
                     onSaved={(pet) => {
                       onChange(pet.id);

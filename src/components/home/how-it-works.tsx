@@ -15,7 +15,7 @@ function Node({ n, icon }: { n: number; icon: ReactNode }) {
   return (
     <span className="relative z-10 flex size-12 shrink-0 items-center justify-center rounded-full border border-hairline bg-surface text-leash shadow-card ring-8 ring-canvas [&_svg]:size-5">
       {icon}
-      <span className="absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-leash text-label font-bold text-surface ring-2 ring-canvas">
+      <span className="absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-leash-dark text-xs font-bold text-surface ring-2 ring-canvas">
         {n}
       </span>
     </span>
@@ -77,7 +77,7 @@ export function HowItWorks({ hours }: { hours: string }) {
             ) : null}
             <Node n={index + 1} icon={step.icon} />
             <div className="min-w-0 pt-1 md:mt-5 md:max-w-xs md:pt-0">
-              <h3 className="text-title font-semibold">{step.title}</h3>
+              <h3 className="text-base font-semibold">{step.title}</h3>
               <p className="mt-1 text-sm text-ink-muted">{step.body}</p>
             </div>
           </li>

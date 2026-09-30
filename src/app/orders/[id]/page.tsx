@@ -17,7 +17,7 @@ import { CardSkeleton, PageSkeleton, Skeleton } from "@/components/ui/skeleton";
 import { EmptyState, ErrorState } from "@/components/ui/states";
 import { OrderStatusPill, PaymentStatusPill } from "@/components/ui/status-pill";
 import { api, isApiError } from "@/lib/api";
-import { formatDate, formatDayTime } from "@/lib/format";
+import { formatDate, formatDayTimeInline } from "@/lib/format";
 import { addressLine } from "@/lib/labels";
 import { qk } from "@/lib/query-keys";
 import type { Order } from "@/lib/types";
@@ -40,14 +40,18 @@ function OrderView({ order }: { order: Order }) {
             <Package />
           </IconTile>
           <div className="min-w-0">
-            <h1 className="font-display text-headline font-semibold sm:text-display">Order {order.code}</h1>
-            <p className="mt-1 text-sm text-ink-muted">Placed {formatDayTime(order.placedAt).toLowerCase()}</p>
+            <h1 className="title-page">Order {order.code}</h1>
+            <p className="mt-1 text-sm text-ink-muted">Placed {formatDayTimeInline(order.placedAt)}</p>
+            {/* Phones: the status sits under the title rather than wrapping to its own row. */}
+            <OrderStatusPill status={order.status} className="mt-3 sm:hidden" />
           </div>
         </div>
-        <OrderStatusPill status={order.status} className="mt-2" />
+        <span className="mt-2 hidden sm:block">
+          <OrderStatusPill status={order.status} />
+        </span>
       </header>
 
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-10">
+      <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-10">
         <div className="grid grid-cols-1 min-w-0 content-start gap-3 sm:gap-4">
           <Card>
             {order.status === "cancelled" ? (
@@ -56,7 +60,7 @@ function OrderView({ order }: { order: Order }) {
                   <PackageX />
                 </IconTile>
                 <div>
-                  <p className="text-title font-semibold">This order was cancelled</p>
+                  <p className="text-base font-semibold">This order was cancelled</p>
                   <p className="mt-1 text-sm text-ink-muted">
                     Anything you paid is refunded to your original payment method.
                   </p>
@@ -87,9 +91,9 @@ function OrderView({ order }: { order: Order }) {
                     iconClassName="size-6"
                   />
                   <div className="min-w-0 flex-1">
-                    <p className="text-small text-ink-muted">{item.brand}</p>
+                    <p className="text-caption text-ink-muted">{item.brand}</p>
                     <p className="mt-1 truncate text-sm font-semibold">{item.name}</p>
-                    <p className="mt-1 text-small text-ink-muted">
+                    <p className="mt-1 text-caption text-ink-muted">
                       {item.quantity} × <Money paise={item.pricePaise} />
                     </p>
                   </div>
@@ -120,7 +124,7 @@ function OrderView({ order }: { order: Order }) {
               <div className="flex items-baseline justify-between border-t border-dashed border-hairline pt-4">
                 <dt className="font-semibold">Total</dt>
                 <dd>
-                  <Money paise={order.totalPaise} display className="text-subhead" />
+                  <Money paise={order.totalPaise} display className="text-xl" />
                 </dd>
               </div>
             </dl>
@@ -145,20 +149,28 @@ function OrderDetail() {
   return (
     <>
       <PageTitle title={query.data ? `Order ${query.data.code}` : "Order"} />
-      <Container>
+      <Container grow>
         <PageBack href="/orders">All orders</PageBack>
         {query.data ? (
           <OrderView order={query.data} />
         ) : query.isError ? (
           isApiError(query.error) && query.error.status === 404 ? (
             <EmptyState
+              fill
+              areaClassName="pt-2 sm:pt-4"
               icon={<PackageX />}
               title="We could not find that order"
               body="It may belong to another account, or the link is wrong."
               action={<ButtonLink href="/orders">See your orders</ButtonLink>}
             />
           ) : (
-            <ErrorState error={query.error} onRetry={() => void query.refetch()} retrying={query.isFetching} />
+            <ErrorState
+              fill
+              areaClassName="pt-2 sm:pt-4"
+              error={query.error}
+              onRetry={() => void query.refetch()}
+              retrying={query.isFetching}
+            />
           )
         ) : (
           <div role="status" aria-label="Loading order">
@@ -169,7 +181,7 @@ function OrderDetail() {
                 <Skeleton className="h-4 w-40" />
               </div>
             </div>
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-10">
+            <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-10">
               <div className="grid grid-cols-1 content-start gap-3 sm:gap-4">
                 <CardSkeleton lines={1} />
                 <CardSkeleton lines={4} />

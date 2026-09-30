@@ -109,19 +109,21 @@ function CartLineRow({ line }: { line: CartLine }) {
         iconClassName="size-6"
       />
       <div className="min-w-0 flex-1">
-        <p className="text-small text-ink-muted">{product.brand}</p>
+        <p className="text-caption text-ink-muted">{product.brand}</p>
         <p className="mt-1 line-clamp-2 text-sm font-semibold">{product.name}</p>
-        <p className="mt-1 text-small text-ink-muted">
+        <p className="mt-1 text-caption text-ink-muted">
           <Money paise={product.pricePaise} /> each
         </p>
-        {!product.inStock ? <p className="mt-1 text-small font-semibold text-alert">Out of stock</p> : null}
-        <QuantityStepper
-          className="mt-3"
-          name={product.name}
-          quantity={line.quantity}
-          disabled={setQuantity.isPending}
-          onChange={(quantity) => setQuantity.mutate({ product, quantity })}
-        />
+        {!product.inStock ? <p className="mt-1 text-caption font-semibold text-alert">Out of stock</p> : null}
+        <div className="mt-3 flex items-center justify-between gap-3">
+          <QuantityStepper
+            name={product.name}
+            quantity={line.quantity}
+            disabled={setQuantity.isPending}
+            onChange={(quantity) => setQuantity.mutate({ product, quantity })}
+          />
+          <Money paise={product.pricePaise * line.quantity} className="text-sm font-semibold" />
+        </div>
       </div>
     </li>
   );
@@ -153,7 +155,7 @@ function CartTotals({
           <div className="flex items-baseline justify-between border-t border-dashed border-hairline pt-3">
             <dt className="font-semibold">Total</dt>
             <dd>
-              <Money paise={data.totalPaise} display className="text-subhead" />
+              <Money paise={data.totalPaise} display className="text-xl" />
             </dd>
           </div>
         </dl>

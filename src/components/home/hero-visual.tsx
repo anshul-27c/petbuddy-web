@@ -43,27 +43,27 @@ export function HeroVisual() {
             <span className="flex size-10 items-center justify-center rounded-full border-2 border-surface bg-leash text-surface shadow-cta">
               <Home className="size-5" />
             </span>
-            <span className="mt-1 rounded-full bg-surface px-2 py-1 text-label font-semibold shadow-card">Home</span>
+            <span className="mt-1 rounded-full bg-surface px-2 py-1 text-xs font-semibold shadow-card">Home</span>
           </div>
           <div className="absolute top-[67.5%] left-[28%] flex -translate-x-1/2 -translate-y-1/2 flex-col items-center">
             <span className="pulse-dot flex size-10 items-center justify-center rounded-full border-2 border-surface bg-trail text-trail">
               <Footprints className="relative z-10 size-5 text-surface" />
             </span>
-            <span className="mt-1 rounded-full bg-surface px-2 py-1 text-label font-semibold shadow-card">Your carer</span>
+            <span className="mt-1 rounded-full bg-surface px-2 py-1 text-xs font-semibold shadow-card">Your carer</span>
           </div>
         </div>
       </div>
 
       <div className="absolute -right-2 -bottom-6 w-60 rounded-card border border-hairline bg-surface p-4 shadow-float motion-safe:animate-[float-y_6s_ease-in-out_infinite] sm:-right-6">
         <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-2 rounded-full bg-sky px-3 py-1 text-label font-semibold text-leash-dark">
+          <span className="inline-flex items-center gap-2 rounded-full bg-sky px-3 py-1 text-xs font-semibold text-leash-dark">
             <span className="pulse-dot size-1.5 rounded-full bg-current" />
             On the way
           </span>
-          <span className="text-small text-ink-muted">6 min away</span>
+          <span className="text-caption text-ink-muted">6 min away</span>
         </div>
         <p className="mt-2 text-sm font-semibold">Pet walking, 5:00 – 6:00 pm</p>
-        <p className="mt-1 flex items-center gap-1 text-small text-trail">
+        <p className="mt-1 flex items-center gap-1 text-caption text-trail">
           <ShieldCheck className="size-3.5" />
           ID and selfie verified
         </p>
@@ -73,7 +73,7 @@ export function HeroVisual() {
         <span className="flex size-8 items-center justify-center rounded-full bg-trail-soft text-trail">
           <Camera className="size-4" />
         </span>
-        <span className="text-small font-semibold">New photo update</span>
+        <span className="text-caption font-semibold">New photo update</span>
       </div>
     </div>
   );

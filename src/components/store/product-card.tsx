@@ -79,20 +79,20 @@ export function ProductCard({ product, quantity }: { product: Product; quantity:
               Out of stock
             </Pill>
           ) : off > 0 ? (
-            <span className="inline-flex items-center gap-1 rounded-full bg-surface px-2 py-1 text-label font-bold text-ink shadow-card">
+            <span className="inline-flex items-center gap-1 rounded-full bg-surface px-2 py-1 text-xs font-bold text-ink shadow-card">
               <TagIcon className="size-3 text-tail" aria-hidden />
               {off}% off
             </span>
           ) : null}
         </div>
       </div>
-      <p className="mt-3 truncate text-small text-ink-muted">{product.brand}</p>
-      <h3 className="mt-1 line-clamp-2 min-h-[2.8em] text-sm leading-[1.4] font-semibold">{product.name}</h3>
-      <RatingInline rating={product.rating} count={product.reviewCount} className="mt-1 text-small" />
+      <p className="mt-3 truncate text-caption text-ink-muted">{product.brand}</p>
+      <h3 className="mt-1 line-clamp-2 min-h-10 text-sm font-semibold">{product.name}</h3>
+      <RatingInline rating={product.rating} count={product.reviewCount} className="mt-1 text-caption" />
       <div className="mt-auto pt-3">
         <div className="flex min-h-11 flex-col justify-end">
-          <Money paise={product.pricePaise} display className="text-title leading-tight" />
-          <span className={cn("text-small", !(off > 0 && product.mrpPaise) && "invisible")} aria-hidden={!(off > 0 && product.mrpPaise)}>
+          <Money paise={product.pricePaise} display className="text-lg" />
+          <span className={cn("text-caption", !(off > 0 && product.mrpPaise) && "invisible")} aria-hidden={!(off > 0 && product.mrpPaise)}>
             <span className="text-ink-muted">MRP </span>
             {off > 0 && product.mrpPaise ? <Money paise={product.mrpPaise} strike /> : "–"}
           </span>

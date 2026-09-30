@@ -11,6 +11,8 @@ import { api } from "@/lib/api";
 import { formatMoney } from "@/lib/format";
 import { usePolicy } from "@/lib/queries";
 import type { Booking } from "@/lib/types";
+import { useFieldErrors } from "@/lib/use-field-errors";
+import { LIMITS, maxLengthError } from "@/lib/validation";
 import { useBookingRefresh } from "./use-booking-refresh";
 
 /** States the fee before the person commits, using the server's figure for "now". */
@@ -21,6 +23,8 @@ export function CancelDialog({ booking, open, onClose }: { booking: Booking; ope
   const { freeCancelHours } = usePolicy();
   const fee = booking.cancellationFeeIfNowPaise;
   const hours = `${freeCancelHours} ${freeCancelHours === 1 ? "hour" : "hours"}`;
+  const { errors, show, clear, fromServer, ref } = useFieldErrors<"reason">();
+  const [unmapped, setUnmapped] = useState<unknown>(null);
 
   const cancel = useMutation({
     mutationFn: () => api.bookings.cancel(booking.id, reason.trim() || null),
@@ -36,7 +40,18 @@ export function CancelDialog({ booking, open, onClose }: { booking: Booking; ope
       });
       onClose();
     },
+    onError: (error) => setUnmapped(fromServer(error, { reason: "reason" }) ? null : error),
   });
+
+  const submit = () => {
+    if (cancel.isPending) return;
+    setUnmapped(null);
+    if (show({ reason: maxLengthError(reason, LIMITS.cancelReason, "the reason") })) return;
+    cancel.mutate();
+  };
+
+  // A 422 on the reason shows under the field; anything else as a notice.
+  const notice = unmapped;
 
   return (
     <Dialog
@@ -50,13 +65,13 @@ export function CancelDialog({ booking, open, onClose }: { booking: Booking; ope
           <Button variant="outline" onClick={onClose} disabled={cancel.isPending}>
             Keep booking
           </Button>
-          <Button variant="danger" onClick={() => cancel.mutate()} loading={cancel.isPending}>
+          <Button variant="danger" onClick={submit} loading={cancel.isPending}>
             {fee > 0 ? `Cancel and pay ${formatMoney(fee)} fee` : "Cancel booking"}
           </Button>
         </div>
       }
     >
-      <div className="space-y-4">
+      <div ref={ref} className="space-y-4">
         {fee > 0 ? (
           <Notice tone="warning" title={`A ${formatMoney(fee)} fee applies`}>
             The visit is less than {hours} away, so {formatMoney(fee)} is kept as a cancellation fee. The rest of
@@ -71,12 +86,16 @@ export function CancelDialog({ booking, open, onClose }: { booking: Booking; ope
           label="Why are you cancelling?"
           optional
           value={reason}
-          onChange={(event) => setReason(event.target.value)}
+          onChange={(event) => {
+            setReason(event.target.value);
+            clear("reason");
+          }}
+          error={errors.reason}
           placeholder="Plans changed"
-          maxLength={500}
+          maxLength={LIMITS.cancelReason}
           rows={3}
         />
-        {cancel.error ? <ErrorNotice error={cancel.error} /> : null}
+        {notice ? <ErrorNotice error={notice} /> : null}
       </div>
     </Dialog>
   );

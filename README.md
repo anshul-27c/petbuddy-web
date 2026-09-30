@@ -43,6 +43,7 @@ Checks:
 
 ```bash
 npm run lint
+npm test           # unit tests for validation and formatting (node --test)
 ```
 
 Deploying to Railway: `railway.json` builds with `npm run build` and starts
@@ -92,7 +93,9 @@ src/
   lib/
     api.ts              the one API client, typed per endpoint
     types.ts            shapes copied from the API contract
-    format.ts           money (paise), dates and times (en-IN), distances
+    format.ts           money (paise), dates and times (en-IN, India time), distances, plurals
+    validation.ts       form rules that mirror the API validators (tested in validation.test.ts)
+    use-field-errors.ts field errors, focus on the first invalid field, 422 mapping
     labels.ts           sentence-case labels for every enum
     queries.ts          shared queries (config, services, pets, addresses, cart)
     query-keys.ts       TanStack Query keys, grouped for invalidation
@@ -112,10 +115,18 @@ src/
     live key yet.
   Closing either without paying is treated as "cancelled" and changes nothing.
 - **Design tokens** (colours, radii, type sizes, shadows, easing) are
-  Tailwind v4 `@theme` tokens in `src/app/globals.css`; the default palette is
-  cleared so only these colours exist. The same file documents the 4-point
-  spacing scale and defines the layout utilities that apply it
-  (`container-page`, `stack-sections`, `stack-landing`, `rail`, `pb-bar`).
+  Tailwind v4 `@theme` tokens in `src/app/globals.css`; the default palette and
+  type scale are cleared so only these exist. One sans family sets
+  everything; the serif is used only for the logo wordmark. The
+  type scale is 12/16, 13/18, 14/20, 16/24, 18/26, 20/28, 24/32, 30/38, 36/44
+  and 48/56, with roles in `.title-page`, `.title-section` and `.title-hero`;
+  body text is 15 px on phones and 16 px from 640 px, and figures are tabular.
+  The same file documents the 4-point spacing scale and defines the layout
+  utilities that apply it (`container-page`, `stack-sections`,
+  `stack-landing`, `rail`, `pb-bar`, `min-h-page`, `state-area`).
+- **Forms** check on submit, show the message under the field, move focus to
+  the first invalid field and clear a message as it is fixed; the submit
+  button stays enabled. A 422's field errors land under the same fields.
 - **Layout primitives**: `Container`, `PageHeader` and `PageBack`
   (`components/layout/container.tsx`), `SectionHeader` (the one section title
   style), `Card`/`CardTitle` and `IconTile`. `components/ui/grid.ts` picks

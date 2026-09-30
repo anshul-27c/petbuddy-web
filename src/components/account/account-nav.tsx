@@ -1,22 +1,15 @@
 "use client";
 
-import { Heart, MapPin, Package, PawPrint, UserRound } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { ACCOUNT_LINKS } from "@/components/layout/account-menu";
 import { Container, PageHeader } from "@/components/layout/container";
 import { cn } from "@/lib/utils";
 
-const LINKS = [
-  { href: "/account", label: "Profile", icon: UserRound },
-  { href: "/account/pets", label: "Pets", icon: PawPrint },
-  { href: "/account/addresses", label: "Addresses", icon: MapPin },
-  { href: "/account/favourites", label: "Favourites", icon: Heart },
-  { href: "/orders", label: "Orders", icon: Package },
-];
-
 /**
- * The account sections: a sideways-scrolling row of pills on phones and
+ * The account sections (the same five, with the same names, as the account
+ * menu in the header): a sideways-scrolling row of pills on phones and
  * tablets, a list down the side from 1024 px.
  */
 export function AccountNav() {
@@ -24,7 +17,7 @@ export function AccountNav() {
   return (
     <nav aria-label="Account">
       <ul className="rail gap-2 lg:sticky lg:top-24 lg:mx-0 lg:flex-col lg:gap-1 lg:overflow-visible lg:px-0">
-        {LINKS.map(({ href, label, icon: Icon }) => {
+        {ACCOUNT_LINKS.map(({ href, label, icon: Icon }) => {
           const active = href === "/orders" ? pathname.startsWith("/orders") : pathname === href;
           return (
             <li key={href} className="shrink-0">
@@ -50,7 +43,11 @@ export function AccountNav() {
   );
 }
 
-/** The frame for every account page: title, the section nav, then the page itself. */
+/**
+ * The frame for every account page: title, the section nav, then the page
+ * itself. The page column fills the rest of the page area, so an empty state
+ * centres in it (beside the nav from 1024 px, under it below that).
+ */
 export function AccountShell({
   title,
   subtitle,
@@ -63,11 +60,11 @@ export function AccountShell({
   children: ReactNode;
 }) {
   return (
-    <Container>
+    <Container grow>
       <PageHeader title={title} subtitle={subtitle} action={action} />
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-10">
+      <div className="flex flex-1 flex-col gap-6 sm:gap-8 lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-10">
         <AccountNav />
-        <div className="min-w-0">{children}</div>
+        <div className="flex min-w-0 flex-1 flex-col">{children}</div>
       </div>
     </Container>
   );

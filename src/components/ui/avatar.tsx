@@ -4,13 +4,13 @@ import { initials } from "@/lib/labels";
 import { cn } from "@/lib/utils";
 
 const SIZES = {
-  xs: "size-7 text-label",
-  sm: "size-9 text-small",
+  xs: "size-7 text-xs",
+  sm: "size-9 text-caption",
   md: "size-11 text-sm",
   lg: "size-14 text-body",
-  xl: "size-18 text-title",
+  xl: "size-18 text-base",
   // The profile hero: 72 px on phones, 96 px from 640 px up.
-  hero: "size-18 text-title sm:size-24 sm:text-headline",
+  hero: "size-18 text-base sm:size-24 sm:text-2xl",
 } as const;
 
 /** Initials on the brand tint. An icon can stand in for pets. */

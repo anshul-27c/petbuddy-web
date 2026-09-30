@@ -1,12 +1,15 @@
 "use client";
 
-import { Check, ChevronDown } from "lucide-react";
+import { Check, ChevronDown, CircleAlert } from "lucide-react";
 import { useId, type ComponentProps, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-/** Inputs share one look: 48 px tall, 16 px inset, and a soft leash halo on focus. */
+/**
+ * Inputs share one look: 44 px tall (the default button's height), 16 px inset,
+ * 16 px text (smaller text makes phones zoom in on focus) and a soft leash halo on focus.
+ */
 const CONTROL =
-  "w-full rounded-field border bg-surface px-4 text-body text-ink shadow-card placeholder:text-ink-muted transition duration-150 ease-out hover:border-ink-faint focus-glow disabled:bg-canvas disabled:text-ink-faint";
+  "w-full rounded-field border bg-surface px-4 text-base text-ink shadow-card placeholder:text-ink-muted transition duration-150 ease-out hover:border-ink-faint focus-glow disabled:bg-canvas disabled:text-ink-faint";
 
 function describedBy(id: string, error: string | undefined, hint: ReactNode) {
   if (error) return `${id}-error`;
@@ -25,6 +28,18 @@ interface ShellProps {
   hideLabel?: boolean;
 }
 
+/** A field's error, under it: an alert icon centred on the first line, then the message. */
+export function FieldError({ id, children, className }: { id?: string; children: ReactNode; className?: string }) {
+  return (
+    <p id={id} className={cn("flex gap-2 text-caption text-alert", className)}>
+      <span className="flex h-[1lh] shrink-0 items-center" aria-hidden>
+        <CircleAlert className="size-3.5" />
+      </span>
+      <span>{children}</span>
+    </p>
+  );
+}
+
 function FieldShell({ id, label, hint, error, optional, className, children, hideLabel }: ShellProps) {
   return (
     <div className={cn("flex flex-col gap-2", className)}>
@@ -34,11 +49,9 @@ function FieldShell({ id, label, hint, error, optional, className, children, hid
       </label>
       {children}
       {error ? (
-        <p id={`${id}-error`} className="text-small font-medium text-alert">
-          {error}
-        </p>
+        <FieldError id={`${id}-error`}>{error}</FieldError>
       ) : hint ? (
-        <p id={`${id}-hint`} className="text-small text-ink-muted">
+        <p id={`${id}-hint`} className="text-caption text-ink-muted">
           {hint}
         </p>
       ) : null}
@@ -79,7 +92,7 @@ export function TextField({
       aria-describedby={describedBy(id, error, hint)}
       className={cn(
         CONTROL,
-        "h-12",
+        "h-11",
         error || invalid ? "border-alert" : "border-hairline",
         leading ? "pl-18" : "",
         className,
@@ -159,9 +172,10 @@ export function SelectField({
         <select
           id={id}
           aria-invalid={error ? true : undefined}
+          aria-describedby={describedBy(id, error, hint)}
           className={cn(
             CONTROL,
-            "h-12 appearance-none pr-10",
+            "h-11 appearance-none pr-10",
             error ? "border-alert" : "border-hairline",
             className,
           )}
@@ -196,8 +210,8 @@ export function Toggle({
   return (
     <div className="flex min-h-11 items-center justify-between gap-4">
       <label htmlFor={id} className="min-w-0 cursor-pointer">
-        <span className="block text-body font-medium text-ink">{label}</span>
-        {description ? <span className="mt-1 block text-small text-ink-muted">{description}</span> : null}
+        <span className="block text-sm font-semibold text-ink">{label}</span>
+        {description ? <span className="mt-1 block text-caption text-ink-muted">{description}</span> : null}
       </label>
       <span className="relative inline-flex shrink-0">
         <input
@@ -277,7 +291,7 @@ export function ChoiceCard({
       ) : null}
       <span className="min-w-0 flex-1">
         <span className="block text-body font-semibold text-ink">{title}</span>
-        {description ? <span className="mt-1 block text-small text-ink-muted">{description}</span> : null}
+        {description ? <span className="mt-1 block text-caption text-ink-muted">{description}</span> : null}
       </span>
       {trailing ? <span className="shrink-0">{trailing}</span> : null}
       <span

@@ -22,10 +22,12 @@ function Orders() {
   return (
     <QueryView
       query={orders}
+      fill
       loading={<ListSkeleton count={3} />}
       isEmpty={(list) => list.length === 0}
       empty={
         <EmptyState
+          fill
           icon={<Package />}
           title="No orders yet"
           body="Food, toys and grooming supplies you order from the store will show up here."
@@ -50,7 +52,7 @@ function Orders() {
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-title font-semibold">Order {order.code}</p>
+                      <p className="text-base font-semibold">Order {order.code}</p>
                       <OrderStatusPill status={order.status} />
                     </div>
                     <p className="mt-1 text-sm text-ink-muted">
