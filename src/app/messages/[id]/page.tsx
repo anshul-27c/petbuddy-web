@@ -17,6 +17,7 @@ import { formatDayTime, formatMaskedPhone } from "@/lib/format";
 import { useServiceCatalogue } from "@/lib/queries";
 import { qk } from "@/lib/query-keys";
 import type { ChatThread } from "@/lib/types";
+import { useRealtimeStatus } from "@/components/realtime/realtime-provider";
 
 function useMarkRead(thread: ChatThread) {
   const queryClient = useQueryClient();
@@ -65,35 +66,51 @@ function Thread({ thread }: { thread: ChatThread }) {
         </Link>
         <Avatar name={thread.withName} />
         <div className="min-w-0 flex-1">
-          <h1 className="truncate text-title font-semibold">{thread.withName}</h1>
+          <h1 className="truncate text-title font-semibold">
+            {thread.withName}
+          </h1>
           <Link
             href={`/bookings/${thread.bookingId}`}
             className="mt-1 block truncate text-small text-leash-dark hover:underline"
           >
-            {catalogue.label(thread.service)} · {formatDayTime(thread.bookingStart)} · {thread.bookingCode}
+            {catalogue.label(thread.service)} ·{" "}
+            {formatDayTime(thread.bookingStart)} · {thread.bookingCode}
           </Link>
         </div>
       </div>
       <p className="flex items-center justify-center gap-2 border-b border-hairline bg-sky/60 px-3 py-2 text-center text-small text-leash-dark">
         <Phone className="size-3.5" aria-hidden />
         <span>
-          {thread.maskedPhone ? `${formatMaskedPhone(thread.maskedPhone)} · ` : ""}Numbers are masked on both sides.
+          {thread.maskedPhone
+            ? `${formatMaskedPhone(thread.maskedPhone)} · `
+            : ""}
+          Numbers are masked on both sides.
         </span>
       </p>
       <MessageList messages={thread.messages} className="min-h-0 flex-1" />
-      <Composer onSend={(text) => send.mutateAsync(text)} sending={send.isPending} error={send.error} />
+      <Composer
+        onSend={(text) => send.mutateAsync(text)}
+        sending={send.isPending}
+        error={send.error}
+      />
     </div>
   );
 }
 
 export default function ChatThreadPage() {
   const { id } = useParams<{ id: string }>();
+  // Messages arrive over the live connection; polling is only the fallback.
+  const live = useRealtimeStatus() === "live";
   const query = useQuery({
     queryKey: qk.chat(id),
     queryFn: () => api.chats.get(id),
-    refetchInterval: 4000,
+    refetchInterval: live ? 60_000 : 4000,
   });
-  const title = <PageTitle title={query.data ? `Chat with ${query.data.withName}` : "Messages"} />;
+  const title = (
+    <PageTitle
+      title={query.data ? `Chat with ${query.data.withName}` : "Messages"}
+    />
+  );
 
   if (query.data) {
     return (
@@ -120,7 +137,11 @@ export default function ChatThreadPage() {
     return (
       <div className="pt-4 sm:pt-6 lg:pt-0">
         {title}
-        <ErrorState error={query.error} onRetry={() => void query.refetch()} retrying={query.isFetching} />
+        <ErrorState
+          error={query.error}
+          onRetry={() => void query.refetch()}
+          retrying={query.isFetching}
+        />
       </div>
     );
   }
