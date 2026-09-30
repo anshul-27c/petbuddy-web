@@ -1,4 +1,8 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 import { Logo } from "./logo";
 
 const COLUMNS = [
@@ -28,8 +32,12 @@ const COLUMNS = [
 ];
 
 export function SiteFooter() {
+  // An open conversation is a full-screen chat on phones, with nothing to
+  // scroll to below it.
+  const inThread = /^\/messages\/[^/]+/.test(usePathname() ?? "");
+
   return (
-    <footer className="border-t border-hairline bg-surface">
+    <footer className={cn("border-t border-hairline bg-surface", inThread && "hidden lg:block")}>
       <div className="container-page grid gap-8 py-10 sm:py-12 md:grid-cols-[1.5fr_3fr] md:gap-10">
         <div>
           <Logo />

@@ -311,6 +311,8 @@ export interface TimelineEvent {
   at: string;
   note: string | null;
   photoUrl: string | null;
+  /** Who it came from; older API versions leave it out. */
+  actor?: Actor;
 }
 
 export interface Cancellation {

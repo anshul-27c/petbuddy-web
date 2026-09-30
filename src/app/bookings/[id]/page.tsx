@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { CalendarClock, CalendarX2, MapPin, NotebookPen, Star } from "lucide-react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useState, type ReactNode } from "react";
+import { Suspense, useEffect, useState, type ReactNode } from "react";
 import { RequireAuth } from "@/components/auth/require-auth";
 import { CancelDialog } from "@/components/booking/cancel-dialog";
 import { CarerContact } from "@/components/booking/carer-contact";
@@ -94,7 +94,13 @@ function BookingView({ booking, updatedAt }: { booking: Booking; updatedAt: numb
   const router = useRouter();
   const serviceLabel = catalogue.label(booking.service);
   const live = LIVE.has(booking.status);
-  const confirmed = params.get("confirmed") === "1";
+  // The "booked, here's what happens next" banner greets a new booking once:
+  // not after it's cancelled or finished, and not again on a reload.
+  const [greet] = useState(() => params.get("confirmed") === "1");
+  const confirmed = greet && (booking.status === "requested" || booking.status === "confirmed");
+  useEffect(() => {
+    if (params.get("confirmed") === "1") router.replace(`/bookings/${booking.id}`, { scroll: false });
+  }, [params, router, booking.id]);
 
   return (
     <div>

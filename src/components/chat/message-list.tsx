@@ -45,7 +45,7 @@ export function MessageList({ messages, className }: { messages: ChatMessage[]; 
           return (
             <Fragment key={message.id}>
               {newDay ? (
-                <li className="flex justify-center py-2" aria-hidden>
+                <li className="flex justify-center py-2">
                   <span className="rounded-full bg-surface px-3 py-1 text-xs font-semibold text-ink-muted shadow-card">
                     {formatDay(message.at)}
                   </span>

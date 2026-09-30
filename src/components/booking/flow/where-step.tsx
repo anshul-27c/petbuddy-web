@@ -117,7 +117,7 @@ export function WhereStep({
           optional
           value={gateCode}
           onChange={(event) => onGateCode(event.target.value)}
-          placeholder="4821"
+          placeholder="e.g. 4821"
           maxLength={LIMITS.gateCode}
           error={errors.gateCode}
           hint="Added to your notes for the carer."

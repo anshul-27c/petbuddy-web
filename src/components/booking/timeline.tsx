@@ -35,6 +35,16 @@ function Dot({ kind }: { kind: TimelineEvent["kind"] }) {
   );
 }
 
+/**
+ * A note from the owner is a reschedule (the only note an owner writes);
+ * a note from the carer is their update from the visit.
+ */
+function eventTitle(event: TimelineEvent): string {
+  if (event.kind === "note" && event.actor === "owner") return "Rescheduled";
+  if (event.kind === "note" && event.actor === "earner") return "Update from your carer";
+  return TIMELINE_LABELS[event.kind] ?? "Update";
+}
+
 /** What has happened so far, oldest first, with photo updates inline. */
 export function Timeline({ events }: { events: TimelineEvent[] }) {
   if (events.length === 0) {
@@ -56,7 +66,7 @@ export function Timeline({ events }: { events: TimelineEvent[] }) {
           ) : null}
           <Dot kind={event.kind} />
           <div className="min-w-0 flex-1 pt-1">
-            <p className="text-sm font-semibold">{TIMELINE_LABELS[event.kind] ?? "Update"}</p>
+            <p className="text-sm font-semibold">{eventTitle(event)}</p>
             <p className="mt-1 text-caption text-ink-muted">
               <time dateTime={event.at}>{formatDayTime(event.at)}</time>
             </p>

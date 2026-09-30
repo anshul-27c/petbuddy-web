@@ -107,6 +107,7 @@ export function RescheduleDialog({
           earnerId={booking.earner.id}
           service={booking.service}
           excludeBookingId={booking.id}
+          preferDate={booking.start}
           carerName={first}
           selected={picked}
           onSelect={(slot) => {

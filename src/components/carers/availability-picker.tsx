@@ -6,7 +6,7 @@ import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState, QueryView } from "@/components/ui/states";
 import { api } from "@/lib/api";
-import { availabilityDayParts, businessHour, formatTime } from "@/lib/format";
+import { availabilityDayParts, businessDate, businessHour, formatTime } from "@/lib/format";
 import { qk } from "@/lib/query-keys";
 import type { DayAvailability, ServiceKey, Slot } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -55,6 +55,7 @@ export function AvailabilityPicker({
   selected,
   onSelect,
   carerName,
+  preferDate,
 }: {
   earnerId: string;
   service?: ServiceKey;
@@ -62,6 +63,8 @@ export function AvailabilityPicker({
   selected: string | null;
   onSelect: (slot: Slot) => void;
   carerName: string;
+  /** A day to open on, if it still has free slots (rescheduling opens on the booked day). */
+  preferDate?: string;
 }) {
   const query = useAvailability(earnerId, service, excludeBookingId);
   return (
@@ -77,7 +80,7 @@ export function AvailabilityPicker({
         />
       }
     >
-      {(days) => <PickerBody days={days} selected={selected} onSelect={onSelect} />}
+      {(days) => <PickerBody days={days} selected={selected} onSelect={onSelect} preferDate={preferDate} />}
     </QueryView>
   );
 }
@@ -86,15 +89,20 @@ function PickerBody({
   days,
   selected,
   onSelect,
+  preferDate,
 }: {
   days: DayAvailability[];
   selected: string | null;
   onSelect: (slot: Slot) => void;
+  preferDate?: string;
 }) {
   const [chosenDay, setChosenDay] = useState<number | null>(null);
   const selectedDay = days.findIndex((day) => day.slots.some((slot) => sameInstant(slot.start, selected)));
   const firstOpen = Math.max(0, days.findIndex((day) => openCount(day) > 0));
-  const dayIndex = chosenDay ?? (selectedDay >= 0 ? selectedDay : firstOpen);
+  const preferredDay = preferDate
+    ? days.findIndex((day) => businessDate(day.date) === businessDate(preferDate) && openCount(day) > 0)
+    : -1;
+  const dayIndex = chosenDay ?? (selectedDay >= 0 ? selectedDay : preferredDay >= 0 ? preferredDay : firstOpen);
   const day = days[Math.min(dayIndex, days.length - 1)];
 
   return (
