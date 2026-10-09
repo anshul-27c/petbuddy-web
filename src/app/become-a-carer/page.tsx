@@ -215,6 +215,11 @@ export default function BecomeACarerPage() {
               ) : (
                 <p>Once every step is done, send it from the app and it goes for review.</p>
               )}
+              {hasFee ? (
+                <p className="text-sm">
+                  If your application isn’t approved, we refund the {fee ?? "fee"} in full, to the way you paid.
+                </p>
+              ) : null}
             </JoinStep>
             <JoinStep n={6} last icon={<Package />} title="Order your starter kit (optional)">
               <p>
@@ -282,7 +287,8 @@ export default function BecomeACarerPage() {
             {hasFee ? (
               <Question q="Is there a fee to join?">
                 A one-time {fee ? `${fee} ` : ""}registration fee, paid in the app when you send your application. You
-                pay it once, never again for a resubmission, and there is no subscription.
+                pay it once, never again for a resubmission, and there is no subscription. If your application isn’t
+                approved, we refund it in full.
               </Question>
             ) : null}
             <Question q="Do I have to accept every request?">
