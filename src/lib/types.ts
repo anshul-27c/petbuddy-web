@@ -46,7 +46,7 @@ export type PaymentStatus =
   | "partiallyRefunded"
   | "refunded"
   | "failed";
-export type PaymentPurpose = "booking" | "tip" | "order" | "starterKit";
+export type PaymentPurpose = "booking" | "tip" | "order" | "starterKit" | "registrationFee";
 export type OrderStatus =
   | "placed"
   | "packed"
@@ -209,6 +209,8 @@ export interface PublicConfig {
   lateCancelFeePercent: number;
   minWithdrawalPaise: number;
   starterKitPricePaise: number;
+  /** The one-time carer registration fee; 0 when there is none. Older APIs leave it out. */
+  registrationFeePaise?: number;
   requestWindowMinutes: number;
   paymentProvider: "mock" | "razorpay";
   razorpayKeyId: string | null;

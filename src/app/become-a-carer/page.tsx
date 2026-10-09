@@ -11,6 +11,7 @@ import {
   Package,
   PhoneOff,
   Plus,
+  ReceiptIndianRupee,
   Siren,
   Smartphone,
   Wallet,
@@ -99,6 +100,10 @@ export default function BecomeACarerPage() {
   const commission = config ? `${config.commissionPercent}%` : null;
   const minWithdrawal = config ? formatMoney(config.minWithdrawalPaise) : null;
   const kitPrice = config ? formatMoney(config.starterKitPricePaise) : null;
+  // Unknown while the config loads; zero when there is no fee to pay.
+  const feePaise = config ? (config.registrationFeePaise ?? 0) : null;
+  const fee = feePaise ? formatMoney(feePaise) : null;
+  const hasFee = feePaise !== 0;
 
   return (
     <>
@@ -167,7 +172,7 @@ export default function BecomeACarerPage() {
                 id="join-title"
                 eyebrow="Joining"
                 title="How to join"
-                subtitle="Five steps, all in the app. Everything saves as you go, so you can stop and come back."
+                subtitle="Six steps, all in the app. Everything saves as you go, so you can stop and come back."
               />
             </div>
           </div>
@@ -196,7 +201,22 @@ export default function BecomeACarerPage() {
             <JoinStep n={4} icon={<Landmark />} title="Add where to pay you">
               <p>A UPI ID or a bank account. Only the last four digits of an account number are ever shown back.</p>
             </JoinStep>
-            <JoinStep n={5} last icon={<Package />} title="Order your starter kit (optional)">
+            <JoinStep
+              n={5}
+              icon={<ReceiptIndianRupee />}
+              title={hasFee ? "Pay the registration fee and send it in" : "Send your application"}
+            >
+              {hasFee ? (
+                <p>
+                  Once every step is done, pay the one-time {fee ? `${fee} ` : ""}registration fee in the app and your
+                  application goes for review. You pay it once: if anything needs fixing, you send it again without
+                  paying again.
+                </p>
+              ) : (
+                <p>Once every step is done, send it from the app and it goes for review.</p>
+              )}
+            </JoinStep>
+            <JoinStep n={6} last icon={<Package />} title="Order your starter kit (optional)">
               <p>
                 A printed PetBuddy ID card and two wristbands, posted to you. Owners recognise the card at the door.
               </p>
@@ -259,6 +279,12 @@ export default function BecomeACarerPage() {
             <Question q="When can I start taking bookings?">
               Once your verification is approved. Go online in the app and requests near you start arriving.
             </Question>
+            {hasFee ? (
+              <Question q="Is there a fee to join?">
+                A one-time {fee ? `${fee} ` : ""}registration fee, paid in the app when you send your application. You
+                pay it once, never again for a resubmission, and there is no subscription.
+              </Question>
+            ) : null}
             <Question q="Do I have to accept every request?">
               No. You choose which requests to accept. A request you do not answer in time goes back to the owner
               with a full refund.
