@@ -1,7 +1,11 @@
 /**
  * The hosted checkout path, used when `/config` reports `paymentProvider: "razorpay"`.
  * Everything specific to that provider lives in this file.
- * Not yet exercised against a live key.
+ *
+ * The server opens the order (pinning the amount) and hands over the
+ * publishable key; the checkout's payment id, order id and signature go back
+ * with whatever is being bought, and the server verifies them before it
+ * accepts the payment. Switching the gateway on is a server setting only.
  */
 import { api, ApiError } from "../api";
 import type { PaymentMethod, PaymentProof, PaymentPurpose, PublicConfig } from "../types";
@@ -26,8 +30,9 @@ interface CheckoutOptions {
   currency: "INR";
   name: string;
   description: string;
-  prefill?: { method?: PaymentMethod };
+  prefill?: { method?: PaymentMethod; contact?: string; name?: string };
   theme?: { color: string };
+  retry?: { enabled: boolean; max_count?: number };
   handler: (response: CheckoutSuccess) => void;
   modal?: { ondismiss?: () => void; escape?: boolean };
 }
@@ -68,9 +73,16 @@ function loadCheckout(): Promise<void> {
   return scriptPromise;
 }
 
+/** Who is paying, so the sheet doesn't ask again. */
+export interface Payer {
+  phone?: string | null;
+  name?: string | null;
+}
+
 export async function payWithHostedCheckout(
   request: { amountPaise: number; purpose: PaymentPurpose; description: string; method: PaymentMethod },
   config: PublicConfig,
+  payer: Payer = {},
 ): Promise<PaymentProof> {
   const order = await api.payments.createOrder({
     purpose: request.purpose,
@@ -98,8 +110,13 @@ export async function payWithHostedCheckout(
       currency: "INR",
       name: "PetBuddy",
       description: request.description,
-      prefill: { method: request.method },
+      prefill: {
+        method: request.method,
+        ...(payer.phone ? { contact: `+91${payer.phone}` } : {}),
+        ...(payer.name ? { name: payer.name } : {}),
+      },
       theme: { color: "#5170FF" },
+      retry: { enabled: true, max_count: 3 },
       handler: (response) =>
         resolve({
           id: response.razorpay_payment_id,

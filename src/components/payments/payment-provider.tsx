@@ -3,6 +3,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { ShieldCheck } from "lucide-react";
 import { createContext, useCallback, useContext, useRef, useState, type ReactNode } from "react";
+import { useAuth } from "@/components/auth/auth-provider";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { METHOD_ICONS } from "@/components/ui/icons";
@@ -44,6 +45,7 @@ interface Pending {
  */
 export function PaymentProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [pending, setPending] = useState<Pending | null>(null);
   const pendingRef = useRef<Pending | null>(null);
 
@@ -56,7 +58,7 @@ export function PaymentProvider({ children }: { children: ReactNode }) {
     async (request) => {
       const config = await queryClient.fetchQuery(configQuery);
       if (config.paymentProvider === "razorpay") {
-        return payWithHostedCheckout(request, config);
+        return payWithHostedCheckout(request, config, { phone: user?.phone, name: user?.name });
       }
       // Test mode: a dialog stands in for the payment sheet.
       pendingRef.current?.reject(new PaymentCancelledError());
@@ -64,7 +66,7 @@ export function PaymentProvider({ children }: { children: ReactNode }) {
         settle({ request, resolve, reject });
       });
     },
-    [queryClient, settle],
+    [queryClient, settle, user],
   );
 
   const cancel = () => {
