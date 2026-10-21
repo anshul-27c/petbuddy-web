@@ -1,10 +1,9 @@
 import {
   BOOKING_STATUS_LABELS,
-  ORDER_STATUS_LABELS,
   PAYMENT_STATUS_LABELS,
 } from "@/lib/labels";
 import type { ReactNode } from "react";
-import type { BookingStatus, OrderStatus, PaymentStatus } from "@/lib/types";
+import type { BookingStatus, PaymentStatus } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 export type PillTone = "amber" | "leash" | "trail" | "alert" | "muted";
@@ -32,16 +31,6 @@ const PAYMENT_TONES: Record<PaymentStatus, PillTone> = {
   failed: "alert",
   refunded: "muted",
   partiallyRefunded: "muted",
-};
-
-// Order statuses are not in the shared pill table; they follow the booking
-// lifecycle they resemble (placed ~ requested, packed/shipped ~ confirmed).
-const ORDER_TONES: Record<OrderStatus, PillTone> = {
-  placed: "amber",
-  packed: "leash",
-  shipped: "leash",
-  delivered: "trail",
-  cancelled: "alert",
 };
 
 /** A status in a soft tinted capsule. `live` adds a pulsing ring to the dot. */
@@ -86,14 +75,6 @@ export function PaymentStatusPill({ status, className }: { status: PaymentStatus
   return (
     <Pill tone={PAYMENT_TONES[status]} className={className}>
       {PAYMENT_STATUS_LABELS[status]}
-    </Pill>
-  );
-}
-
-export function OrderStatusPill({ status, className }: { status: OrderStatus; className?: string }) {
-  return (
-    <Pill tone={ORDER_TONES[status]} className={className}>
-      {ORDER_STATUS_LABELS[status]}
     </Pill>
   );
 }

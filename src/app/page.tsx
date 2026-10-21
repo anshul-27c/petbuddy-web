@@ -1,13 +1,12 @@
 "use client";
 
-import { MapPinned, RotateCcw, Search, ShieldCheck, Truck } from "lucide-react";
+import { MapPinned, RotateCcw, Search, ShieldCheck } from "lucide-react";
 import { CarerBand } from "@/components/home/carer-band";
 import { HeroVisual } from "@/components/home/hero-visual";
 import { HowItWorks } from "@/components/home/how-it-works";
 import { NearbyRail } from "@/components/home/nearby-rail";
 import { NextBooking } from "@/components/home/next-booking";
 import { ServicesGrid } from "@/components/home/services-grid";
-import { StoreTeaser } from "@/components/home/store-teaser";
 import { TrustBento } from "@/components/home/trust-bento";
 import { Container } from "@/components/layout/container";
 import { PageTitle } from "@/components/layout/page-title";
@@ -126,28 +125,6 @@ export default function HomePage() {
             }
           />
           <NearbyRail />
-        </section>
-
-        <section aria-labelledby="store-title">
-          <SectionHeader
-            landing
-            id="store-title"
-            eyebrow={
-              <>
-                <Truck className="size-4" aria-hidden />
-                Delivered to your door
-              </>
-            }
-            title="The PetBuddy store"
-            subtitle="Food and treats, toys, grooming kits and everyday gear, picked for pets like yours."
-            // Short, like the carers rail's, so it keeps its place beside the title on a phone.
-            action={
-              <SectionLink href="/store" label="See the whole store">
-                See all
-              </SectionLink>
-            }
-          />
-          <StoreTeaser />
         </section>
 
         <CarerBand />

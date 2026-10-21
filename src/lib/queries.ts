@@ -67,17 +67,3 @@ export function useAddresses() {
     enabled: status === "signedIn",
   });
 }
-
-export function useCartLines() {
-  const { status } = useAuth();
-  return useQuery({ queryKey: qk.cart, queryFn: api.store.cart, enabled: status === "signedIn" });
-}
-
-export function useCartSummary() {
-  const { status } = useAuth();
-  return useQuery({
-    queryKey: qk.cartSummary,
-    queryFn: api.store.cartSummary,
-    enabled: status === "signedIn",
-  });
-}

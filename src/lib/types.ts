@@ -38,7 +38,6 @@ export type TimelineKind =
   | "note"
   | "finished"
   | "cancelled";
-export type ProductCategory = "food" | "toys" | "grooming" | "health" | "gear";
 export type PaymentMethod = "upi" | "card" | "netbanking";
 export type PaymentStatus =
   | "created"
@@ -46,13 +45,7 @@ export type PaymentStatus =
   | "partiallyRefunded"
   | "refunded"
   | "failed";
-export type PaymentPurpose = "booking" | "tip" | "order" | "starterKit" | "registrationFee";
-export type OrderStatus =
-  | "placed"
-  | "packed"
-  | "shipped"
-  | "delivered"
-  | "cancelled";
+export type PaymentPurpose = "booking" | "tip" | "starterKit" | "registrationFee";
 export type Actor = "owner" | "earner" | "admin" | "system";
 export type EarnerSort =
   | "recommended"
@@ -416,64 +409,6 @@ export interface ChatThread {
   unread: number;
   maskedPhone: string; // "987654••••"
   messages: ChatMessage[];
-}
-
-// ---- Store ---------------------------------------------------------------
-
-export interface Product {
-  id: string;
-  name: string;
-  brand: string;
-  category: ProductCategory;
-  pricePaise: number;
-  mrpPaise: number | null;
-  rating: number;
-  reviewCount: number;
-  imageUrl: string | null;
-  inStock: boolean;
-  blurb: string;
-}
-
-export interface CartLine {
-  product: Product;
-  quantity: number;
-}
-
-export interface CartSummary {
-  lines: CartLine[];
-  itemCount: number;
-  subtotalPaise: number;
-  deliveryFeePaise: number;
-  totalPaise: number;
-}
-
-export interface OrderItem {
-  productId: string;
-  name: string;
-  brand: string;
-  imageUrl: string | null;
-  pricePaise: number;
-  quantity: number;
-  totalPaise: number;
-}
-
-export interface Order {
-  id: string;
-  code: string;
-  status: OrderStatus;
-  items: OrderItem[];
-  subtotalPaise: number;
-  deliveryFeePaise: number;
-  totalPaise: number;
-  address: Address;
-  paymentStatus: PaymentStatus;
-  placedAt: string;
-  deliveredAt: string | null;
-}
-
-export interface OrderInput {
-  addressId?: string;
-  payment: PaymentProof;
 }
 
 // ---- Payments and notifications -----------------------------------------

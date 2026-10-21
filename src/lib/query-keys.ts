@@ -1,4 +1,4 @@
-import type { BookingScope, EarnerFilters, ProductCategory, ServiceKey } from "./types";
+import type { BookingScope, EarnerFilters, ServiceKey } from "./types";
 
 /**
  * Query keys, arranged so a prefix invalidates a whole family
@@ -31,16 +31,6 @@ export const qk = {
   chatsAll: ["chats"] as const,
   chats: ["chats", "list"] as const,
   chat: (id: string) => ["chats", "detail", id] as const,
-
-  products: (category: ProductCategory | null, q: string) =>
-    ["products", category ?? "all", q] as const,
-  cartAll: ["cart"] as const,
-  cart: ["cart", "lines"] as const,
-  cartSummary: ["cart", "summary"] as const,
-
-  ordersAll: ["orders"] as const,
-  orders: ["orders", "list"] as const,
-  order: (id: string) => ["orders", "detail", id] as const,
 
   notifications: ["notifications"] as const,
 };

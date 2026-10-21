@@ -16,13 +16,6 @@ const COLUMNS = [
     ],
   },
   {
-    title: "Store",
-    links: [
-      { href: "/store", label: "Pet store" },
-      { href: "/orders", label: "Your orders" },
-    ],
-  },
-  {
     title: "PetBuddy",
     links: [
       { href: "/become-a-carer", label: "Become a carer" },
@@ -45,7 +38,7 @@ export function SiteFooter() {
             Vetted carers for walks, sitting, boarding, grooming and vet visits, close to home.
           </p>
         </div>
-        <div className="grid grid-cols-3 gap-4 sm:gap-6">
+        <div className="grid grid-cols-2 gap-4 sm:gap-6">
           {COLUMNS.map((column) => (
             <nav key={column.title} aria-label={column.title} className="min-w-0">
               <h2 className="text-sm font-bold text-ink">{column.title}</h2>

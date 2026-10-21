@@ -1,14 +1,11 @@
 import {
   Bird,
-  Bone,
   Cat,
   CreditCard,
   Dog,
   Footprints,
-  HeartPulse,
   House,
   Landmark,
-  Link2,
   PawPrint,
   Pill,
   Rabbit,
@@ -17,10 +14,9 @@ import {
   Smartphone,
   Sofa,
   Stethoscope,
-  ToyBrick,
   type LucideIcon,
 } from "lucide-react";
-import type { PaymentMethod, PetSpecies, ProductCategory, ServiceKey } from "@/lib/types";
+import type { PaymentMethod, PetSpecies, ServiceKey } from "@/lib/types";
 
 export const SERVICE_ICONS: Record<ServiceKey, LucideIcon> = {
   walking: Footprints,
@@ -40,14 +36,6 @@ export const SPECIES_ICONS: Record<PetSpecies, LucideIcon> = {
   other: PawPrint,
 };
 
-export const CATEGORY_ICONS: Record<ProductCategory, LucideIcon> = {
-  food: Bone,
-  toys: ToyBrick,
-  grooming: Scissors,
-  health: HeartPulse,
-  gear: Link2,
-};
-
 export const METHOD_ICONS: Record<PaymentMethod, LucideIcon> = {
   upi: Smartphone,
   card: CreditCard,
@@ -61,10 +49,5 @@ export function ServiceIcon({ service, className }: { service: ServiceKey; class
 
 export function SpeciesIcon({ species, className }: { species: PetSpecies; className?: string }) {
   const Icon = SPECIES_ICONS[species] ?? PawPrint;
-  return <Icon className={className} aria-hidden />;
-}
-
-export function CategoryIcon({ category, className }: { category: ProductCategory; className?: string }) {
-  const Icon = CATEGORY_ICONS[category] ?? PawPrint;
   return <Icon className={className} aria-hidden />;
 }

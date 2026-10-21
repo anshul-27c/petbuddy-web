@@ -195,7 +195,7 @@ const dateFormat = new Intl.DateTimeFormat(LOCALE, {
 });
 
 /** "14 Sept 2026" */
-export function formatDate(iso: string | Date): string {
+function formatDate(iso: string | Date): string {
   return dateFormat.format(new Date(iso));
 }
 

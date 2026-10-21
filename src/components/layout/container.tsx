@@ -30,30 +30,24 @@ export function Container({
 
 /**
  * The top of a content page: 24 / 40 px from the header to the title, and
- * 24 / 32 px from the title block to the first section. With `back`, the back
- * link takes the top slot and its text sits where the title would have.
+ * 24 / 32 px from the title block to the first section.
  */
 export function PageHeader({
   title,
   subtitle,
   action,
-  back,
   meta,
   className,
 }: {
   title: ReactNode;
   subtitle?: ReactNode;
   action?: ReactNode;
-  back?: ReactNode;
   /** A slot beside the title, such as a status pill. */
   meta?: ReactNode;
   className?: string;
 }) {
   return (
-    // The back link is a 44 px target whose text sits 12 px inside it, so the
-    // slot starts 12 px higher (12 / 28) to put that text at the usual 24 / 40.
-    <header className={cn("pb-6 sm:pb-8", back ? "pt-3 sm:pt-7" : "pt-6 sm:pt-10", className)}>
-      {back ? <div className="mb-1">{back}</div> : null}
+    <header className={cn("pt-6 pb-6 sm:pt-10 sm:pb-8", className)}>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
@@ -70,7 +64,7 @@ export function PageHeader({
 }
 
 /** "← All carers": the way back up from a detail page. */
-export function BackLink({ href, children }: { href: string; children: ReactNode }) {
+function BackLink({ href, children }: { href: string; children: ReactNode }) {
   return (
     <Link
       href={href}

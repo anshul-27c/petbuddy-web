@@ -5,7 +5,6 @@ import { useState, type ReactNode } from "react";
 import { AuthProvider } from "@/components/auth/auth-provider";
 import { PaymentProvider } from "@/components/payments/payment-provider";
 import { RealtimeProvider } from "@/components/realtime/realtime-provider";
-import { CartDrawerProvider } from "@/components/store/cart-drawer";
 import { ToastProvider } from "@/components/ui/toast";
 import { isApiError } from "@/lib/api";
 
@@ -34,9 +33,7 @@ export function Providers({ children }: { children: ReactNode }) {
       <ToastProvider>
         <AuthProvider>
           <RealtimeProvider>
-            <PaymentProvider>
-              <CartDrawerProvider>{children}</CartDrawerProvider>
-            </PaymentProvider>
+            <PaymentProvider>{children}</PaymentProvider>
           </RealtimeProvider>
         </AuthProvider>
       </ToastProvider>

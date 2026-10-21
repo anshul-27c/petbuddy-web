@@ -12,8 +12,6 @@ import type {
   Booking,
   BookingInput,
   BookingScope,
-  CartLine,
-  CartSummary,
   ChatThread,
   DayAvailability,
   Earner,
@@ -22,8 +20,6 @@ import type {
   MeResponse,
   Notification,
   NotificationMeta,
-  Order,
-  OrderInput,
   OtpSent,
   Paginated,
   PageMeta,
@@ -32,8 +28,6 @@ import type {
   Pet,
   PetInput,
   PriceBreakdown,
-  Product,
-  ProductCategory,
   ProfileInput,
   PublicConfig,
   QuoteInput,
@@ -289,18 +283,6 @@ export const api = {
     send: (threadId: string, text: string) =>
       request<ChatThread>("POST", `/chats/${id(threadId)}/messages`, { body: { text } }),
     markRead: (threadId: string) => request<null>("POST", `/chats/${id(threadId)}/read`),
-  },
-
-  store: {
-    products: (params: { category?: ProductCategory; q?: string } = {}) =>
-      request<Product[]>("GET", "/products", { query: params }),
-    cart: () => request<CartLine[]>("GET", "/cart"),
-    cartSummary: () => request<CartSummary>("GET", "/cart/summary"),
-    setQuantity: (productId: string, quantity: number) =>
-      request<CartLine[]>("PUT", `/cart/${id(productId)}`, { body: { quantity } }),
-    placeOrder: (input: OrderInput) => request<Order>("POST", "/orders", { body: input }),
-    orders: () => request<Order[]>("GET", "/orders"),
-    order: (orderId: string) => request<Order>("GET", `/orders/${id(orderId)}`),
   },
 
   payments: {

@@ -18,7 +18,7 @@ export type ButtonSize = "sm" | "md" | "lg";
 const VARIANTS: Record<ButtonVariant, string> = {
   // White text needs the deeper blue for 4.5:1; the brighter leash stays for icons, rings and fills without text.
   primary: "bg-leash-dark text-surface shadow-cta hover:brightness-90 active:brightness-85",
-  // Money moments only: "Book and pay", "Place order", "Pay". Set large and bold
+  // Money moments only: "Book and pay", "Pay". Set large and bold
   // so white on the accent meets the large-text contrast ratio.
   accent: "bg-tail text-surface shadow-cta-accent hover:brightness-95 active:brightness-90",
   tonal: "bg-sky text-leash-dark hover:bg-leash-tint active:bg-leash-tint",

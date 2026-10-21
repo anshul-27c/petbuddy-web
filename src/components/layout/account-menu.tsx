@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, Heart, LogOut, MapPin, Package, PawPrint, UserRound } from "lucide-react";
+import { ChevronDown, Heart, LogOut, MapPin, PawPrint, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/components/auth/auth-provider";
 import { Avatar } from "@/components/ui/avatar";
@@ -13,7 +13,6 @@ export const ACCOUNT_LINKS = [
   { href: "/account/pets", label: "Pets", icon: PawPrint },
   { href: "/account/addresses", label: "Addresses", icon: MapPin },
   { href: "/account/favourites", label: "Favourites", icon: Heart },
-  { href: "/orders", label: "Store orders", icon: Package },
 ] as const;
 
 export function useSignOutAndLeave() {

@@ -1,8 +1,8 @@
 # petbuddy-web
 
 The pet-owner website for PetBuddy: find a vetted carer, book and pay for a
-visit, follow it live, chat with the carer, and shop the pet store. Carers
-use the PetBuddy app; the website only explains how to join.
+visit, follow it live and chat with the carer. Carers use the PetBuddy app;
+the website only explains how to join.
 
 Built with Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4,
 TanStack Query v5 and lucide-react. Everything that touches data renders in
@@ -59,10 +59,9 @@ Public:
 
 | Path | What it shows |
 |---|---|
-| `/` | Hero, services with starting prices, how it works, trust and safety, carers near you, store teaser, carer sign-up band |
+| `/` | Hero, services with starting prices, how it works, trust and safety, carers near you, carer sign-up band |
 | `/carers` | Search, filter chips, service picker, sort and favourites-only (signed in); filters live in the URL |
 | `/carers/[id]` | Carer profile: trust signals, about, services and prices, 14-day availability, reviews with a paginated "all reviews" dialog, sticky Book button |
-| `/store` | Products with category chips and search, basket controls, basket drawer |
 | `/become-a-carer` | How carers join in the app: verification, starter kit, payouts |
 | `/login` | Phone number, then a six-digit code; returns to `?next=` |
 
@@ -74,8 +73,6 @@ Signed in (a visitor who is signed out is sent to `/login?next=…`):
 | `/bookings` | Upcoming (soonest pinned) and past (`?tab=past`) |
 | `/bookings/[id]` | Status and next steps, live panel with map and SOS while the carer is on the way or with your pet, carer contact, timeline, price, cancel, reschedule and rate. `?confirmed=1` shows the success banner |
 | `/messages`, `/messages/[id]` | Conversations and a thread (refreshed every few seconds) |
-| `/store/checkout` | Delivery address, order summary, payment |
-| `/orders`, `/orders/[id]` | Store orders and their progress |
 | `/account` | Profile, sign out, delete account |
 | `/account/pets`, `/account/addresses`, `/account/favourites` | Manage pets, addresses and saved carers |
 
@@ -89,7 +86,7 @@ src/
     layout/             header, footer, menus, page title
     auth/               token-backed auth provider, route guard, OTP boxes
     booking/            booking flow, detail panels, dialogs, live map
-    carers/ store/ chat/ pets/ addresses/ home/ account/ payments/
+    carers/ chat/ pets/ addresses/ home/ account/ payments/
   lib/
     api.ts              the one API client, typed per endpoint
     types.ts            shapes copied from the API contract
@@ -97,7 +94,7 @@ src/
     validation.ts       form rules that mirror the API validators (tested in validation.test.ts)
     use-field-errors.ts field errors, focus on the first invalid field, 422 mapping
     labels.ts           sentence-case labels for every enum
-    queries.ts          shared queries (config, services, pets, addresses, cart)
+    queries.ts          shared queries (config, services, pets, addresses)
     query-keys.ts       TanStack Query keys, grouped for invalidation
     payments/           cancellation error and the hosted checkout module
 ```

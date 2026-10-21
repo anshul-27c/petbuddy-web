@@ -8,7 +8,7 @@ import { Container, PageHeader } from "@/components/layout/container";
 import { cn } from "@/lib/utils";
 
 /**
- * The account sections (the same five, with the same names, as the account
+ * The account sections (the same four, with the same names, as the account
  * menu in the header): a sideways-scrolling row of pills on phones and
  * tablets, a list down the side from 1024 px.
  */
@@ -18,7 +18,7 @@ export function AccountNav() {
     <nav aria-label="Account">
       <ul className="rail gap-2 lg:sticky lg:top-24 lg:mx-0 lg:flex-col lg:gap-1 lg:overflow-visible lg:px-0">
         {ACCOUNT_LINKS.map(({ href, label, icon: Icon }) => {
-          const active = href === "/orders" ? pathname.startsWith("/orders") : pathname === href;
+          const active = pathname === href;
           return (
             <li key={href} className="shrink-0">
               <Link

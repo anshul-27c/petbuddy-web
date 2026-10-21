@@ -35,7 +35,6 @@ export const LIMITS = {
   reviewText: 1000,
   chatMessage: 2000,
   search: 80,
-  cartQuantity: 20,
 } as const;
 
 // ---- Phone and code --------------------------------------------------------

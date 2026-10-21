@@ -1,12 +1,10 @@
 "use client";
 
-import { LogOut, Menu, ShoppingBag, X } from "lucide-react";
+import { LogOut, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { loginHref, useAuth } from "@/components/auth/auth-provider";
-import { useCartDrawer } from "@/components/store/cart-drawer";
-import { useCartQuantities } from "@/components/store/use-cart";
 import { ButtonLink } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -49,26 +47,6 @@ function NavLink({ item, pathname, className }: { item: NavItem; pathname: strin
   );
 }
 
-function CartButton() {
-  const { openCart } = useCartDrawer();
-  const { count } = useCartQuantities();
-  return (
-    <button
-      type="button"
-      onClick={openCart}
-      className="relative inline-flex size-11 items-center justify-center rounded-full text-ink transition duration-150 hover:bg-canvas active:scale-95"
-      aria-label={count > 0 ? `Basket, ${count} ${count === 1 ? "item" : "items"}` : "Basket"}
-    >
-      <ShoppingBag className="size-5" aria-hidden />
-      {count > 0 ? (
-        <span className="absolute top-0 right-0 inline-flex h-5 min-w-5 animate-pop-in items-center justify-center rounded-full bg-leash-dark px-1 text-xs font-bold text-surface ring-2 ring-surface">
-          {count > 99 ? "99+" : count}
-        </span>
-      ) : null}
-    </button>
-  );
-}
-
 export function SiteHeader() {
   const { status } = useAuth();
   const pathname = usePathname();
@@ -87,13 +65,11 @@ export function SiteHeader() {
   const nav: NavItem[] = signedIn
     ? [
         { href: "/carers", label: "Find carers" },
-        { href: "/store", label: "Store" },
         { href: "/bookings", label: "Bookings" },
         { href: "/messages", label: "Messages", dot: unread > 0 },
       ]
     : [
         { href: "/carers", label: "Find carers" },
-        { href: "/store", label: "Store" },
         { href: "/become-a-carer", label: "Become a carer" },
       ];
 
@@ -120,7 +96,6 @@ export function SiteHeader() {
           ) : signedIn ? (
             <>
               <NotificationsMenu />
-              <CartButton />
               <div className="hidden md:block">
                 <AccountMenu />
               </div>

@@ -14,16 +14,16 @@ import { cn } from "@/lib/utils";
 import { useNotifications } from "./use-activity";
 
 function routeFor(notification: Notification): string | null {
-  const { bookingId, threadId, orderId } = notification.data ?? {};
+  const { bookingId, threadId } = notification.data ?? {};
   if (threadId) return `/messages/${threadId}`;
   if (bookingId) return `/bookings/${bookingId}`;
-  if (orderId) return `/orders/${orderId}`;
   return null;
 }
 
 function KindIcon({ kind }: { kind: Notification["kind"] }) {
   const className = "size-4";
   if (kind === "chat") return <MessageCircle className={className} aria-hidden />;
+  // The store has closed; this keeps old order notifications readable.
   if (kind === "order") return <Package className={className} aria-hidden />;
   if (kind === "booking") return <CalendarCheck className={className} aria-hidden />;
   return <Sparkles className={className} aria-hidden />;

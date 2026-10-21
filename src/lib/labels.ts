@@ -9,13 +9,11 @@ import type {
   BookingStatus,
   Earner,
   EarnerSort,
-  OrderStatus,
   PaymentMethod,
   PaymentStatus,
   Pet,
   PetSpecies,
   PetTemperament,
-  ProductCategory,
   Service,
   ServiceKey,
   TimelineKind,
@@ -129,14 +127,6 @@ export const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {
   failed: "Payment failed",
 };
 
-export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
-  placed: "Placed",
-  packed: "Packed",
-  shipped: "Shipped",
-  delivered: "Delivered",
-  cancelled: "Cancelled",
-};
-
 export const TIMELINE_LABELS: Record<TimelineKind, string> = {
   booked: "Booking placed",
   confirmed: "Carer confirmed",
@@ -173,16 +163,6 @@ export const TEMPERAMENT_ORDER: PetTemperament[] = [
   "anxious",
   "reactive",
 ];
-
-export const CATEGORY_LABELS: Record<ProductCategory, string> = {
-  food: "Food & treats",
-  toys: "Toys",
-  grooming: "Grooming",
-  health: "Health",
-  gear: "Collars & leashes",
-};
-
-export const CATEGORY_ORDER: ProductCategory[] = ["food", "toys", "grooming", "health", "gear"];
 
 export const PAYMENT_METHODS: { value: PaymentMethod; label: string; blurb: string }[] = [
   { value: "upi", label: "UPI", blurb: "Pay with any UPI app" },
